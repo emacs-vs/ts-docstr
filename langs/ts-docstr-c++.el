@@ -1,4 +1,4 @@
-;;; ts-docstr-c.el --- Document string for C  -*- lexical-binding: t; -*-
+;;; ts-docstr-c++.el --- Document string for C++  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Shen, Jen-Chieh
 
@@ -19,24 +19,24 @@
 
 ;;; Commentary:
 ;;
-;; Document string for C.
+;; Document string for C++.
 ;;
 
 ;;; Code:
 
 (require 'ts-docstr)
 
-(defcustom ts-docstr-c-style nil
+(defcustom ts-docstr-c++-style nil
   "Style specification for document string in C."
   :type '(choice (const :tag "No specify" nil))
   :group 'docstr)
 
-(defcustom ts-docstr-c-format "{v} {d}"
+(defcustom ts-docstr-c++-format "{v} {d}"
   ""
   :type 'string
   :group 'docstr)
 
-(defmacro ts-docstr-c--narrow-region (&rest body)
+(defmacro ts-docstr-c++--narrow-region (&rest body)
   "Narrow region to class/struct/function declaration."
   (declare (indent 0))
   `(save-restriction
@@ -44,9 +44,9 @@
      ,@body))
 
 ;;;###autoload
-(defun ts-docstr-c-activate ()
+(defun ts-docstr-c++-activate ()
   "Return t if we are able to add document string at this point."
-  (ts-docstr-c--narrow-region
+  (ts-docstr-c++--narrow-region
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_specifier
                                                    struct_specifier
                                                    enum_specifier
@@ -58,7 +58,7 @@
             (t (nth 0 nodes))))))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-c--parse-return ()
+(defun ts-docstr-c++--parse-return ()
   "Return t if function does have return value."
   (let* ((nodes-fd (ts-docstr-grab-nodes-in-range '(function_declarator)))
          (node-fd (nth 0 nodes-fd))
@@ -73,9 +73,9 @@
     return))
 
 ;;;###autoload
-(defun ts-docstr-c-parse ()
-  "Parse declaration for C."
-  (ts-docstr-c--narrow-region
+(defun ts-docstr-c++-parse ()
+  "Parse declaration for C++."
+  (ts-docstr-c++--narrow-region
     (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
                 (param (nth 0 params)))
       (if (<= 2 (length params))
@@ -96,12 +96,14 @@
                       (setf (nth last types)
                             (concat (nth last types) (tsc-node-text node)))))))))
            param)
-          `(:type ,types :variables ,variables :return ,(ts-docstr-c--parse-return)))))))
+          `(:type ,types :variables ,variables :return ,(ts-docstr-c++--parse-return)))))))
 
 ;;;###autoload
-(defun ts-docstr-c-insert (node data)
+(defun ts-docstr-c++-insert (node data)
   "Insert document string upon NODE and DATA."
+  (message "node; %s" node)
+  (message "data; %s" data)
   )
 
-(provide 'ts-docstr-c)
-;;; ts-docstr-c.el ends here
+(provide 'ts-docstr-c++)
+;;; ts-docstr-c++.el ends here

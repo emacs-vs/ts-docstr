@@ -32,6 +32,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'pcase)
 (require 'subr-x)
 
 (require 'list-utils)
@@ -61,6 +62,36 @@
 (defcustom ts-docstr-default-typename "[type]"
   "Placeholder string for unknown type description."
   :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-before-activate-hook nil
+  "Hooks run before inserting document string."
+  :type 'hook
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-after-activate-hook nil
+  "Hooks run after inserting document string."
+  :type 'hook
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-before-parse-hook nil
+  "Hooks run before inserting document string."
+  :type 'hook
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-after-parse-hook nil
+  "Hooks run after inserting document string."
+  :type 'hook
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-before-insert-hook nil
+  "Hooks run before inserting document string."
+  :type 'hook
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-after-insert-hook nil
+  "Hooks run after inserting document string."
+  :type 'hook
   :group 'ts-docstr)
 
 ;;
@@ -112,7 +143,7 @@
        (progn ,@body)
      (user-error "Ignored, tree-sitter-mode is not enabled in the current buffer")))
 
-(defun ts-docstr-leaf (node)
+(defun ts-docstr-leaf-p (node)
   "Return t if NODE is leaf node."
   (zerop (tsc-count-children node)))
 
@@ -167,13 +198,37 @@ node from the root."
   (when-let ((module (asoc-get ts-docstr-module-alist major-mode)))
     (require module nil t)))
 
+(defun ts-docstr--module-funcall (module event &rest args)
+  "Call for each events."
+  (let ((event-name (intern (format "%s-%s" module event)))
+        (before-hook (intern (format "ts-docstr-before-%s-hook" event)))
+        (after-hook (intern (format "ts-docstr-after-%s-hook" event)))
+        (before-module-hook (intern (format "%s-before-%s-hook" module event)))
+        (after-module-hook (intern (format "%s-after-%s-hook" module event)))
+        (result))
+    (apply #'run-hook-with-args (list before-hook))  ; before has no arguments
+    (apply #'run-hook-with-args (list before-module-hook))  ; before has no arguments
+    (setq result (pcase event
+                   ("insert" (apply event-name args))
+                   (_ (funcall event-name))))
+    (apply #'run-hook-with-args (append (list after-hook) args))
+    (apply #'run-hook-with-args (append (list after-module-hook) args))
+    result))
+
+(defun ts-docstr--process-events (module)
+  "Process MODULE events, this entire process to add document string."
+  (when-let ((node (ts-docstr--module-funcall module "activate"))
+             (data (ts-docstr--module-funcall module "parse")))
+    (ts-docstr--module-funcall module "insert" node data)))
+
 ;;;###autoload
 (defun ts-docstr-at-point ()
   "Add document string at point."
   (interactive)
   (ts-docstr--ensure-ts
-
-    ))
+    (if-let ((module (ts-docstr--require-module)))
+        (ts-docstr--process-events module)
+      (user-error "Language is either not supported or WIP... %s" major-mode))))
 
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here
