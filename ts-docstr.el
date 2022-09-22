@@ -31,6 +31,8 @@
 
 ;;; Code:
 
+(require 'subr-x)
+
 (require 's)
 (require 'tree-sitter)
 
@@ -38,6 +40,55 @@
   "A document string minor mode using tree-sitter."
   :group 'tree-sitter
   :prefix "ts-docstr-")
+
+;;
+;; (@* "Entry" )
+;;
+
+(defun ts-docstr--enable ()
+  "Enable `ts-docstr' in current buffer."
+  )
+
+(defun ts-docstr--disable ()
+  "Disable `ts-docstr' in current buffer."
+  )
+
+;;;###autoload
+(define-minor-mode ts-docstr-mode
+  "Minor mode `ts-docstr-mode'."
+  :lighter " DocStr"
+  :group docstr
+  (if ts-docstr-mode (ts-docstr--enable) (ts-docstr--disable)))
+
+(defun ts-docstr--turn-on-docstr-mode ()
+  "Turn on the `ts-docstr-mode'."
+  (ts-docstr-mode 1))
+
+;;;###autoload
+(define-globalized-minor-mode global-ts-docstr-mode
+  ts-docstr-mode ts-docstr--turn-on-docstr-mode
+  :require 'ts-docstr)
+
+;;
+;; (@* "Core" )
+;;
+
+(defcustom ts-docstr-parsers-alist
+  `((c-mode . ts-docstr-c))
+  ""
+  :type '(alist key-type symbol))
+
+(defun ts-docstr--require-module ()
+  "Require LANG module."
+  (when-let ((module (asoc-get ts-docstr-parsers-alist major-mode)))
+    (require module nil t)))
+
+;;;###autoload
+(defun ts-docstr-at-point ()
+  "Add document string at point."
+  (interactive)
+  (if (ts-docstr--require-module))
+  )
 
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here
