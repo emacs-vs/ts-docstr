@@ -70,25 +70,61 @@
   :require 'ts-docstr)
 
 ;;
+;; (@* "Util" )
+;;
+
+(defmacro ts-docstr--ensure-ts (&rest body)
+  "Run BODY only if `tree-sitter-mode` is enabled."
+  (declare (indent 0))
+  `(if (bound-and-true-p tree-sitter-mode)
+       (progn ,@body)
+     (user-error "Ignored, tree-sitter-mode is not enabled in the current buffer")))
+
+;;
 ;; (@* "Core" )
 ;;
 
 (defcustom ts-docstr-parsers-alist
-  `((c-mode . ts-docstr-c))
-  ""
-  :type '(alist key-type symbol))
+  `((c-mode          . ts-docstr-c)
+    (c++-mode        . ts-docstr-c++)
+    (csharp-mode     . ts-docstr-csharp)
+    (go-mode         . ts-docstr-go)
+    (java-mode       . ts-docstr-java)
+    (javascript-mode . ts-docstr-js)
+    (js-mode         . ts-docstr-js)
+    (js2-mode        . ts-docstr-js)
+    (js3-mode        . ts-docstr-js)
+    (php-mode        . ts-docstr-php)
+    (python-mode     . ts-docstr-python)
+    (ruby-mode       . ts-docstr-ruby)
+    (rust-mode       . ts-docstr-rust)
+    (scala-mode      . ts-docstr-scala)
+    (swift-mode      . ts-docstr-swift)
+    (typescript-mode . ts-docstr-typescript))
+  "Parsers alist."
+  :type '(alist key-type symbol)
+  :group 'ts-docstr)
 
 (defun ts-docstr--require-module ()
-  "Require LANG module."
+  "Try to require module."
   (when-let ((module (asoc-get ts-docstr-parsers-alist major-mode)))
     (require module nil t)))
+
+(defun ts-docstr--parser-data (type name &optional default-value)
+  "Create parser readable data (plist).
+
+Argument TYPE is the a list of typename.  Argument NAME is the a list of
+variables name.  DEFAULT-VALUE is a list corresponds to NAME, this argument is
+optional since only certain languages use that to generate document string."
+  `(:type ,type :name ,name :default-value ,default-value))
 
 ;;;###autoload
 (defun ts-docstr-at-point ()
   "Add document string at point."
   (interactive)
-  (if (ts-docstr--require-module))
-  )
+  (ts-docstr--ensure-ts
+
+    ))
 
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here

@@ -26,10 +26,30 @@
 
 (require 'ts-docstr)
 
+(defcustom ts-docstr-c-style nil
+  "Style specification for document string in C."
+  :type '(choice (const :tag "No specify" nil))
+  :group 'docstr)
+
 ;;;###autoload
-(defun ts-docstr-c ()
+(defun ts-docstr-c-activate ()
   ""
-  `(:type nil :name nil :default-value nil))
+  (interactive)
+  (let* ((pos (point))
+         (root (tsc-root-node tree-sitter-tree))
+         ;;(node (tsc-get-descendant-for-point-range root pos pos))
+         )
+    (message "node: %s" (tsc-node-text root))
+    ))
+
+;;;###autoload
+(defun ts-docstr-c-parse ()
+  ""
+  (ts-docstr--parser-data nil nil))
+
+;;;###autoload
+(defun ts-docstr-c-insert ()
+  "")
 
 (provide 'ts-docstr-c)
 ;;; ts-docstr-c.el ends here
