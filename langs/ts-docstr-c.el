@@ -31,16 +31,22 @@
   :type '(choice (const :tag "No specify" nil))
   :group 'docstr)
 
+(defmacro ts-docstr-c--narrow-region (&rest body)
+  "Narrow region to class/struct/function declaration."
+  (declare (indent 0))
+  `(save-restriction
+     (narrow-to-region (line-beginning-position) (line-end-position 2))
+     ,@body))
+
 ;;;###autoload
 (defun ts-docstr-c-activate ()
-  ""
-  (interactive)
-  (let* ((pos (point))
-         (root (tsc-root-node tree-sitter-tree))
-         ;;(node (tsc-get-descendant-for-point-range root pos pos))
-         )
-    (message "node: %s" (tsc-node-text root))
-    ))
+  "Return t if we are able to add document string at this point."
+  (ts-docstr-c--narrow-region
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(function_declarator)))
+           (len-nodes (length nodes)))
+      (cond ((zerop len-nodes) (user-error "No declaration found"))
+            ((<= 2 len-nodes) (user-error "Multiple declarations are invalid"))
+            (t t)))))
 
 ;;;###autoload
 (defun ts-docstr-c-parse ()

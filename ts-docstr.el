@@ -31,6 +31,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'subr-x)
 
 (require 's)
@@ -79,6 +80,27 @@
   `(if (bound-and-true-p tree-sitter-mode)
        (progn ,@body)
      (user-error "Ignored, tree-sitter-mode is not enabled in the current buffer")))
+
+(defun ts-docstr-grab-nodes (nodes &optional node)
+  "Grab a list NODES from current buffer.
+
+You can pass in NODE to start the captures from that node; default will use the
+node from the root."
+  (when-let* ((node (or node (tsc-root-node tree-sitter-tree)))
+              (patterns (seq-mapcat (lambda (type) `(,(list type) @name)) nodes 'vector))
+              (query (ignore-errors
+                       (tsc-make-query tree-sitter-language patterns)))
+              (found-nodes (tsc-query-captures query node #'ignore)))
+    (mapcar #'cdr found-nodes)))
+
+(defun ts-docstr-grab-nodes-in-range (nodes &optional beg end)
+  "Grab a list of NODES in range from BEG to END."
+  (when-let ((beg (or beg (point-min))) (end (or end (point-max)))
+             (nodes (ts-docstr-grab-nodes nodes)))
+    (cl-remove-if-not (lambda (node)
+                        (and (<= beg (tsc-node-start-position node))
+                             (>= end (tsc-node-end-position node))))
+                      nodes)))
 
 ;;
 ;; (@* "Core" )
