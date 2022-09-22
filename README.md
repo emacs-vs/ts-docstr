@@ -12,11 +12,11 @@
 These languages are fairly complete:
 
 * C / C++ / C#
+* Java
 
 These languages are in development:
 
 * Go
-* Java
 * JavaScript
 * PHP
 * Python
