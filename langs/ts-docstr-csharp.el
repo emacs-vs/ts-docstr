@@ -64,9 +64,9 @@
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-csharp--parse-return ()
   "Return t if function does have return value."
-  (let* ((nodes-fd (ts-docstr-grab-nodes-in-range '(function_declarator)))
-         (node-fd (nth 0 nodes-fd))
-         (parent (tsc-get-parent node-fd))
+  (let* ((nodes-pl (ts-docstr-grab-nodes-in-range '(parameter_list)))
+         (node-pl (nth 0 nodes-pl))
+         (parent (tsc-get-parent node-pl))
          (return t))
     (tsc-mapc-children
      (lambda (node)
@@ -80,21 +80,27 @@
 (defun ts-docstr-csharp-parse ()
   "Parse declaration for C#."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
-                (param (nth 0 params)))
-      (if (<= 2 (length params))
-          (user-error "Found multiple parameter_list, %s" (length params))
-        (let (types variables)
+    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list))))
+      (let (types variables default-values)
+        (dolist (param params)
           (tsc-traverse-mapc
            (lambda (node)
+             (message "%s" (tsc-node-text node))
              (when (ts-docstr-leaf-p node)
                (pcase (ts-docstr-2-str (tsc-node-type node))
                  ("equals_value_clause"
-                  (ts-docstr-push (tsc-node-text node) types))
+                  ;; TODO: default-value?
+                  )
                  ("identifier"
-                  (ts-docstr-push (tsc-node-text node) variables)))))
-           param)
-          `(:type ,types :variable ,variables :return ,(ts-docstr-c++--parse-return)))))))
+                  (ts-docstr-push
+                   (tsc-node-text node)
+                   (if (zerop (% (+ (length types) (length variables)) 2))
+                       types
+                     variables))))))
+           param))
+        (list :type types :variable variables
+              :default-values default-values
+              :return (ts-docstr-csharp--parse-return))))))
 
 (defun ts-docstr-csharp-config ()
   "Configure style according to variable `ts-docstr-csharp-style'."
@@ -110,19 +116,18 @@
 (defun ts-docstr-csharp-insert (_node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-c-like-narrow-region
-    (message "%s" _node)
     (ts-docstr-inserting
      (when-let* ((types (plist-get data :type))
                  (variables (plist-get data :variable))
                  (len (length types)))
        (insert c-start "\n")
-       (setq restore-point (point))
        (insert c-prefix (ts-docstr-format 'summary) "\n")
+       (setq restore-point (1- (point)))
+       (insert c-end "\n")
        (dotimes (index len)
          (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
        (when (plist-get data :return)
-         (insert c-prefix (ts-docstr-format 'return) "\n"))
-       (insert c-end)))))
+         (insert c-prefix (ts-docstr-format 'return)))))))
 
 (provide 'ts-docstr-csharp)
 ;;; ts-docstr-csharp.el ends here
