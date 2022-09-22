@@ -6,7 +6,7 @@
 ;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; URL: https://github.com/emacs-vs/ts-docstr
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "26.1") (tree-sitter "0.15.1") (s "1.9.0"))
+;; Package-Requires: ((emacs "26.1") (tree-sitter "0.15.1") (s "1.9.0") (list-utils "0.4.6"))
 ;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
@@ -34,6 +34,7 @@
 (require 'cl-lib)
 (require 'subr-x)
 
+(require 'list-utils)
 (require 's)
 (require 'tree-sitter)
 
@@ -74,6 +75,12 @@
 ;; (@* "Util" )
 ;;
 
+(defmacro ts-docstr-push (newelt seq)
+  "Push NEWELT to the ahead or back of SEQ."
+  `(if (zerop (length ,seq))
+       (push ,newelt ,seq)
+     (list-utils-insert-after-pos ,seq (min (1- (length ,seq)) 0) ,newelt)))
+
 (defmacro ts-docstr--ensure-ts (&rest body)
   "Run BODY only if `tree-sitter-mode` is enabled."
   (declare (indent 0))
@@ -106,7 +113,7 @@ node from the root."
 ;; (@* "Core" )
 ;;
 
-(defcustom ts-docstr-parsers-alist
+(defcustom ts-docstr-module-alist
   `((c-mode          . ts-docstr-c)
     (c++-mode        . ts-docstr-c++)
     (csharp-mode     . ts-docstr-csharp)
@@ -129,16 +136,16 @@ node from the root."
 
 (defun ts-docstr--require-module ()
   "Try to require module."
-  (when-let ((module (asoc-get ts-docstr-parsers-alist major-mode)))
+  (when-let ((module (asoc-get ts-docstr-module-alist major-mode)))
     (require module nil t)))
 
-(defun ts-docstr--parser-data (type name &optional default-value)
+(defun ts-docstr--parser-data (type variables &optional default-value)
   "Create parser readable data (plist).
 
-Argument TYPE is the a list of typename.  Argument NAME is the a list of
+Argument TYPE is the a list of typename.  Argument VARIABLES is the a list of
 variables name.  DEFAULT-VALUE is a list corresponds to NAME, this argument is
 optional since only certain languages use that to generate document string."
-  `(:type ,type :name ,name :default-value ,default-value))
+  `(:type ,type :variables ,variables :default-value ,default-value))
 
 ;;;###autoload
 (defun ts-docstr-at-point ()

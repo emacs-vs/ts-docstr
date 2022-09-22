@@ -42,16 +42,41 @@
 (defun ts-docstr-c-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c--narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(function_declarator)))
-           (len-nodes (length nodes)))
-      (cond ((zerop len-nodes) (user-error "No declaration found"))
-            ((<= 2 len-nodes) (user-error "Multiple declarations are invalid"))
-            (t t)))))
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_specifier
+                                                   struct_specifier
+                                                   function_declarator))))
+      (cond ((zerop (length nodes))
+             (user-error "No declaration found"))
+            ((<= 2 (length nodes))
+             (user-error "Multiple declarations are invalid, %s" (length nodes)))
+            (t (nth 0 nodes))))))
 
 ;;;###autoload
 (defun ts-docstr-c-parse ()
   ""
-  (ts-docstr--parser-data nil nil))
+  (ts-docstr-c--narrow-region
+    (let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
+           (param (nth 0 params)))
+      (if (<= 2 (length params))
+          (user-error "Found multiple parameter_list, %s" (length params))
+        (let (types variables)
+          (tsc-traverse-mapc
+           (lambda (node)
+             (when (zerop (tsc-count-children node))
+               (jcs-print (format "%s" (tsc-node-type node)))
+               (pcase (format "%s" (tsc-node-type node))
+                 ((or "primitive_type" "type_identifier")
+                  (push (tsc-node-text node) types))
+                 ("identifier"
+                  (push (tsc-node-text node) variables))
+                 ((or "*" "&" "[" "]")
+                  (if (null types)
+                      (push (tsc-node-text node) types)
+                    (let ((last (1- (length types))))
+                      (setf (nth last types)
+                            (concat (nth last types) (tsc-node-text node)))))))))
+           param)
+          (ts-docstr--parser-data types variables))))))
 
 ;;;###autoload
 (defun ts-docstr-c-insert ()

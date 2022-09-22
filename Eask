@@ -11,8 +11,9 @@
 (source "melpa")
 
 (depends-on "emacs" "26.1")
-(depends-on "tree-sitter")
+(depends-on "list-utils")
 (depends-on "s")
+(depends-on "tree-sitter")
 
 (development
  (depends-on "ert-runner"))
