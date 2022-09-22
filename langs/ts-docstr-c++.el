@@ -26,25 +26,27 @@
 
 (require 'ts-docstr)
 
-(defcustom ts-docstr-c++-style nil
-  "Style specification for document string in C."
-  :type '(choice (const :tag "No specify" nil))
-  :group 'docstr)
+(defcustom ts-docstr-c++-style 'javadoc
+  "Style specification for document string in C++."
+  :type '(choice (const :tag "No specify" nil)
+                 (const :tag "Javadoc Style" javadoc)
+                 (const :tag "Qt Style" qt))
+  :group 'ts-docstr)
 
 (defcustom ts-docstr-c++-format-summary "{d}"
-  ""
+  "Format for summary line."
   :type 'string
-  :group 'docstr)
+  :group 'ts-docstr)
 
 (defcustom ts-docstr-c++-format-param "@param {v} {d}"
-  ""
+  "Format for parameter line."
   :type 'string
-  :group 'docstr)
+  :group 'ts-docstr)
 
 (defcustom ts-docstr-c++-format-return "@return {d}"
-  ""
+  "Format for return line."
   :type 'string
-  :group 'docstr)
+  :group 'ts-docstr)
 
 (defmacro ts-docstr-c++--narrow-region (&rest body)
   "Narrow region to class/struct/function declaration."
@@ -111,6 +113,18 @@
 (defun ts-docstr-c++-config ()
   "Configure style according to variable `ts-docstr-c++-style'."
   (cl-case ts-docstr-c++-style
+    (javadoc (list :start "/**"
+                   :prefix "* "
+                   :end "*/"
+                   :summary "{d}"
+                   :param "@param {v} {d}"
+                   :return "@return {d}"))
+    (qt (list :start "/*!"
+              :prefix "    "
+              :end "*/"
+              :summary "{d}"
+              :param "\\\\param {v} {d}"
+              :return "\\\\return {d}"))
     (t (list :start "/**"
              :prefix "* "
              :end "*/"

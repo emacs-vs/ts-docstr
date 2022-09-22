@@ -168,17 +168,28 @@ node from the root."
                              (>= end (tsc-node-end-position node))))
                       nodes)))
 
-(defmacro ts-docstr-inserting (&rest body)
-  "Do stuff before and after inserting document string."
-  `(let* ((restore-point (point))  ; this is expect to be modified
-          (config-data (funcall (intern (format "%s-config" (ts-docstr-module)))))
+(defvar ts-docstr--format-summary)
+(defvar ts-docstr--format-param)
+(defvar ts-docstr--format-return)
+
+(defmacro ts-docstr--setup-style (&rest body)
+  "Set up the style data."
+  `(let* ((config-data (funcall (intern (format "%s-config" (ts-docstr-module)))))
           (c-start (plist-get config-data :start))
           (c-prefix (plist-get config-data :prefix))
           (c-end (plist-get config-data :end))
           (c-summary (plist-get config-data :summary))
           (c-param (plist-get config-data :param))
           (c-return (plist-get config-data :return)))
-     ,@body
+     (setq ts-docstr--format-summary c-summary
+           ts-docstr--format-param c-param
+           ts-docstr--format-return c-return)
+     ,@body))
+
+(defmacro ts-docstr-inserting (&rest body)
+  "Do stuff before and after inserting document string."
+  `(let ((restore-point (point)))  ; this is expect to be modified
+     (ts-docstr--setup-style ,@body)
      (ignore-errors (indent-region (point-min) (point-max)))
      (goto-char restore-point)
      (goto-char (line-end-position))))
@@ -251,7 +262,7 @@ node from the root."
 
 (cl-defun ts-docstr-format (desc-type &key typename variable)
   "Set default format for document string."
-  (let* ((format-name (format "%s-format-%s" (ts-docstr-module) desc-type))
+  (let* ((format-name (format "ts-docstr--format-%s" desc-type))
          (format (symbol-value (intern format-name))))
     (when typename (setq format (s-replace "{t}" typename format)))
     (when variable (setq format (s-replace "{v}" variable format)))
