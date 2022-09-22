@@ -33,6 +33,21 @@
                  (const :tag "Qt Style" qt))
   :group 'ts-docstr)
 
+(defcustom ts-docstr-c++-start "/**"
+  "Docstring start line."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-c++-prefix "* "
+  "Docstring prefix for each line."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-c++-end "*/"
+  "Docstring end line."
+  :type 'string
+  :group 'ts-docstr)
+
 (defcustom ts-docstr-c++-format-summary "{d}"
   "Format for summary line."
   :type 'string
@@ -116,9 +131,9 @@
               :summary "{d}"
               :param "\\\\param {v} {d}"
               :return "\\\\return {d}"))
-    (t (list :start "/**"
-             :prefix "* "
-             :end "*/"
+    (t (list :start ts-docstr-c++-start
+             :prefix ts-docstr-c++-prefix
+             :end ts-docstr-c++-end
              :summary ts-docstr-c++-format-summary
              :param ts-docstr-c++-format-param
              :return ts-docstr-c++-format-return))))

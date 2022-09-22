@@ -31,6 +31,21 @@
   :type '(choice (const :tag "No specify" nil))
   :group 'ts-docstr)
 
+(defcustom ts-docstr-csharp-start "/// <summary>"
+  "Docstring start line."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-csharp-prefix "/// "
+  "Docstring prefix for each line."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-csharp-end "/// <summary>"
+  "Docstring end line."
+  :type 'string
+  :group 'ts-docstr)
+
 (defcustom ts-docstr-csharp-format-summary "{d}"
   "Format for summary line."
   :type 'string
@@ -53,7 +68,6 @@
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
                                                    struct_declaration
                                                    enum_declaration
-                                                   method_declaration
                                                    parameter_list))))
       (cond ((zerop (length nodes))
              (user-error "No declaration found"))
@@ -85,7 +99,6 @@
         (dolist (param params)
           (tsc-traverse-mapc
            (lambda (node)
-             (message "%s" (tsc-node-text node))
              (when (ts-docstr-leaf-p node)
                (pcase (ts-docstr-2-str (tsc-node-type node))
                  ("equals_value_clause"
@@ -105,9 +118,9 @@
 (defun ts-docstr-csharp-config ()
   "Configure style according to variable `ts-docstr-csharp-style'."
   (cl-case ts-docstr-csharp-style
-    (t (list :start "/// <summary>"
-             :prefix "/// "
-             :end "/// <summary>"
+    (t (list :start ts-docstr-csharp-start
+             :prefix ts-docstr-csharp-prefix
+             :end ts-docstr-csharp-end
              :summary ts-docstr-csharp-format-summary
              :param ts-docstr-csharp-format-param
              :return ts-docstr-csharp-format-return))))

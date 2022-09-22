@@ -31,6 +31,21 @@
   :type '(choice (const :tag "No specify" nil))
   :group 'docstr)
 
+(defcustom ts-docstr-c-start "/**"
+  "Docstring start line."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-c-prefix "* "
+  "Docstring prefix for each line."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-c-end "*/"
+  "Docstring end line."
+  :type 'string
+  :group 'ts-docstr)
+
 (defcustom ts-docstr-c-format-summary "{d}"
   "Format for summary line."
   :type 'string
@@ -67,9 +82,9 @@
 (defun ts-docstr-c-config ()
   "Configure style according to variable `ts-docstr-c-style'."
   (cl-case ts-docstr-c-style
-    (t (list :start "/**"
-             :prefix "* "
-             :end "*/"
+    (t (list :start ts-docstr-c-start
+             :prefix ts-docstr-c-prefix
+             :end ts-docstr-c-end
              :summary ts-docstr-c-format-summary
              :param ts-docstr-c-format-param
              :return ts-docstr-c-format-return))))
