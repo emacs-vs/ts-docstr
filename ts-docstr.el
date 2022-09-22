@@ -6,7 +6,7 @@
 ;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; URL: https://github.com/emacs-vs/ts-docstr
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "26.1") (tree-sitter "0.15.1") (s "1.9.0") (list-utils "0.4.6"))
+;; Package-Requires: ((emacs "27.1") (tree-sitter "0.15.1") (s "1.9.0") (list-utils "0.4.6"))
 ;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
@@ -43,6 +43,26 @@
   :group 'tree-sitter
   :prefix "ts-docstr-")
 
+(defcustom ts-docstr-desc-summary "[summary]"
+  "Placeholder string for summary description."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-desc-param "[description]"
+  "Placeholder string for parameter description."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-desc-return "[description]"
+  "Placeholder string for return description."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-default-typename "[type]"
+  "Placeholder string for unknown type description."
+  :type 'string
+  :group 'ts-docstr)
+
 ;;
 ;; (@* "Entry" )
 ;;
@@ -59,7 +79,7 @@
 (define-minor-mode ts-docstr-mode
   "Minor mode `ts-docstr-mode'."
   :lighter " DocStr"
-  :group docstr
+  :group ts-docstr
   (if ts-docstr-mode (ts-docstr--enable) (ts-docstr--disable)))
 
 (defun ts-docstr--turn-on-docstr-mode ()
@@ -91,6 +111,10 @@
   `(if (bound-and-true-p tree-sitter-mode)
        (progn ,@body)
      (user-error "Ignored, tree-sitter-mode is not enabled in the current buffer")))
+
+(defun ts-docstr-leaf (node)
+  "Return t if NODE is leaf node."
+  (zerop (tsc-count-children node)))
 
 (defun ts-docstr-grab-nodes (nodes &optional node)
   "Grab a list NODES from current buffer.
@@ -142,14 +166,6 @@ node from the root."
   "Try to require module."
   (when-let ((module (asoc-get ts-docstr-module-alist major-mode)))
     (require module nil t)))
-
-(defun ts-docstr--parser-data (type variables &optional default-value)
-  "Create parser readable data (plist).
-
-Argument TYPE is the a list of typename.  Argument VARIABLES is the a list of
-variables name.  DEFAULT-VALUE is a list corresponds to NAME, this argument is
-optional since only certain languages use that to generate document string."
-  `(:type ,type :variables ,variables :default-value ,default-value))
 
 ;;;###autoload
 (defun ts-docstr-at-point ()

@@ -31,6 +31,11 @@
   :type '(choice (const :tag "No specify" nil))
   :group 'docstr)
 
+(defcustom ts-docstr-c-format "{v} {d}"
+  ""
+  :type 'string
+  :group 'docstr)
+
 (defmacro ts-docstr-c--narrow-region (&rest body)
   "Narrow region to class/struct/function declaration."
   (declare (indent 0))
@@ -51,18 +56,33 @@
              (user-error "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
 
+;; NOTE: This is only used in function declaration!
+(defun ts-docstr-c--parse-return ()
+  "Return t if function does have return value."
+  (let* ((nodes-fd (ts-docstr-grab-nodes-in-range '(function_declarator)))
+         (node-fd (nth 0 nodes-fd))
+         (parent (tsc-get-parent node-fd))
+         (return t))
+    (tsc-mapc-children
+     (lambda (node)
+       (when (ts-docstr-leaf node)
+         (when (string= (tsc-node-text node) "void")
+           (setq return nil))))
+     parent)
+    return))
+
 ;;;###autoload
 (defun ts-docstr-c-parse ()
-  ""
+  "Parse declaration for C."
   (ts-docstr-c--narrow-region
-    (let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
-           (param (nth 0 params)))
+    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
+                (param (nth 0 params)))
       (if (<= 2 (length params))
           (user-error "Found multiple parameter_list, %s" (length params))
         (let (types variables)
           (tsc-traverse-mapc
            (lambda (node)
-             (when (zerop (tsc-count-children node))
+             (when (ts-docstr-leaf node)
                (pcase (ts-docstr-2-str (tsc-node-type node))
                  ((or "primitive_type" "type_identifier")
                   (ts-docstr-push (tsc-node-text node) types))
@@ -75,11 +95,12 @@
                       (setf (nth last types)
                             (concat (nth last types) (tsc-node-text node)))))))))
            param)
-          (ts-docstr--parser-data types variables))))))
+          `(:type ,types :variables ,variables :return ,(ts-docstr-c--parse-return)))))))
 
 ;;;###autoload
-(defun ts-docstr-c-insert ()
-  "")
+(defun ts-docstr-c-insert (node data)
+  ""
+  )
 
 (provide 'ts-docstr-c)
 ;;; ts-docstr-c.el ends here
