@@ -31,7 +31,17 @@
   :type '(choice (const :tag "No specify" nil))
   :group 'docstr)
 
-(defcustom ts-docstr-c++-format "{v} {d}"
+(defcustom ts-docstr-c++-format-summary "{d}"
+  ""
+  :type 'string
+  :group 'docstr)
+
+(defcustom ts-docstr-c++-format-param "@param {v} {d}"
+  ""
+  :type 'string
+  :group 'docstr)
+
+(defcustom ts-docstr-c++-format-return "@return {d}"
   ""
   :type 'string
   :group 'docstr)
@@ -96,14 +106,34 @@
                       (setf (nth last types)
                             (concat (nth last types) (tsc-node-text node)))))))))
            param)
-          `(:type ,types :variables ,variables :return ,(ts-docstr-c++--parse-return)))))))
+          `(:type ,types :variable ,variables :return ,(ts-docstr-c++--parse-return)))))))
+
+(defun ts-docstr-c++-config ()
+  "Configure style according to variable `ts-docstr-c++-style'."
+  (cl-case ts-docstr-c++-style
+    (t (list :start "/**"
+             :prefix "* "
+             :end "*/"
+             :summary ts-docstr-c++-format-summary
+             :param ts-docstr-c++-format-param
+             :return ts-docstr-c++-format-return))))
 
 ;;;###autoload
 (defun ts-docstr-c++-insert (node data)
   "Insert document string upon NODE and DATA."
-  (message "node; %s" node)
-  (message "data; %s" data)
-  )
+  (ts-docstr-c++--narrow-region
+    (ts-docstr-inserting
+     (when-let* ((types (plist-get data :type))
+                 (variables (plist-get data :variable))
+                 (len (length types)))
+       (insert c-start "\n")
+       (setq restore-point (point))
+       (insert c-prefix (ts-docstr-format 'summary) "\n")
+       (dotimes (index len)
+         (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
+       (when (plist-get data :return)
+         (insert c-prefix (ts-docstr-format 'return) "\n"))
+       (insert c-end)))))
 
 (provide 'ts-docstr-c++)
 ;;; ts-docstr-c++.el ends here

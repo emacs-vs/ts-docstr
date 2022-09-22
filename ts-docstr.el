@@ -168,6 +168,21 @@ node from the root."
                              (>= end (tsc-node-end-position node))))
                       nodes)))
 
+(defmacro ts-docstr-inserting (&rest body)
+  "Do stuff before and after inserting document string."
+  `(let* ((restore-point (point))  ; this is expect to be modified
+          (config-data (funcall (intern (format "%s-config" (ts-docstr-module)))))
+          (c-start (plist-get config-data :start))
+          (c-prefix (plist-get config-data :prefix))
+          (c-end (plist-get config-data :end))
+          (c-summary (plist-get config-data :summary))
+          (c-param (plist-get config-data :param))
+          (c-return (plist-get config-data :return)))
+     ,@body
+     (ignore-errors (indent-region (point-min) (point-max)))
+     (goto-char restore-point)
+     (goto-char (line-end-position))))
+
 ;;
 ;; (@* "Core" )
 ;;
@@ -193,9 +208,13 @@ node from the root."
   :type '(alist key-type symbol)
   :group 'ts-docstr)
 
+(defun ts-docstr-module ()
+  "Return current module name."
+  (asoc-get ts-docstr-module-alist major-mode))
+
 (defun ts-docstr--require-module ()
   "Try to require module."
-  (when-let ((module (asoc-get ts-docstr-module-alist major-mode)))
+  (when-let ((module (ts-docstr-module)))
     (require module nil t)))
 
 (defun ts-docstr--module-funcall (module event &rest args)
@@ -229,6 +248,19 @@ node from the root."
     (if-let ((module (ts-docstr--require-module)))
         (ts-docstr--process-events module)
       (user-error "Language is either not supported or WIP... %s" major-mode))))
+
+(cl-defun ts-docstr-format (desc-type &key typename variable)
+  "Set default format for document string."
+  (let* ((format-name (format "%s-format-%s" (ts-docstr-module) desc-type))
+         (format (symbol-value (intern format-name))))
+    (when typename (setq format (s-replace "{t}" typename format)))
+    (when variable (setq format (s-replace "{v}" variable format)))
+    (setq format (s-replace "{d}" (cl-case desc-type
+                                    (summary ts-docstr-desc-summary)
+                                    (param ts-docstr-desc-param)
+                                    (return ts-docstr-desc-return))
+                            format))
+    format))
 
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here
