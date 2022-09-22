@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'ts-docstr-c++)
+(require 'ts-docstr)
 
 (defcustom ts-docstr-c-style nil
   "Style specification for document string in C."
@@ -49,7 +49,7 @@
 ;;;###autoload
 (defun ts-docstr-c-activate ()
   "Return t if we are able to add document string at this point."
-  (ts-docstr-c++-narrow-region
+  (ts-docstr-c-like-narrow-region
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(struct_specifier
                                                    enum_specifier
                                                    function_declarator))))
@@ -77,7 +77,7 @@
 ;;;###autoload
 (defun ts-docstr-c-insert (_node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c++-narrow-region
+  (ts-docstr-c-like-narrow-region
     (ts-docstr-inserting
      (when-let* ((types (plist-get data :type))
                  (variables (plist-get data :variable))

@@ -273,5 +273,16 @@ node from the root."
                             format))
     format))
 
+;;
+;; (@* "C-like" )
+;;
+
+(defmacro ts-docstr-c-like-narrow-region (&rest body)
+  "Narrow region to class/struct/function declaration."
+  (declare (indent 0))
+  `(save-restriction
+     (narrow-to-region (line-beginning-position) (line-end-position 2))
+     ,@body))
+
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here

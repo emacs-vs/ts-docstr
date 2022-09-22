@@ -1,4 +1,4 @@
-;;; ts-docstr-c++.el --- Document string for C++  -*- lexical-binding: t; -*-
+;;; ts-docstr-csharp.el --- Document string for C#  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Shen, Jen-Chieh
 
@@ -19,43 +19,42 @@
 
 ;;; Commentary:
 ;;
-;; Document string for C++.
+;; Document string for C#.
 ;;
 
 ;;; Code:
 
 (require 'ts-docstr)
 
-(defcustom ts-docstr-c++-style 'javadoc
-  "Style specification for document string in C++."
-  :type '(choice (const :tag "No specify" nil)
-                 (const :tag "Javadoc Style" javadoc)
-                 (const :tag "Qt Style" qt))
+(defcustom ts-docstr-csharp-style nil
+  "Style specification for document string in C#."
+  :type '(choice (const :tag "No specify" nil))
   :group 'ts-docstr)
 
-(defcustom ts-docstr-c++-format-summary "{d}"
+(defcustom ts-docstr-csharp-format-summary "{d}"
   "Format for summary line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-c++-format-param "@param {v} {d}"
+(defcustom ts-docstr-csharp-format-param "<param name=\"{v}\">{d}</param>"
   "Format for parameter line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-c++-format-return "@return {d}"
+(defcustom ts-docstr-csharp-format-return "<returns>{d}</returns>"
   "Format for return line."
   :type 'string
   :group 'ts-docstr)
 
 ;;;###autoload
-(defun ts-docstr-c++-activate ()
+(defun ts-docstr-csharp-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_specifier
-                                                   struct_specifier
-                                                   enum_specifier
-                                                   function_declarator))))
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
+                                                   struct_declaration
+                                                   enum_declaration
+                                                   method_declaration
+                                                   parameter_list))))
       (cond ((zerop (length nodes))
              (user-error "No declaration found"))
             ((<= 2 (length nodes))
@@ -63,7 +62,7 @@
             (t (nth 0 nodes))))))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-c++--parse-return ()
+(defun ts-docstr-csharp--parse-return ()
   "Return t if function does have return value."
   (let* ((nodes-fd (ts-docstr-grab-nodes-in-range '(function_declarator)))
          (node-fd (nth 0 nodes-fd))
@@ -78,55 +77,40 @@
     return))
 
 ;;;###autoload
-(defun ts-docstr-c++-parse ()
-  "Parse declaration for C++."
+(defun ts-docstr-csharp-parse ()
+  "Parse declaration for C#."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_declaration))))
-      (let (types variables)
-        (dolist (param params)
+    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
+                (param (nth 0 params)))
+      (if (<= 2 (length params))
+          (user-error "Found multiple parameter_list, %s" (length params))
+        (let (types variables)
           (tsc-traverse-mapc
            (lambda (node)
              (when (ts-docstr-leaf-p node)
                (pcase (ts-docstr-2-str (tsc-node-type node))
-                 ((or "primitive_type" "type_identifier")
+                 ("equals_value_clause"
                   (ts-docstr-push (tsc-node-text node) types))
                  ("identifier"
-                  (ts-docstr-push (tsc-node-text node) variables))
-                 ((or "*" "&" "[" "]")
-                  (if (null types)
-                      (ts-docstr-push (tsc-node-text node) types)
-                    (let ((last (1- (length types))))
-                      (setf (nth last types)
-                            (concat (nth last types) (tsc-node-text node)))))))))
-           param))
-        `(:type ,types :variable ,variables :return ,(ts-docstr-c++--parse-return))))))
+                  (ts-docstr-push (tsc-node-text node) variables)))))
+           param)
+          `(:type ,types :variable ,variables :return ,(ts-docstr-c++--parse-return)))))))
 
-(defun ts-docstr-c++-config ()
-  "Configure style according to variable `ts-docstr-c++-style'."
-  (cl-case ts-docstr-c++-style
-    (javadoc (list :start "/**"
-                   :prefix "* "
-                   :end "*/"
-                   :summary "{d}"
-                   :param "@param {v} {d}"
-                   :return "@return {d}"))
-    (qt (list :start "/*!"
-              :prefix "    "
-              :end "*/"
-              :summary "{d}"
-              :param "\\\\param {v} {d}"
-              :return "\\\\return {d}"))
-    (t (list :start "/**"
-             :prefix "* "
-             :end "*/"
-             :summary ts-docstr-c++-format-summary
-             :param ts-docstr-c++-format-param
-             :return ts-docstr-c++-format-return))))
+(defun ts-docstr-csharp-config ()
+  "Configure style according to variable `ts-docstr-csharp-style'."
+  (cl-case ts-docstr-csharp-style
+    (t (list :start "/// <summary>"
+             :prefix "/// "
+             :end "/// <summary>"
+             :summary ts-docstr-csharp-format-summary
+             :param ts-docstr-csharp-format-param
+             :return ts-docstr-csharp-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-c++-insert (_node data)
+(defun ts-docstr-csharp-insert (_node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-c-like-narrow-region
+    (message "%s" _node)
     (ts-docstr-inserting
      (when-let* ((types (plist-get data :type))
                  (variables (plist-get data :variable))
@@ -140,5 +124,5 @@
          (insert c-prefix (ts-docstr-format 'return) "\n"))
        (insert c-end)))))
 
-(provide 'ts-docstr-c++)
-;;; ts-docstr-c++.el ends here
+(provide 'ts-docstr-csharp)
+;;; ts-docstr-csharp.el ends here
