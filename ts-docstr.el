@@ -75,6 +75,10 @@
 ;; (@* "Util" )
 ;;
 
+(defun ts-docstr-2-str (object)
+  "Convert OBJECT to string."
+  (format "%s" object))
+
 (defmacro ts-docstr-push (newelt seq)
   "Push NEWELT to the ahead or back of SEQ."
   `(if (zerop (length ,seq))

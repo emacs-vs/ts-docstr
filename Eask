@@ -6,7 +6,9 @@
 (keywords "convenience")
 
 (package-file "ts-docstr.el")
+(files "*el" "langs/*.el")
 
+(source "gnu")
 (source "jcs-elpa")
 (source "melpa")
 
