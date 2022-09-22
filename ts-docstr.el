@@ -168,9 +168,9 @@ node from the root."
                              (>= end (tsc-node-end-position node))))
                       nodes)))
 
-(defvar ts-docstr--format-summary)
-(defvar ts-docstr--format-param)
-(defvar ts-docstr--format-return)
+(defvar ts-docstr--format-summary nil)
+(defvar ts-docstr--format-param nil)
+(defvar ts-docstr--format-return nil)
 
 (defmacro ts-docstr--setup-style (&rest body)
   "Set up the style data."
@@ -221,7 +221,7 @@ node from the root."
 
 (defun ts-docstr-module ()
   "Return current module name."
-  (asoc-get ts-docstr-module-alist major-mode))
+  (cdr (assq major-mode ts-docstr-module-alist)))
 
 (defun ts-docstr--require-module ()
   "Try to require module."

@@ -48,7 +48,8 @@
   :type 'string
   :group 'ts-docstr)
 
-(defmacro ts-docstr-c++--narrow-region (&rest body)
+;;;###autoload
+(defmacro ts-docstr-c++-narrow-region (&rest body)
   "Narrow region to class/struct/function declaration."
   (declare (indent 0))
   `(save-restriction
@@ -58,7 +59,7 @@
 ;;;###autoload
 (defun ts-docstr-c++-activate ()
   "Return t if we are able to add document string at this point."
-  (ts-docstr-c++--narrow-region
+  (ts-docstr-c++-narrow-region
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_specifier
                                                    struct_specifier
                                                    enum_specifier
@@ -87,7 +88,7 @@
 ;;;###autoload
 (defun ts-docstr-c++-parse ()
   "Parse declaration for C++."
-  (ts-docstr-c++--narrow-region
+  (ts-docstr-c++-narrow-region
     (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
                 (param (nth 0 params)))
       (if (<= 2 (length params))
@@ -133,9 +134,9 @@
              :return ts-docstr-c++-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-c++-insert (node data)
+(defun ts-docstr-c++-insert (_node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c++--narrow-region
+  (ts-docstr-c++-narrow-region
     (ts-docstr-inserting
      (when-let* ((types (plist-get data :type))
                  (variables (plist-get data :variable))

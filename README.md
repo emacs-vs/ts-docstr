@@ -11,11 +11,10 @@
 
 These languages are fairly complete:
 
-* C++
+* C / C++
 
 These languages are in development:
 
-* C
 * C#
 * Go
 * Java

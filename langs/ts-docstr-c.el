@@ -24,31 +24,33 @@
 
 ;;; Code:
 
-(require 'ts-docstr)
+(require 'ts-docstr-c++)
 
 (defcustom ts-docstr-c-style nil
   "Style specification for document string in C."
   :type '(choice (const :tag "No specify" nil))
   :group 'docstr)
 
-(defcustom ts-docstr-c-format "{v} {d}"
-  ""
+(defcustom ts-docstr-c-format-summary "{d}"
+  "Format for summary line."
   :type 'string
-  :group 'docstr)
+  :group 'ts-docstr)
 
-(defmacro ts-docstr-c--narrow-region (&rest body)
-  "Narrow region to class/struct/function declaration."
-  (declare (indent 0))
-  `(save-restriction
-     (narrow-to-region (line-beginning-position) (line-end-position 2))
-     ,@body))
+(defcustom ts-docstr-c-format-param "@param {v} {d}"
+  "Format for parameter line."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-c-format-return "@return {d}"
+  "Format for return line."
+  :type 'string
+  :group 'ts-docstr)
 
 ;;;###autoload
 (defun ts-docstr-c-activate ()
   "Return t if we are able to add document string at this point."
-  (ts-docstr-c--narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_specifier
-                                                   struct_specifier
+  (ts-docstr-c++-narrow-region
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(struct_specifier
                                                    enum_specifier
                                                    function_declarator))))
       (cond ((zerop (length nodes))
@@ -57,51 +59,37 @@
              (user-error "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
 
-;; NOTE: This is only used in function declaration!
-(defun ts-docstr-c--parse-return ()
-  "Return t if function does have return value."
-  (let* ((nodes-fd (ts-docstr-grab-nodes-in-range '(function_declarator)))
-         (node-fd (nth 0 nodes-fd))
-         (parent (tsc-get-parent node-fd))
-         (return t))
-    (tsc-mapc-children
-     (lambda (node)
-       (when (ts-docstr-leaf-p node)
-         (when (string= (tsc-node-text node) "void")
-           (setq return nil))))
-     parent)
-    return))
-
 ;;;###autoload
 (defun ts-docstr-c-parse ()
   "Parse declaration for C."
-  (ts-docstr-c--narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list)))
-                (param (nth 0 params)))
-      (if (<= 2 (length params))
-          (user-error "Found multiple parameter_list, %s" (length params))
-        (let (types variables)
-          (tsc-traverse-mapc
-           (lambda (node)
-             (when (ts-docstr-leaf-p node)
-               (pcase (ts-docstr-2-str (tsc-node-type node))
-                 ((or "primitive_type" "type_identifier")
-                  (ts-docstr-push (tsc-node-text node) types))
-                 ("identifier"
-                  (ts-docstr-push (tsc-node-text node) variables))
-                 ((or "*" "&" "[" "]")
-                  (if (null types)
-                      (ts-docstr-push (tsc-node-text node) types)
-                    (let ((last (1- (length types))))
-                      (setf (nth last types)
-                            (concat (nth last types) (tsc-node-text node)))))))))
-           param)
-          `(:type ,types :variables ,variables :return ,(ts-docstr-c--parse-return)))))))
+  (ts-docstr-c++-parse))
+
+(defun ts-docstr-c-config ()
+  "Configure style according to variable `ts-docstr-c-style'."
+  (cl-case ts-docstr-c-style
+    (t (list :start "/**"
+             :prefix "* "
+             :end "*/"
+             :summary ts-docstr-c-format-summary
+             :param ts-docstr-c-format-param
+             :return ts-docstr-c-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-c-insert (node data)
+(defun ts-docstr-c-insert (_node data)
   "Insert document string upon NODE and DATA."
-  )
+  (ts-docstr-c++-narrow-region
+    (ts-docstr-inserting
+     (when-let* ((types (plist-get data :type))
+                 (variables (plist-get data :variable))
+                 (len (length types)))
+       (insert c-start "\n")
+       (setq restore-point (point))
+       (insert c-prefix (ts-docstr-format 'summary) "\n")
+       (dotimes (index len)
+         (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
+       (when (plist-get data :return)
+         (insert c-prefix (ts-docstr-format 'return) "\n"))
+       (insert c-end)))))
 
 (provide 'ts-docstr-c)
 ;;; ts-docstr-c.el ends here
