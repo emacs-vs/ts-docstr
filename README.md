@@ -6,6 +6,28 @@
 
 [![CI](https://github.com/emacs-vs/ts-docstr/actions/workflows/test.yml/badge.svg)](https://github.com/emacs-vs/ts-docstr/actions/workflows/test.yml)
 
+## 🔨 Supported languages
+> ⚠️ Please sort these two lists alphabetically!
+
+These languages are fairly complete:
+
+* C++
+
+These languages are in development:
+
+* C
+* C#
+* Go
+* Java
+* JavaScript
+* PHP
+* Python
+* Ruby
+* Rust
+* Scala
+* Swift
+* TypeScript
+
 ## Contribute
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
