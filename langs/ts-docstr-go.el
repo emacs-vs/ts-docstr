@@ -79,31 +79,38 @@
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-go--parse-return ()
   "Return t if function does have return value."
-  (let* ((nodes-pl (ts-docstr-grab-nodes-in-range '(formal_parameters)))
-         (node-pl (nth 0 nodes-pl))
-         (parent (tsc-get-parent node-pl))
-         (return t))
-    (tsc-mapc-children
-     (lambda (node)
-       (when (ts-docstr-leaf-p node)
-         (when (string= (tsc-node-text node) "void")
-           (setq return nil))))
-     parent)
-    return))
+  (when-let*
+      ((nodes-fp (ts-docstr-grab-nodes-in-range '(parameter_list)))
+       (node-fp (nth 0 nodes-fp))
+       (node-sb (ts-docstr-get-next-sibling node-fp "block")))
+    (cl-some (lambda (return-node)
+               (<= 3 (tsc-count-children return-node)))
+             (ts-docstr-find-children-traverse node-sb "return_statement"))))
 
 ;;;###autoload
 (defun ts-docstr-go-parse ()
   "Parse declaration for Go."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(formal_parameters))))
+    (when-let* ((params-lst (ts-docstr-grab-nodes-in-range '(parameter_list)))
+                (param-lst (nth (1- (length params-lst)) params-lst))
+                (params (ts-docstr-find-children param-lst "parameter_declaration")))
       (let (types variables default-values)
         (dolist (param params)
           (tsc-traverse-mapc
            (lambda (node)
              (pcase (ts-docstr-2-str (tsc-node-type node))
-               ((or "array_type" "integral_type" "floating_point_type"
-                    "boolean_type" "scoped_type_identifier"
-                    "generic_type" "type_identifier")
+               ((or "generic_type"
+                    "qualified_type"
+                    "pointer_type"
+                    "struct_type"
+                    "interface_type"
+                    "array_type"
+                    "slice_type"
+                    "map_type"
+                    "channel_type"
+                    "function_type"
+                    "type_identifier"
+                    "implicit_length_array_type")
                 (ts-docstr-push (tsc-node-text node) types))
                ("identifier"
                 (ts-docstr-push (tsc-node-text node) variables))))

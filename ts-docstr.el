@@ -134,7 +134,7 @@
   "Push NEWELT to the ahead or back of SEQ."
   `(if (zerop (length ,seq))
        (push ,newelt ,seq)
-     (list-utils-insert-after-pos ,seq (min (1- (length ,seq)) 0) ,newelt)))
+     (list-utils-insert-after-pos ,seq (max (1- (length ,seq)) 0) ,newelt)))
 
 (defmacro ts-docstr--ensure-ts (&rest body)
   "Run BODY only if `tree-sitter-mode` is enabled."

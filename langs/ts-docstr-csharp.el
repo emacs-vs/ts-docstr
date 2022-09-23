@@ -97,19 +97,23 @@
     (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list))))
       (let (types variables default-values)
         (dolist (param params)
-          (tsc-traverse-mapc
+          (tsc-mapc-children
            (lambda (node)
-             (when (ts-docstr-leaf-p node)
-               (pcase (ts-docstr-2-str (tsc-node-type node))
-                 ("equals_value_clause"
-                  ;; TODO: default-value?
-                  )
-                 ("identifier"
-                  (ts-docstr-push
-                   (tsc-node-text node)
-                   (if (zerop (% (+ (length types) (length variables)) 2))
-                       types
-                     variables))))))
+             (when (eq (tsc-node-type node) 'parameter)  ; Enters `parameter' node
+               (dotimes (index (tsc-count-children node))
+                 (let ((child (tsc-get-nth-child node index)))  ; access `parameter' child
+                   (pcase (ts-docstr-2-str (tsc-node-type child))
+                     ("predefined_type"
+                      (ts-docstr-push (tsc-node-text child) types))
+                     ("identifier"
+                      (ts-docstr-push
+                       (tsc-node-text child)
+                       ;; If first child (index 0) is `identifier', then it
+                       ;; could be a type. Otherwise, it's a variable name.
+                       (if (zerop index) types variables)))
+                     ("equals_value_clause"
+                      ;; TODO: default-value?
+                      ))))))
            param))
         (list :type types :variable variables
               :default-values default-values
