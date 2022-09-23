@@ -81,8 +81,11 @@
   (let* ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
          (node-fp (nth 0 nodes-fp))
          (node-cs (ts-docstr-get-next-sibling node-fp "compound_statement")))
-    (cl-some (lambda (return-node)
-               (<= 3 (tsc-count-children return-node)))
+    ;; OKAY: This is probably the best solution!
+    ;;
+    ;; We traverse the entire tree nad look for `return', if it does return
+    ;; with something else, we simply return true!
+    (cl-some (lambda (return-node) (<= 3 (tsc-count-children return-node)))
              (ts-docstr-find-children-traverse node-cs "return_statement"))))
 
 ;;;###autoload

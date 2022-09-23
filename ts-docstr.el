@@ -321,6 +321,7 @@ node from the root."
   "Do stuff before and after inserting document string."
   (declare (indent 0) (debug t))
   `(let ((restore-point (point)))  ; this is expect to be modified
+     (indent-for-tab-command)
      (ts-docstr--setup-style ,@body)
      (msgu-silent (ignore-errors (indent-region (point-min) (point-max))))
      (goto-char restore-point)

@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'ts-docstr)
+(require 'ts-docstr-c++)
 
 (defcustom ts-docstr-c-style nil
   "Style specification for document string in C."
@@ -75,9 +75,9 @@
             (t (nth 0 nodes))))))
 
 ;;;###autoload
-(defun ts-docstr-c-parse ()
+(defun ts-docstr-c-parse (node)
   "Parse declaration for C."
-  (ts-docstr-c++-parse))
+  (ts-docstr-c++-parse node))
 
 (defun ts-docstr-c-config ()
   "Configure style according to variable `ts-docstr-c-style'."
@@ -90,21 +90,9 @@
              :return ts-docstr-c-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-c-insert (_node data)
+(defun ts-docstr-c-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c-like-narrow-region
-    (ts-docstr-inserting
-      (when-let* ((types (plist-get data :type))
-                  (variables (plist-get data :variable))
-                  (len (length types)))
-        (insert c-start "\n")
-        (setq restore-point (point))
-        (insert c-prefix (ts-docstr-format 'summary) "\n")
-        (dotimes (index len)
-          (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
-        (when (plist-get data :return)
-          (insert c-prefix (ts-docstr-format 'return) "\n"))
-        (insert c-end)))))
+  (ts-docstr-c++-insert node data))
 
 (provide 'ts-docstr-c)
 ;;; ts-docstr-c.el ends here

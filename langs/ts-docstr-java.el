@@ -83,6 +83,8 @@
          (node-pl (nth 0 nodes-pl))
          (parent (tsc-get-parent node-pl))
          (return t))
+    ;; OKAY: We don't traverse like `JavaScript' does, since Java needs to declare
+    ;; return type in the function declaration.
     (tsc-mapc-children
      (lambda (node)
        (when (ts-docstr-leaf-p node)

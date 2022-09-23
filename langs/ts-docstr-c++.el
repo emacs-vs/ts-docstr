@@ -76,8 +76,15 @@
              (user-error "No declaration found"))
             ((<= 2 (length nodes))
              (user-error "Multiple declarations are invalid, %s" (length nodes)))
-            (t
-             (nth 0 nodes))))))
+            (t (nth 0 nodes))))))
+
+;; NOTE: This is generally not necessary but kinda useful for user.
+(defun ts-docstr-c++--get-name (node)
+  "Return declaration name, class/struct/enum/function."
+  (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
+                         (ts-docstr-find-children node "identifier")))
+         (node-name (nth 0 nodes-name)))
+    (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-c++--parse-return ()
@@ -86,6 +93,8 @@
          (node-fd (nth 0 nodes-fd))
          (parent (tsc-get-parent node-fd))
          (return t))
+    ;; OKAY: We don't traverse like `JavaScript' does, since C/C++ needs to declare
+    ;; return type in the function declaration.
     (tsc-mapc-children
      (lambda (node)
        (when (ts-docstr-leaf-p node)
@@ -98,31 +107,27 @@
 (defun ts-docstr-c++-parse (node)
   "Parse declaration for C++."
   (ts-docstr-c-like-narrow-region
-    (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
-                           (ts-docstr-find-children node "identifier")))
-           (node-name (nth 0 nodes-name))
-           (name (tsc-node-text node-name)))
-      (if-let ((params (ts-docstr-grab-nodes-in-range '(parameter_list))))
-          (let (types variables)
-            (dolist (param params)
-              (tsc-mapc-children
-               (lambda (node)
-                 (when (eq (tsc-node-type node) 'parameter_declaration)  ; Enters `parameter_declaration' node
-                   (dotimes (index (tsc-count-children node))
-                     (let ((child (tsc-get-nth-child node index)))  ; access `parameter_declaration' child
-                       (pcase (ts-docstr-2-str (tsc-node-type child))
-                         ((or "primitive_type" "type_identifier")
-                          (ts-docstr-push (tsc-node-text child) types))
-                         ((or "identifier"
-                              "array_declarator"
-                              "pointer_declarator"
-                              "reference_declarator")
-                          (ts-docstr-push (s-replace " " "" (tsc-node-text child)) variables)))))))
-               param))
-            (list :type ,types :variable ,variables
-                  :return ,(ts-docstr-c++--parse-return)
-                  :name name))
-        (list :name name)))))
+    (if-let ((params (ts-docstr-grab-nodes-in-range '(parameter_list))))
+        (let (types variables)
+          (dolist (param params)
+            (tsc-mapc-children
+             (lambda (node)
+               (when (eq (tsc-node-type node) 'parameter_declaration)  ; Enters `parameter_declaration' node
+                 (dotimes (index (tsc-count-children node))
+                   (let ((child (tsc-get-nth-child node index)))  ; access `parameter_declaration' child
+                     (pcase (ts-docstr-2-str (tsc-node-type child))
+                       ((or "primitive_type" "type_identifier")
+                        (ts-docstr-push (tsc-node-text child) types))
+                       ((or "identifier"
+                            "array_declarator"
+                            "pointer_declarator"
+                            "reference_declarator")
+                        (ts-docstr-push (s-replace " " "" (tsc-node-text child)) variables)))))))
+             param))
+          (list :type types :variable variables
+                :return (ts-docstr-c++--parse-return)
+                :name (ts-docstr-c++--get-name node)))
+      (list :name (ts-docstr-c++--get-name node)))))
 
 (defun ts-docstr-c++-config ()
   "Configure style according to variable `ts-docstr-c++-style'."
@@ -152,7 +157,7 @@
   (ts-docstr-c-like-narrow-region
     (ts-docstr-inserting
       (cl-case (tsc-node-type node)
-        (function_declarator
+        (function_declarator  ; For function
          (when-let* ((types (plist-get data :type))
                      (variables (plist-get data :variable))
                      (len (length variables)))
@@ -168,7 +173,7 @@
            (when (plist-get data :return)
              (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
            (ts-docstr-insert c-end)))
-        (t
+        (t  ; For the rest of the type, class/struct/enum
          (ts-docstr-insert c-start "\n")
          (ts-docstr-insert c-prefix "\n")
          (setq restore-point (1- (point)))

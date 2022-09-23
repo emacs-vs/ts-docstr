@@ -68,12 +68,20 @@
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
                                                    struct_declaration
                                                    enum_declaration
-                                                   parameter_list))))
+                                                   method_declaration))))
       (cond ((zerop (length nodes))
              (user-error "No declaration found"))
             ((<= 2 (length nodes))
              (user-error "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
+
+;; NOTE: This is generally not necessary but kinda useful for user.
+(defun ts-docstr-csharp--get-name (node)
+  "Return declaration name, class/struct/enum/function."
+  (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
+                         (ts-docstr-find-children node "identifier")))
+         (node-name (nth 0 nodes-name)))
+    (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-csharp--parse-return ()
@@ -82,6 +90,8 @@
          (node-pl (nth 0 nodes-pl))
          (parent (tsc-get-parent node-pl))
          (return t))
+    ;; OKAY: We don't traverse like `JavaScript' does, since C# needs to declare
+    ;; return type in the function declaration.
     (tsc-mapc-children
      (lambda (node)
        (when (ts-docstr-leaf-p node)
@@ -91,33 +101,37 @@
     return))
 
 ;;;###autoload
-(defun ts-docstr-csharp-parse ()
+(defun ts-docstr-csharp-parse (node)
   "Parse declaration for C#."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list))))
-      (let (types variables default-values)
-        (dolist (param params)
-          (tsc-mapc-children
-           (lambda (node)
-             (when (eq (tsc-node-type node) 'parameter)  ; Enters `parameter' node
-               (dotimes (index (tsc-count-children node))
-                 (let ((child (tsc-get-nth-child node index)))  ; access `parameter' child
-                   (pcase (ts-docstr-2-str (tsc-node-type child))
-                     ("predefined_type"
-                      (ts-docstr-push (tsc-node-text child) types))
-                     ("identifier"
-                      (ts-docstr-push
-                       (tsc-node-text child)
-                       ;; If first child (index 0) is `identifier', then it
-                       ;; could be a type. Otherwise, it's a variable name.
-                       (if (zerop index) types variables)))
-                     ("equals_value_clause"
-                      ;; TODO: default-value?
-                      ))))))
-           param))
-        (list :type types :variable variables
-              :default-values default-values
-              :return (ts-docstr-csharp--parse-return))))))
+    ;; OKAY: We find parameters directly from the captured node, this is much
+    ;; faster than the previous capture method.
+    (if-let ((params (ts-docstr-find-children node "parameter_list")))
+        (let (types variables default-values)
+          (dolist (param params)
+            (tsc-mapc-children
+             (lambda (node)
+               (when (eq (tsc-node-type node) 'parameter)  ; Enters `parameter' node
+                 (dotimes (index (tsc-count-children node))
+                   (let ((child (tsc-get-nth-child node index)))  ; access `parameter' child
+                     (pcase (ts-docstr-2-str (tsc-node-type child))
+                       ("predefined_type"
+                        (ts-docstr-push (tsc-node-text child) types))
+                       ("identifier"
+                        (ts-docstr-push
+                         (tsc-node-text child)
+                         ;; If first child (index 0) is `identifier', then it
+                         ;; could be a type. Otherwise, it's a variable name.
+                         (if (zerop index) types variables)))
+                       ("equals_value_clause"
+                        ;; TODO: default-value?
+                        ))))))
+             param))
+          (list :type types :variable variables
+                :default-values default-values
+                :return (ts-docstr-csharp--parse-return)
+                :name (ts-docstr-csharp--get-name node)))
+      (list :name (ts-docstr-csharp--get-name node)))))
 
 (defun ts-docstr-csharp-config ()
   "Configure style according to variable `ts-docstr-csharp-style'."
@@ -130,21 +144,28 @@
              :return ts-docstr-csharp-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-csharp-insert (_node data)
+(defun ts-docstr-csharp-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-c-like-narrow-region
     (ts-docstr-inserting
-      (when-let* ((types (plist-get data :type))
-                  (variables (plist-get data :variable))
-                  (len (length types)))
-        (insert c-start "\n")
-        (insert c-prefix (ts-docstr-format 'summary) "\n")
-        (setq restore-point (1- (point)))
-        (insert c-end "\n")
-        (dotimes (index len)
-          (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
-        (when (plist-get data :return)
-          (insert c-prefix (ts-docstr-format 'return)))))))
+      (cl-case (tsc-node-type node)
+        (method_declaration
+         (when-let* ((types (plist-get data :type))
+                     (variables (plist-get data :variable))
+                     (len (length types)))
+           (insert c-start "\n")
+           (insert c-prefix (ts-docstr-format 'summary) "\n")
+           (setq restore-point (1- (point)))
+           (insert c-end "\n")
+           (dotimes (index len)
+             (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
+           (when (plist-get data :return)
+             (insert c-prefix (ts-docstr-format 'return)))))
+        (t
+         (insert c-start "\n")
+         (insert c-prefix (ts-docstr-format 'summary) "\n")
+         (setq restore-point (1- (point)))
+         (insert c-end))))))
 
 (provide 'ts-docstr-csharp)
 ;;; ts-docstr-csharp.el ends here
