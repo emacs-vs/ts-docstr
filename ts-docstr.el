@@ -106,11 +106,13 @@
 
 (defun ts-docstr--enable ()
   "Enable `ts-docstr' in current buffer."
-  )
+  (if (ts-docstr--require-module)
+      (ts-docstr-key-enable)
+    (ts-docstr-mode -1)))
 
 (defun ts-docstr--disable ()
   "Disable `ts-docstr' in current buffer."
-  )
+  (ts-docstr-key-disable))
 
 ;;;###autoload
 (define-minor-mode ts-docstr-mode
@@ -236,7 +238,7 @@ node from the root."
     (scala-mode      . ts-docstr-scala)
     (swift-mode      . ts-docstr-swift)
     (typescript-mode . ts-docstr-typescript))
-  "Parsers alist."
+  "Module alist."
   :type '(alist key-type symbol)
   :group 'ts-docstr)
 
