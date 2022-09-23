@@ -15,6 +15,7 @@
         - [🔍 Method 2. Manual](#🔍-method-2-manual)
     - [📇 Commands](#📇-commands)
     - [🔧 Customization](#🔧-customization)
+        - [🎣 Keys](#🎣-keys)
         - [🎣 Hooks](#🎣-hooks)
     - [🔨 Supported languages](#🔨-supported-languages)
     - [Contribute](#contribute)
@@ -60,6 +61,14 @@ or
 | `ts-docstr-mode`     | Use nature key bindings.              |
 
 ## 🔧 Customization
+
+### 🎣 Keys
+
+Better editing experience,
+
+```elisp
+(setq ts-docstr-key-support t)
+```
 
 ### 🎣 Hooks
 
