@@ -14,6 +14,8 @@
         - [🔍 Method 1. with `straight.el` and `use-package`:](#🔍-method-1-with-straightel-and-use-package)
         - [🔍 Method 2. Manual](#🔍-method-2-manual)
     - [📇 Commands](#📇-commands)
+    - [🔧 Customization](#🔧-customization)
+        - [Hooks](#hooks)
     - [🔨 Supported languages](#🔨-supported-languages)
     - [Contribute](#contribute)
         - [❓ How to create a docstring parser?](#❓-how-to-create-a-docstring-parser)
@@ -55,6 +57,23 @@ or
 | Commands             | Description                           |
 |:---------------------|:--------------------------------------|
 | `ts-docstr-at-point` | Add document string at current point. |
+
+## 🔧 Customization
+
+### Hooks
+
+Hook patterns are:
+
+* `ts-docstr-[module]-before-[activate/parse/insert]-hook`
+* `ts-docstr-[module]-after-[activate/parse/insert]-hook`
+
+For example,
+
+* `ts-docstr-c++-before-activate-hook`
+
+or just a general one, (without the language name)
+
+* `ts-docstr-before-activate-hook`
 
 ## 🔨 Supported languages
 > ⚠️ Please sort these two lists alphabetically!
