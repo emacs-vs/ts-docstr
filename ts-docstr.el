@@ -195,11 +195,13 @@ node from the root."
 
 (defun ts-docstr-find-children (node type)
   "Search node TYPE from children; this return a list."
-  (cl-remove-if-not #'ts-docstr--compare-type (ts-docstr-children node)))
+  (cl-remove-if-not (lambda (next) (ts-docstr--compare-type next type))
+                    (ts-docstr-children node)))
 
 (defun ts-docstr-find-children-traverse (node type)
   "Like function `ts-docstr-find-children' but traverse it."
-  (cl-remove-if-not #'ts-docstr--compare-type (ts-docstr-children-traverse node)))
+  (cl-remove-if-not (lambda (next) (ts-docstr--compare-type next type))
+                    (ts-docstr-children-traverse node)))
 
 ;;
 ;; (@* "Core" )

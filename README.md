@@ -62,12 +62,11 @@ or
 These languages are fairly complete:
 
 * C / C++ / C#
-* Java
+* Java / JavaScript
 
 These languages are in development:
 
 * Go
-* JavaScript
 * PHP
 * Python
 * Ruby

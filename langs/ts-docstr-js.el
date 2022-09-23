@@ -53,7 +53,7 @@
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-js-format-param "@param {{v}} {d}"
+(defcustom ts-docstr-js-format-param "@param {{t}} {v} - {d}"
   "Format for parameter line."
   :type 'string
   :group 'ts-docstr)
@@ -111,13 +111,13 @@
                  :prefix "* "
                  :end "*/"
                  :summary "{d}"
-                 :param "@param {{v}} - {d}"
+                 :param "@param {{t}} {v} - {d}"
                  :return "@return {d}"))
     (google (list :start "/**"
                   :prefix "* "
                   :end "*/"
                   :summary "{d}"
-                  :param "@param {{v}} {d}"
+                  :param "@param {{t}} {v} {d}"
                   :return "@return {d}"))
     (t (list :start ts-docstr-js-start
              :prefix ts-docstr-js-prefix
