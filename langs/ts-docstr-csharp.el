@@ -105,7 +105,8 @@
   "Parse declaration for C#."
   (ts-docstr-c-like-narrow-region
     ;; OKAY: We find parameters directly from the captured node, this is much
-    ;; faster than the previous capture method.
+    ;; faster than the previous capture method (previously, we were capturing
+    ;; it from the whole buffer).
     (if-let ((params (ts-docstr-find-children node "parameter_list")))
         (let (types variables)
           (dolist (param params)

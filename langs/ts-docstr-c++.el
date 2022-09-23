@@ -107,7 +107,10 @@
 (defun ts-docstr-c++-parse (node)
   "Parse declaration for C++."
   (ts-docstr-c-like-narrow-region
-    (if-let ((params (ts-docstr-grab-nodes-in-range '(parameter_list))))
+    ;; OKAY: We find parameters directly from the captured node, this is much
+    ;; faster than the previous capture method (previously, we were capturing
+    ;; it from the whole buffer).
+    (if-let ((params (ts-docstr-find-children node "parameter_list")))
         (let (types variables)
           (dolist (param params)
             (tsc-mapc-children

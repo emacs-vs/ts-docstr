@@ -42,6 +42,20 @@
 ;; (@* "Util" )
 ;;
 
+(defun ts-docstr--looking-back (regexp &optional limit greedy)
+  "Wrapper for function `looking-back'.
+See function `looking-back' description for arguments REGEXP, LIMIT,
+and GREEDY."
+  (ignore-errors (looking-back regexp limit greedy)))
+
+(defun ts-docstr--line-is (string)
+  "Check if STRING is equal to current line (trimmed)."
+  (string= (string-trim (thing-at-point 'line)) string))
+
+(defun ts-docstr-comment-p ()
+  "Return non-nil when inside comment block."
+  (nth 4 (syntax-ppss)))
+
 (defun ts-docstr-key--advice-add (key where fnc)
   "Safe add advice KEY with FNC at WHERE."
   (let ((key-fnc (key-binding (kbd key))))
@@ -56,10 +70,6 @@
   "Execute BODY only when major-mode is defined in MODE-LIST."
   (declare (indent 1))
   `(when (memq major-mode ,mode-list) ,@body))
-
-(defun ts-docstr-comment-p ()
-  "Return non-nil when inside comment block."
-  (nth 4 (syntax-ppss)))
 
 (defun ts-docstr-key--valid-p ()
   "Return t when we are able to add document string."
@@ -102,7 +112,8 @@
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(csharp-mode)
     (when (ts-docstr-key--valid-p)
-      (when (string= (string-trim (thing-at-point 'line)) "///")
+      (when (and (ts-docstr--line-is "///")
+                 (ts-docstr--looking-back "///" 3))
         (backward-delete-char 3)
         (ts-docstr-at-point)))))
 
