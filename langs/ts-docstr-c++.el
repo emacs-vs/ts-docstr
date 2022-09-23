@@ -96,23 +96,29 @@
 (defun ts-docstr-c++-parse ()
   "Parse declaration for C++."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_declaration))))
+    (when-let* ((params (ts-docstr-grab-nodes-in-range '(parameter_list))))
       (let (types variables)
         (dolist (param params)
-          (tsc-traverse-mapc
+          (tsc-mapc-children
            (lambda (node)
-             (when (ts-docstr-leaf-p node)
-               (pcase (ts-docstr-2-str (tsc-node-type node))
-                 ((or "primitive_type" "type_identifier")
-                  (ts-docstr-push (tsc-node-text node) types))
-                 ("identifier"
-                  (ts-docstr-push (tsc-node-text node) variables))
-                 ((or "*" "&" "[" "]")
-                  (if (null types)
-                      (ts-docstr-push (tsc-node-text node) types)
-                    (let ((last (1- (length types))))
-                      (setf (nth last types)
-                            (concat (nth last types) (tsc-node-text node)))))))))
+             (when (eq (tsc-node-type node) 'parameter_declaration)  ; Enters `parameter_declaration' node
+               (dotimes (index (tsc-count-children node))
+                 (let ((child (tsc-get-nth-child node index)))  ; access `parameter_declaration' child
+                   (pcase (ts-docstr-2-str (tsc-node-type child))
+                     ((or "primitive_type" "type_identifier")
+                      (ts-docstr-push (tsc-node-text child) types))
+                     ((or "identifier"
+                          "array_declarator"
+                          "pointer_declarator"
+                          "reference_declarator")
+                      (ts-docstr-push (tsc-node-text child) variables))
+                     ((or "*" "&" "[" "]")
+                      (if (null types)
+                          (ts-docstr-push (tsc-node-text child) types)
+                        (let ((last (1- (length types))))
+                          (setf (nth last types)
+                                (concat (nth last types) (tsc-node-text child)))))))
+                   ))))
            param))
         `(:type ,types :variable ,variables :return ,(ts-docstr-c++--parse-return))))))
 
