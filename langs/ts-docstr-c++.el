@@ -111,13 +111,7 @@
                           "array_declarator"
                           "pointer_declarator"
                           "reference_declarator")
-                      (ts-docstr-push (tsc-node-text child) variables))
-                     ((or "*" "&" "[" "]")
-                      (if (null types)
-                          (ts-docstr-push (tsc-node-text child) types)
-                        (let ((last (1- (length types))))
-                          (setf (nth last types)
-                                (concat (nth last types) (tsc-node-text child)))))))
+                      (ts-docstr-push (s-replace " " "" (tsc-node-text child)) variables)))
                    ))))
            param))
         `(:type ,types :variable ,variables :return ,(ts-docstr-c++--parse-return))))))
