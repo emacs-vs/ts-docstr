@@ -94,7 +94,7 @@
     (when-let* ((params-lst (ts-docstr-grab-nodes-in-range '(parameter_list)))
                 (param-lst (nth (1- (length params-lst)) params-lst))
                 (params (ts-docstr-find-children param-lst "parameter_declaration")))
-      (let (types variables default-values)
+      (let (types variables)
         (dolist (param params)
           (tsc-traverse-mapc
            (lambda (node)
@@ -116,7 +116,6 @@
                 (ts-docstr-push (tsc-node-text node) variables))))
            param))
         (list :type types :variable variables
-              :default-values default-values
               :return (ts-docstr-go--parse-return))))))
 
 (defun ts-docstr-go-config ()

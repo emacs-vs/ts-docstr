@@ -98,7 +98,7 @@
   "Parse declaration for Java."
   (ts-docstr-c-like-narrow-region
     (when-let* ((params (ts-docstr-grab-nodes-in-range '(formal_parameters))))
-      (let (types variables default-values)
+      (let (types variables)
         (dolist (param params)
           (tsc-traverse-mapc
            (lambda (node)
@@ -111,7 +111,6 @@
                 (ts-docstr-push (tsc-node-text node) variables))))
            param))
         (list :type types :variable variables
-              :default-values default-values
               :return (ts-docstr-java--parse-return))))))
 
 (defun ts-docstr-java-config ()

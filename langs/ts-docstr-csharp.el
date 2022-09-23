@@ -107,7 +107,7 @@
     ;; OKAY: We find parameters directly from the captured node, this is much
     ;; faster than the previous capture method.
     (if-let ((params (ts-docstr-find-children node "parameter_list")))
-        (let (types variables default-values)
+        (let (types variables)
           (dolist (param params)
             (tsc-mapc-children
              (lambda (node)
@@ -128,7 +128,6 @@
                         ))))))
              param))
           (list :type types :variable variables
-                :default-values default-values
                 :return (ts-docstr-csharp--parse-return)
                 :name (ts-docstr-csharp--get-name node)))
       (list :name (ts-docstr-csharp--get-name node)))))
