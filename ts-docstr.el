@@ -60,7 +60,12 @@
   :group 'ts-docstr)
 
 (defcustom ts-docstr-default-typename "[type]"
-  "Placeholder string for unknown type description."
+  "Placeholder string for unknown type name."
+  :type 'string
+  :group 'ts-docstr)
+
+(defcustom ts-docstr-default-variable "[var]"
+  "Placeholder string for unknown variable name."
   :type 'string
   :group 'ts-docstr)
 
@@ -309,7 +314,7 @@ node from the root."
   "Do stuff before and after inserting document string."
   `(let ((restore-point (point)))  ; this is expect to be modified
      (ts-docstr--setup-style ,@body)
-     (ignore-errors (indent-region (point-min) (point-max)))
+     (msgu-silent (ignore-errors (indent-region (point-min) (point-max))))
      (goto-char restore-point)
      (goto-char (line-end-position))))
 

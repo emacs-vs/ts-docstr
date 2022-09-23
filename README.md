@@ -83,10 +83,10 @@ These languages are fairly complete:
 * C / C++ / C#
 * Go
 * Java / JavaScript
+* PHP
 
 These languages are in development:
 
-* PHP
 * Python
 * Ruby
 * Rust

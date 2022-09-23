@@ -145,7 +145,7 @@
     (ts-docstr-inserting
      (when-let* ((types (plist-get data :type))
                  (variables (plist-get data :variable))
-                 (len (length types)))
+                 (len (length variables)))
        (ts-docstr-insert c-start "\n")
        (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
        (setq restore-point (1- (point)))
