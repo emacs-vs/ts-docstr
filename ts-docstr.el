@@ -6,7 +6,7 @@
 ;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; URL: https://github.com/emacs-vs/ts-docstr
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "27.1") (tree-sitter "0.15.1") (s "1.9.0") (list-utils "0.4.6"))
+;; Package-Requires: ((emacs "27.1") (tree-sitter "0.15.1") (s "1.9.0") (list-utils "0.4.6") (msgu "0.1.0"))
 ;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
@@ -36,6 +36,7 @@
 (require 'subr-x)
 
 (require 'list-utils)
+(require 'msgu)
 (require 's)
 (require 'tree-sitter)
 

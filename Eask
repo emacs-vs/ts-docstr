@@ -14,6 +14,7 @@
 
 (depends-on "emacs" "27.1")
 (depends-on "list-utils")
+(depends-on "msgu")
 (depends-on "s")
 (depends-on "tree-sitter")
 
