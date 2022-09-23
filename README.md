@@ -15,7 +15,7 @@
         - [🔍 Method 2. Manual](#🔍-method-2-manual)
     - [📇 Commands](#📇-commands)
     - [🔧 Customization](#🔧-customization)
-        - [Hooks](#hooks)
+        - [🎣 Hooks](#🎣-hooks)
     - [🔨 Supported languages](#🔨-supported-languages)
     - [Contribute](#contribute)
         - [❓ How to create a docstring parser?](#❓-how-to-create-a-docstring-parser)
@@ -60,7 +60,7 @@ or
 
 ## 🔧 Customization
 
-### Hooks
+### 🎣 Hooks
 
 Hook patterns are:
 
