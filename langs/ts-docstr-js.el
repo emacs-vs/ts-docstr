@@ -1,4 +1,4 @@
-;;; ts-docstr-java.el --- Document string for Java  -*- lexical-binding: t; -*-
+;;; ts-docstr-js.el --- Document string for JavaScript  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Shen, Jen-Chieh
 
@@ -19,56 +19,55 @@
 
 ;;; Commentary:
 ;;
-;; Document string for Java.
+;; Document string for JavaScript.
 ;;
 
 ;;; Code:
 
 (require 'ts-docstr-c++)
 
-(defcustom ts-docstr-java-style 'javadoc
-  "Style specification for document string in Java."
+(defcustom ts-docstr-js-style 'jsdoc
+  "Style specification for document string in JavaScript."
   :type '(choice (const :tag "No specify" nil)
-                 (const :tag "Javadoc Style" javadoc))
+                 (const :tag "JSdoc Style" jsdoc)
+                 (const :tag "Google Style" google))
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-start "/**"
+(defcustom ts-docstr-js-start "/**"
   "Docstring start line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-prefix "* "
+(defcustom ts-docstr-js-prefix "* "
   "Docstring prefix for each line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-end "*/"
+(defcustom ts-docstr-js-end "*/"
   "Docstring end line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-format-summary "{d}"
+(defcustom ts-docstr-js-format-summary "{d}"
   "Format for summary line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-format-param "@param {v} {d}"
+(defcustom ts-docstr-js-format-param "@param {{v}} {d}"
   "Format for parameter line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-format-return "@return {d}"
+(defcustom ts-docstr-js-format-return "@return {d}"
   "Format for return line."
   :type 'string
   :group 'ts-docstr)
 
 ;;;###autoload
-(defun ts-docstr-java-activate ()
+(defun ts-docstr-js-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
-                                                   interface_declaration
-                                                   enum_declaration
                                                    formal_parameters))))
       (cond ((zerop (length nodes))
              (user-error "No declaration found"))
@@ -77,23 +76,19 @@
             (t (nth 0 nodes))))))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-java--parse-return ()
+(defun ts-docstr-js--parse-return ()
   "Return t if function does have return value."
-  (let* ((nodes-pl (ts-docstr-grab-nodes-in-range '(formal_parameters)))
-         (node-pl (nth 0 nodes-pl))
-         (parent (tsc-get-parent node-pl))
-         (return t))
-    (tsc-mapc-children
-     (lambda (node)
-       (when (ts-docstr-leaf-p node)
-         (when (string= (tsc-node-text node) "void")
-           (setq return nil))))
-     parent)
-    return))
+  (when-let*
+      ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
+       (node-fp (nth 0 nodes-fp))
+       (node-sb (ts-docstr-get-next-sibling node-fp "statement_block")))
+    (cl-some (lambda (return-node)
+               (<= 3 (tsc-count-children return-node)))
+             (ts-docstr-find-children node-sb "return_statement"))))
 
 ;;;###autoload
-(defun ts-docstr-java-parse ()
-  "Parse declaration for Java."
+(defun ts-docstr-js-parse ()
+  "Parse declaration for JavaScript."
   (ts-docstr-c-like-narrow-region
     (when-let* ((params (ts-docstr-grab-nodes-in-range '(formal_parameters))))
       (let (types variables default-values)
@@ -101,37 +96,40 @@
           (tsc-traverse-mapc
            (lambda (node)
              (pcase (ts-docstr-2-str (tsc-node-type node))
-               ((or "array_type" "integral_type" "floating_point_type"
-                    "boolean_type" "scoped_type_identifier"
-                    "generic_type" "type_identifier")
-                (ts-docstr-push (tsc-node-text node) types))
                ("identifier"
+                (ts-docstr-push ts-docstr-default-typename types)
                 (ts-docstr-push (tsc-node-text node) variables))))
            param))
         (list :type types :variable variables
               :default-values default-values
-              :return (ts-docstr-java--parse-return))))))
+              :return (ts-docstr-js--parse-return))))))
 
-(defun ts-docstr-java-config ()
-  "Configure style according to variable `ts-docstr-java-style'."
-  (cl-case ts-docstr-java-style
-    (javadoc (list :start "/**"
-                   :prefix "* "
-                   :end "*/"
-                   :summary "{d}"
-                   :param "@param {v} {d}"
-                   :return "@return {d}"))
-    (t (list :start ts-docstr-java-start
-             :prefix ts-docstr-java-prefix
-             :end ts-docstr-java-end
-             :summary ts-docstr-java-format-summary
-             :param ts-docstr-java-format-param
-             :return ts-docstr-java-format-return))))
+(defun ts-docstr-js-config ()
+  "Configure style according to variable `ts-docstr-js-style'."
+  (cl-case ts-docstr-js-style
+    (jsdoc (list :start "/**"
+                 :prefix "* "
+                 :end "*/"
+                 :summary "{d}"
+                 :param "@param {{v}} - {d}"
+                 :return "@return {d}"))
+    (google (list :start "/**"
+                  :prefix "* "
+                  :end "*/"
+                  :summary "{d}"
+                  :param "@param {{v}} {d}"
+                  :return "@return {d}"))
+    (t (list :start ts-docstr-js-start
+             :prefix ts-docstr-js-prefix
+             :end ts-docstr-js-end
+             :summary ts-docstr-js-format-summary
+             :param ts-docstr-js-format-param
+             :return ts-docstr-js-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-java-insert (node data)
+(defun ts-docstr-js-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-c++-insert node data))
 
-(provide 'ts-docstr-java)
-;;; ts-docstr-java.el ends here
+(provide 'ts-docstr-js)
+;;; ts-docstr-js.el ends here

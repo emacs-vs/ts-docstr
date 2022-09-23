@@ -168,31 +168,38 @@ node from the root."
                              (>= end (tsc-node-end-position node))))
                       nodes)))
 
-(defvar ts-docstr--format-summary nil)
-(defvar ts-docstr--format-param nil)
-(defvar ts-docstr--format-return nil)
+(defun ts-docstr-get-next-sibling (node type)
+  "Like function `tsc-get-next-sibling' but with TYPE (string)."
+  (let ((next (tsc-get-next-sibling node)) found)
+    (while (and next (not found))
+      (when (string= (ts-docstr-2-str (tsc-node-type next)) type)
+        (setq found type)))
+    next))
 
-(defmacro ts-docstr--setup-style (&rest body)
-  "Set up the style data."
-  `(let* ((config-data (funcall (intern (format "%s-config" (ts-docstr-module)))))
-          (c-start (plist-get config-data :start))
-          (c-prefix (plist-get config-data :prefix))
-          (c-end (plist-get config-data :end))
-          (c-summary (plist-get config-data :summary))
-          (c-param (plist-get config-data :param))
-          (c-return (plist-get config-data :return)))
-     (setq ts-docstr--format-summary c-summary
-           ts-docstr--format-param c-param
-           ts-docstr--format-return c-return)
-     ,@body))
+(defun ts-docstr-children (node)
+  "Return children from NODE."
+  (let (children)
+    (dotimes (index (tsc-count-children node))
+      (ts-docstr-push (tsc-get-nth-child node index) children))
+    children))
 
-(defmacro ts-docstr-inserting (&rest body)
-  "Do stuff before and after inserting document string."
-  `(let ((restore-point (point)))  ; this is expect to be modified
-     (ts-docstr--setup-style ,@body)
-     (ignore-errors (indent-region (point-min) (point-max)))
-     (goto-char restore-point)
-     (goto-char (line-end-position))))
+(defun ts-docstr-children-traverse (node)
+  "Return children from NODE but traverse it."
+  (let (nodes)
+    (tsc-traverse-mapc (lambda (next) (ts-docstr-push next nodes)) node)
+    nods))
+
+(defun ts-docstr--compare-type (node type)
+  "Compare NODE's type to TYPE."
+  (string= (ts-docstr-2-str (tsc-node-type node)) type))
+
+(defun ts-docstr-find-children (node type)
+  "Search node TYPE from children; this return a list."
+  (cl-remove-if-not #'ts-docstr--compare-type (ts-docstr-children node)))
+
+(defun ts-docstr-find-children-traverse (node type)
+  "Like function `ts-docstr-find-children' but traverse it."
+  (cl-remove-if-not #'ts-docstr--compare-type (ts-docstr-children-traverse node)))
 
 ;;
 ;; (@* "Core" )
@@ -272,6 +279,36 @@ node from the root."
                                     (return ts-docstr-desc-return))
                             format))
     format))
+
+;;
+;; (@* "Insertion" )
+;;
+
+(defvar ts-docstr--format-summary nil)
+(defvar ts-docstr--format-param nil)
+(defvar ts-docstr--format-return nil)
+
+(defmacro ts-docstr--setup-style (&rest body)
+  "Set up the style data."
+  `(let* ((config-data (funcall (intern (format "%s-config" (ts-docstr-module)))))
+          (c-start (plist-get config-data :start))
+          (c-prefix (plist-get config-data :prefix))
+          (c-end (plist-get config-data :end))
+          (c-summary (plist-get config-data :summary))
+          (c-param (plist-get config-data :param))
+          (c-return (plist-get config-data :return)))
+     (setq ts-docstr--format-summary c-summary
+           ts-docstr--format-param c-param
+           ts-docstr--format-return c-return)
+     ,@body))
+
+(defmacro ts-docstr-inserting (&rest body)
+  "Do stuff before and after inserting document string."
+  `(let ((restore-point (point)))  ; this is expect to be modified
+     (ts-docstr--setup-style ,@body)
+     (ignore-errors (indent-region (point-min) (point-max)))
+     (goto-char restore-point)
+     (goto-char (line-end-position))))
 
 ;;
 ;; (@* "C-like" )
