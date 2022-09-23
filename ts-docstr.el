@@ -170,15 +170,20 @@ node from the root."
   (when-let ((beg (or beg (point-min))) (end (or end (point-max)))
              (nodes (ts-docstr-grab-nodes nodes)))
     (cl-remove-if-not (lambda (node)
-                        (and (<= beg (tsc-node-start-position node))
-                             (>= end (tsc-node-end-position node))))
+                        (let ((node-beg (tsc-node-start-position node))
+                              ;;(node-end (tsc-node-end-position node))
+                              )
+                          ;; Make sure the node is overlapped, but not exceeded
+                          (and (<= beg node-beg)
+                               (<= node-beg end))))
                       nodes)))
 
 (defun ts-docstr-get-next-sibling (node type)
   "Like function `tsc-get-next-sibling' but with TYPE (string)."
   (let ((next (tsc-get-next-sibling node)) found)
     (while (and next (not found))
-      (if (string= (ts-docstr-2-str (tsc-node-type next)) type)
+      (if (string= (ts-docstr-2-str (tsc-node-type next))
+                   (if (stringp type) type (ts-docstr-2-str type)))
           (setq found type)
         (setq next (tsc-get-next-sibling next))))
     next))
@@ -255,17 +260,17 @@ node from the root."
     (apply #'run-hook-with-args (list before-hook))  ; before has no arguments
     (apply #'run-hook-with-args (list before-module-hook))  ; before has no arguments
     (setq result (pcase event
-                   ("insert" (apply event-name args))
-                   (_ (funcall event-name))))
+                   ("activate" (funcall event-name))
+                   (_ (apply event-name args))))
     (apply #'run-hook-with-args (append (list after-hook) args))
     (apply #'run-hook-with-args (append (list after-module-hook) args))
     result))
 
 (defun ts-docstr--process-events (module)
   "Process MODULE events, this entire process to add document string."
-  (when-let ((node (ts-docstr--module-funcall module "activate"))
-             (data (ts-docstr--module-funcall module "parse")))
-    (ts-docstr--module-funcall module "insert" node data)))
+  (when-let ((node (ts-docstr--module-funcall module "activate")))
+    (ts-docstr--module-funcall module "insert" node
+                               (ts-docstr--module-funcall module "parse" node))))
 
 ;;;###autoload
 (defun ts-docstr-at-point ()
@@ -299,6 +304,7 @@ node from the root."
 
 (defmacro ts-docstr--setup-style (&rest body)
   "Set up the style data."
+  (declare (indent 0) (debug t))
   `(let* ((config-data (funcall (intern (format "%s-config" (ts-docstr-module)))))
           (c-start (plist-get config-data :start))
           (c-prefix (plist-get config-data :prefix))
@@ -313,6 +319,7 @@ node from the root."
 
 (defmacro ts-docstr-inserting (&rest body)
   "Do stuff before and after inserting document string."
+  (declare (indent 0) (debug t))
   `(let ((restore-point (point)))  ; this is expect to be modified
      (ts-docstr--setup-style ,@body)
      (msgu-silent (ignore-errors (indent-region (point-min) (point-max))))

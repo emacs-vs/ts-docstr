@@ -1,4 +1,4 @@
-;;; ts-docstr-php.el --- Document string for PHP  -*- lexical-binding: t; -*-
+;;; ts-docstr-rust.el --- Document string for Rust  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Shen, Jen-Chieh
 
@@ -19,51 +19,56 @@
 
 ;;; Commentary:
 ;;
-;; Document string for PHP.
+;; Document string for Rust.
 ;;
 
 ;;; Code:
 
-(require 'ts-docstr)
+(require 'ts-docstr-c++)
 
-(defcustom ts-docstr-php-style 'phpdoc
-  "Style specification for document string in PHP."
+(defcustom ts-docstr-rust-style 'rfc-430
+  "Style specification for document string in Rust."
   :type '(choice (const :tag "No specify" nil)
-                 (const :tag "PHPDoc Style" phpdoc))
+                 (const :tag "RFC 430 documentation conventions" rfc-430))
   :group 'ts-docstr)
 
-(defcustom ts-docstr-php-start "/**"
+(defcustom ts-docstr-rust-start "/**"
   "Docstring start line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-php-prefix "* "
+(defcustom ts-docstr-rust-prefix "* "
   "Docstring prefix for each line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-php-end "*/"
+(defcustom ts-docstr-rust-end "*/"
   "Docstring end line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-php-format-summary "{d}"
+(defcustom ts-docstr-rust-format-summary "{d}"
   "Format for summary line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-php-format-param "@param {v} {d}"
+(defcustom ts-docstr-rust-format-param "@param {v} {d}"
   "Format for parameter line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-php-format-return "@return {d}"
+(defcustom ts-docstr-rust-format-return "@return {d}"
   "Format for return line."
   :type 'string
   :group 'ts-docstr)
 
+(defcustom ts-docstr-rust-header-argument "# Arguments"
+  "Header for arguments."
+  :type 'string
+  :group 'ts-docstr)
+
 ;;;###autoload
-(defun ts-docstr-php-activate ()
+(defun ts-docstr-rust-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
@@ -76,7 +81,7 @@
             (t (nth 0 nodes))))))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-php--parse-return ()
+(defun ts-docstr-rust--parse-return ()
   "Return t if function does have return value."
   (let* ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
          (node-fp (nth 0 nodes-fp))
@@ -87,7 +92,7 @@
 
 ;;;###autoload
 (defun ts-docstr-php-parse ()
-  "Parse declaration for PHP."
+  "Parse declaration for Rust."
   (ts-docstr-c-like-narrow-region
     (when-let* ((params (ts-docstr-grab-nodes-in-range '(simple_parameter))))
       (let (types variables)
@@ -107,26 +112,28 @@
                 (ts-docstr-push ts-docstr-default-typename types)
               (ts-docstr-push ts-docstr-default-variable variables))))
         (list :type types :variable variables
-              :return (ts-docstr-php--parse-return))))))
+              :return (ts-docstr-rust--parse-return))))))
 
-(defun ts-docstr-php-config ()
-  "Configure style according to variable `ts-docstr-php-style'."
-  (cl-case ts-docstr-php-style
-    (phpdoc (list :start "/**"
-                  :prefix "* "
-                  :end "*/"
-                  :summary "{d}"
-                  :param "@param {v} {d}"
-                  :return "@return {d}"))
-    (t (list :start ts-docstr-php-start
-             :prefix ts-docstr-php-prefix
-             :end ts-docstr-php-end
-             :summary ts-docstr-php-format-summary
-             :param ts-docstr-php-format-param
-             :return ts-docstr-php-format-return))))
+(defun ts-docstr-rust-config ()
+  "Configure style according to variable `ts-docstr-rust-style'."
+  (cl-case ts-docstr-rust-style
+    (rfc-430 (list :start ""
+                   :prefix "/// "
+                   :end ""
+                   :summary "{d}"
+                   :param "* `{v}` - {d}"
+                   :return ""
+                   :header-arg "# Arguments"))
+    (t (list :start ts-docstr-rust-start
+             :prefix ts-docstr-rust-prefix
+             :end ts-docstr-rust-end
+             :summary ts-docstr-rust-format-summary
+             :param ts-docstr-rust-format-param
+             :return ts-docstr-rust-format-return
+             :header-arg ts-docstr-rust-header-argument))))
 
 ;;;###autoload
-(defun ts-docstr-php-insert (node data)
+(defun ts-docstr-rust-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-c-like-narrow-region
     (ts-docstr-inserting

@@ -134,17 +134,17 @@
   "Insert document string upon NODE and DATA."
   (ts-docstr-c-like-narrow-region
     (ts-docstr-inserting
-     (when-let* ((types (plist-get data :type))
-                 (variables (plist-get data :variable))
-                 (len (length types)))
-       (insert c-start "\n")
-       (insert c-prefix (ts-docstr-format 'summary) "\n")
-       (setq restore-point (1- (point)))
-       (insert c-end "\n")
-       (dotimes (index len)
-         (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
-       (when (plist-get data :return)
-         (insert c-prefix (ts-docstr-format 'return)))))))
+      (when-let* ((types (plist-get data :type))
+                  (variables (plist-get data :variable))
+                  (len (length types)))
+        (insert c-start "\n")
+        (insert c-prefix (ts-docstr-format 'summary) "\n")
+        (setq restore-point (1- (point)))
+        (insert c-end "\n")
+        (dotimes (index len)
+          (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
+        (when (plist-get data :return)
+          (insert c-prefix (ts-docstr-format 'return)))))))
 
 (provide 'ts-docstr-csharp)
 ;;; ts-docstr-csharp.el ends here
