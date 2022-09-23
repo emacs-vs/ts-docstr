@@ -142,13 +142,13 @@
              :return ts-docstr-go-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-go-insert (node data)
+(defun ts-docstr-go-insert (_node data)
   "Insert document string upon NODE and DATA."
-  (cl-case ts-docstr-go-style
-    (godoc (insert c-start ts-docstr-desc-summary "\n"))
-    (t
-     (ts-docstr-c-like-narrow-region
-       (ts-docstr-inserting
+  (ts-docstr-c-like-narrow-region
+    (ts-docstr-inserting
+     (cl-case ts-docstr-go-style
+       (godoc (insert c-start ts-docstr-desc-summary "\n"))
+       (t
         (when-let* ((types (plist-get data :type))
                     (variables (plist-get data :variable))
                     (len (length types)))
