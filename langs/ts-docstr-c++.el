@@ -146,17 +146,18 @@
      (when-let* ((types (plist-get data :type))
                  (variables (plist-get data :variable))
                  (len (length types)))
-       (insert c-start "\n")
-       (insert c-prefix (ts-docstr-format 'summary) "\n")
+       (ts-docstr-insert c-start "\n")
+       (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
        (setq restore-point (1- (point)))
        (dotimes (index len)
-         (insert c-prefix (ts-docstr-format 'param
-                                            :typename (nth index types)
-                                            :variable (nth index variables))
-                 "\n"))
+         (ts-docstr-insert c-prefix
+                           (ts-docstr-format 'param
+                                             :typename (nth index types)
+                                             :variable (nth index variables))
+                           "\n"))
        (when (plist-get data :return)
-         (insert c-prefix (ts-docstr-format 'return) "\n"))
-       (insert c-end)))))
+         (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+       (ts-docstr-insert c-end)))))
 
 (provide 'ts-docstr-c++)
 ;;; ts-docstr-c++.el ends here

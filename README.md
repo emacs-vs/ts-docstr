@@ -81,11 +81,11 @@ or just a general one, (without the language name)
 These languages are fairly complete:
 
 * C / C++ / C#
+* Go
 * Java / JavaScript
 
 These languages are in development:
 
-* Go
 * PHP
 * Python
 * Ruby

@@ -172,8 +172,9 @@ node from the root."
   "Like function `tsc-get-next-sibling' but with TYPE (string)."
   (let ((next (tsc-get-next-sibling node)) found)
     (while (and next (not found))
-      (when (string= (ts-docstr-2-str (tsc-node-type next)) type)
-        (setq found type)))
+      (if (string= (ts-docstr-2-str (tsc-node-type next)) type)
+          (setq found type)
+        (setq next (tsc-get-next-sibling next))))
     next))
 
 (defun ts-docstr-children (node)
@@ -311,6 +312,13 @@ node from the root."
      (ignore-errors (indent-region (point-min) (point-max)))
      (goto-char restore-point)
      (goto-char (line-end-position))))
+
+(defun ts-docstr-insert (&rest args)
+  "Like `insert' but does nothing when string its empty including newline."
+  (cond ((string= (car (last args)) "\n")
+         (unless (string-empty-p (mapconcat #'identity (butlast args)))
+           (apply #'insert args)))
+        (t (apply #'insert args))))
 
 ;;
 ;; (@* "C-like" )

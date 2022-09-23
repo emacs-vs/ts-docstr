@@ -29,9 +29,9 @@
 (defcustom ts-docstr-go-style 'godoc
   "Style specification for document string in Go."
   :type '(choice (const :tag "No specify" nil)
-                 (const :tag "Document String in Golang" godoc))
+                 (const :tag "Official Golang documentation generator" godoc)
+                 (const :tag "Docstring in Swag RESTful API" swag))
   :group 'ts-docstr)
-
 
 (defcustom ts-docstr-go-start "// "
   "Docstring start line."
@@ -80,12 +80,12 @@
 (defun ts-docstr-go--parse-return ()
   "Return t if function does have return value."
   (when-let*
-      ((nodes-fp (ts-docstr-grab-nodes-in-range '(parameter_list)))
-       (node-fp (nth 0 nodes-fp))
-       (node-sb (ts-docstr-get-next-sibling node-fp "block")))
-    (cl-some (lambda (return-node)
-               (<= 3 (tsc-count-children return-node)))
-             (ts-docstr-find-children-traverse node-sb "return_statement"))))
+      ((nodes-pl (ts-docstr-grab-nodes-in-range '(parameter_list)))
+       (node-pl (nth 0 nodes-pl))
+       (node-sb (ts-docstr-get-next-sibling node-pl "block")))
+    ;; If node before `block' node is not `parameter_list', it means the user
+    ;; does not define a return type.
+    (not (equal 'parameter_list (tsc-node-type (tsc-get-prev-sibling node-sb))))))
 
 ;;;###autoload
 (defun ts-docstr-go-parse ()
@@ -122,12 +122,18 @@
 (defun ts-docstr-go-config ()
   "Configure style according to variable `ts-docstr-go-style'."
   (cl-case ts-docstr-go-style
-    (godoc (list :start "// "
+    (godoc (list :start ""
                  :prefix "// "
                  :end ""
                  :summary "{d}"
-                 :param "@param {v} - {d}"
-                 :return "@return {d}"))
+                 :param ""
+                 :return ""))
+    (swag (list :start ""
+                :prefix "// "
+                :end ""
+                :summary "{d}"
+                :param "@param {v} - {d}"
+                :return "@return {d}"))
     (t (list :start ts-docstr-go-start
              :prefix ts-docstr-go-prefix
              :end ts-docstr-go-end
@@ -138,7 +144,26 @@
 ;;;###autoload
 (defun ts-docstr-go-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c++-insert node data))
+  (cl-case ts-docstr-go-style
+    (godoc (insert c-start ts-docstr-desc-summary "\n"))
+    (t
+     (ts-docstr-c-like-narrow-region
+       (ts-docstr-inserting
+        (when-let* ((types (plist-get data :type))
+                    (variables (plist-get data :variable))
+                    (len (length types)))
+          (ts-docstr-insert c-start "\n")
+          (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+          (setq restore-point (1- (point)))
+          (dotimes (index len)
+            (ts-docstr-insert c-prefix
+                              (ts-docstr-format 'param
+                                                :typename (nth index types)
+                                                :variable (nth index variables))
+                              "\n"))
+          (when (plist-get data :return)
+            (ts-docstr-insert c-prefix (ts-docstr-format 'return)))
+          (ts-docstr-insert c-end)))))))
 
 (provide 'ts-docstr-go)
 ;;; ts-docstr-go.el ends here
