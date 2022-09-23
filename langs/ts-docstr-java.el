@@ -102,7 +102,9 @@
            (lambda (node)
              (message "%s %s" (tsc-node-text node) (tsc-node-type node))
              (pcase (ts-docstr-2-str (tsc-node-type node))
-               ((or "array_type" "integral_type")
+               ((or "array_type" "integral_type" "floating_point_type"
+                    "boolean_type" "scoped_type_identifier"
+                    "generic_type" "type_identifier")
                 (ts-docstr-push (tsc-node-text node) types))
                ("identifier"
                 (ts-docstr-push (tsc-node-text node) variables))))
