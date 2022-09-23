@@ -27,15 +27,13 @@
 ;;; Code:
 
 (defcustom ts-docstr-key-alist
-  `(("RET" . ts-docstr-trigger-c-like-return)
-    ("/"   . ts-docstr-trigger-csharp)
-    ("/"   . ts-docstr-trigger-golang)
-    ("-"   . ts-docstr-trigger-lua)
-    ("RET" . ts-docstr-trigger-lua-return)
-    ("\""  . ts-docstr-trigger-python)
-    ("#"   . ts-docstr-trigger-ruby)
-    ("/"   . ts-docstr-trigger-rust)
-    ("/"   . ts-docstr-trigger-swift))
+  `(("RET" . ts-docstr-key-c-like-return)
+    ("/"   . ts-docstr-key-csharp)
+    ("/"   . ts-docstr-key-golang)
+    ("\""  . ts-docstr-key-python)
+    ("#"   . ts-docstr-key-ruby)
+    ("/"   . ts-docstr-key-rust)
+    ("/"   . ts-docstr-key-swift))
   "List of trigger to each `major-mode'."
   :type 'hook
   :group 'ts-docstr)
@@ -53,6 +51,19 @@
   "Safe remove advice KEY with FNC."
   (let ((key-fnc (key-binding (kbd key))))
     (when (symbolp key-fnc) (advice-remove key-fnc fnc))))
+
+(defmacro ts-docstr-key--with-major-modes (mode-list &rest body)
+  "Execute BODY only when major-mode is defined in MODE-LIST."
+  (declare (indent 1))
+  `(when (memq major-mode ,mode-list) ,@body))
+
+(defun ts-docstr-comment-p ()
+  "Return non-nil when inside comment block."
+  (nth 4 (syntax-ppss)))
+
+(defun ts-docstr-key--valid-p ()
+  "Return t when we are able to add document string."
+  (and ts-docstr-mode (ts-docstr-comment-p)))
 
 ;;
 ;; (@* "Entry" )
@@ -74,6 +85,56 @@
 (defun ts-docstr-key-disable ()
   "Disable key support."
   (ts-docstr-key--active nil))
+
+;;
+;; (@* "Implementation" )
+;;
+
+(defun ts-docstr-key-c-like-return (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-major-modes
+      (list c-mode c++-mode csharp-mode java-mode
+            javascript-mode js-mode js2-mode js3-mode)
+    ;; TODO: ..
+    ))
+
+(defun ts-docstr-key-csharp (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-major-modes '(csharp-mode)
+    (when (ts-docstr-key--valid-p)
+      (when (string= (string-trim (thing-at-point 'line)) "///")
+        (backward-delete-char 3)
+        (ts-docstr-at-point)))))
+
+(defun ts-docstr-key-golang (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-major-modes '(go-mode)
+    ;; TODO: ..
+    ))
+
+(defun ts-docstr-key-python (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-major-modes '(python-mode)
+    ;; TODO: ..
+    ))
+
+(defun ts-docstr-key-ruby (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-major-modes '(ruby-mode)
+    ;; TODO: ..
+    ))
+
+(defun ts-docstr-key-rust (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-major-modes '(rust-mode)
+    ;; TODO: ..
+    ))
+
+(defun ts-docstr-key-swift (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-major-modes '(swift-mode)
+    ;; TODO: ..
+    ))
 
 (provide 'ts-docstr-key)
 ;;; ts-docstr-key.el ends here
