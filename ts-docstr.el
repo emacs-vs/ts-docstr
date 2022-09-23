@@ -187,7 +187,7 @@ node from the root."
   "Return children from NODE but traverse it."
   (let (nodes)
     (tsc-traverse-mapc (lambda (next) (ts-docstr-push next nodes)) node)
-    nods))
+    nodes))
 
 (defun ts-docstr--compare-type (node type)
   "Compare NODE's type to TYPE."

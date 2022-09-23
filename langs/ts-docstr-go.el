@@ -1,4 +1,4 @@
-;;; ts-docstr-js.el --- Document string for JavaScript  -*- lexical-binding: t; -*-
+;;; ts-docstr-go.el --- Document string for Go  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Shen, Jen-Chieh
 
@@ -19,56 +19,57 @@
 
 ;;; Commentary:
 ;;
-;; Document string for JavaScript.
+;; Document string for Go.
 ;;
 
 ;;; Code:
 
 (require 'ts-docstr-c++)
 
-(defcustom ts-docstr-js-style 'jsdoc
-  "Style specification for document string in JavaScript."
+(defcustom ts-docstr-go-style 'godoc
+  "Style specification for document string in Go."
   :type '(choice (const :tag "No specify" nil)
-                 (const :tag "JSdoc Style" jsdoc)
-                 (const :tag "Google Style" google))
+                 (const :tag "Document String in Golang" godoc))
   :group 'ts-docstr)
 
-(defcustom ts-docstr-js-start "/**"
+
+(defcustom ts-docstr-go-start "// "
   "Docstring start line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-js-prefix "* "
+(defcustom ts-docstr-go-prefix "// "
   "Docstring prefix for each line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-js-end "*/"
+(defcustom ts-docstr-go-end ""
   "Docstring end line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-js-format-summary "{d}"
+(defcustom ts-docstr-go-format-summary "{d}"
   "Format for summary line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-js-format-param "@param {{t}} {v} - {d}"
+(defcustom ts-docstr-go-format-param "@param {v} - {d}"
   "Format for parameter line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-js-format-return "@return {d}"
+(defcustom ts-docstr-go-format-return "@return {d}"
   "Format for return line."
   :type 'string
   :group 'ts-docstr)
 
 ;;;###autoload
-(defun ts-docstr-js-activate ()
+(defun ts-docstr-go-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
-                                                   formal_parameters))))
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(struct_type
+                                                   field_identifier
+                                                   parameter_list))))
       (cond ((zerop (length nodes))
              (user-error "No declaration found"))
             ((<= 2 (length nodes))
@@ -76,19 +77,23 @@
             (t (nth 0 nodes))))))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-js--parse-return ()
+(defun ts-docstr-go--parse-return ()
   "Return t if function does have return value."
-  (when-let*
-      ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
-       (node-fp (nth 0 nodes-fp))
-       (node-sb (ts-docstr-get-next-sibling node-fp "statement_block")))
-    (cl-some (lambda (return-node)
-               (<= 3 (tsc-count-children return-node)))
-             (ts-docstr-find-children-traverse node-sb "return_statement"))))
+  (let* ((nodes-pl (ts-docstr-grab-nodes-in-range '(formal_parameters)))
+         (node-pl (nth 0 nodes-pl))
+         (parent (tsc-get-parent node-pl))
+         (return t))
+    (tsc-mapc-children
+     (lambda (node)
+       (when (ts-docstr-leaf-p node)
+         (when (string= (tsc-node-text node) "void")
+           (setq return nil))))
+     parent)
+    return))
 
 ;;;###autoload
-(defun ts-docstr-js-parse ()
-  "Parse declaration for JavaScript."
+(defun ts-docstr-go-parse ()
+  "Parse declaration for Go."
   (ts-docstr-c-like-narrow-region
     (when-let* ((params (ts-docstr-grab-nodes-in-range '(formal_parameters))))
       (let (types variables default-values)
@@ -96,40 +101,37 @@
           (tsc-traverse-mapc
            (lambda (node)
              (pcase (ts-docstr-2-str (tsc-node-type node))
+               ((or "array_type" "integral_type" "floating_point_type"
+                    "boolean_type" "scoped_type_identifier"
+                    "generic_type" "type_identifier")
+                (ts-docstr-push (tsc-node-text node) types))
                ("identifier"
-                (ts-docstr-push ts-docstr-default-typename types)
                 (ts-docstr-push (tsc-node-text node) variables))))
            param))
         (list :type types :variable variables
               :default-values default-values
-              :return (ts-docstr-js--parse-return))))))
+              :return (ts-docstr-go--parse-return))))))
 
-(defun ts-docstr-js-config ()
-  "Configure style according to variable `ts-docstr-js-style'."
-  (cl-case ts-docstr-js-style
-    (jsdoc (list :start "/**"
-                 :prefix "* "
-                 :end "*/"
+(defun ts-docstr-go-config ()
+  "Configure style according to variable `ts-docstr-go-style'."
+  (cl-case ts-docstr-go-style
+    (godoc (list :start "// "
+                 :prefix "// "
+                 :end ""
                  :summary "{d}"
-                 :param "@param {{t}} {v} - {d}"
+                 :param "@param {v} - {d}"
                  :return "@return {d}"))
-    (google (list :start "/**"
-                  :prefix "* "
-                  :end "*/"
-                  :summary "{d}"
-                  :param "@param {{t}} {v} {d}"
-                  :return "@return {d}"))
-    (t (list :start ts-docstr-js-start
-             :prefix ts-docstr-js-prefix
-             :end ts-docstr-js-end
-             :summary ts-docstr-js-format-summary
-             :param ts-docstr-js-format-param
-             :return ts-docstr-js-format-return))))
+    (t (list :start ts-docstr-go-start
+             :prefix ts-docstr-go-prefix
+             :end ts-docstr-go-end
+             :summary ts-docstr-go-format-summary
+             :param ts-docstr-go-format-param
+             :return ts-docstr-go-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-js-insert (node data)
+(defun ts-docstr-go-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-c++-insert node data))
 
-(provide 'ts-docstr-js)
-;;; ts-docstr-js.el ends here
+(provide 'ts-docstr-go)
+;;; ts-docstr-go.el ends here
