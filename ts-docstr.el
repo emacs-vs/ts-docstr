@@ -332,7 +332,7 @@ node from the root."
 (defun ts-docstr-insert (&rest args)
   "Like `insert' but does nothing when string its empty including newline."
   (cond ((string= (car (last args)) "\n")
-         (unless (string-empty-p (mapconcat #'identity (butlast args)))
+         (unless (string-empty-p (mapconcat #'identity (butlast args) ""))
            (apply #'insert args)))
         (t (apply #'insert args))))
 

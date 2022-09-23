@@ -26,6 +26,12 @@
 
 ;;; Code:
 
+(require 'ts-docstr)
+
+;;
+;; (@* "Customization" )
+;;
+
 (defcustom ts-docstr-key-alist
   `(("RET" . ts-docstr-key-doxygen-like-return)
     ("/"   . ts-docstr-key-csharp)
@@ -253,6 +259,7 @@ See function `forward-line' for argument N."
 (defun ts-docstr-key--insert-prefix ()
   "Insert prefix."
   (ts-docstr--setup-style
+    (ignore c-start) (ignore c-end)
     (when c-prefix (insert c-prefix) (indent-for-tab-command))))
 
 (defun ts-docstr-key--c-like-return (fnc &rest args)
