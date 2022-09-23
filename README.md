@@ -57,6 +57,7 @@ or
 | Commands             | Description                           |
 |:---------------------|:--------------------------------------|
 | `ts-docstr-at-point` | Add document string at current point. |
+| `ts-docstr-mode`     | Use nature key bindings.              |
 
 ## 🔧 Customization
 

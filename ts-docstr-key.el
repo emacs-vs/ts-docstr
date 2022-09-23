@@ -29,7 +29,7 @@
 (defcustom ts-docstr-key-alist
   `(("RET" . ts-docstr-key-c-like-return)
     ("/"   . ts-docstr-key-csharp)
-    ("/"   . ts-docstr-key-golang)
+    ("/"   . ts-docstr-key-go)
     ("\""  . ts-docstr-key-python)
     ("#"   . ts-docstr-key-ruby)
     ("/"   . ts-docstr-key-rust)
@@ -103,8 +103,14 @@ and GREEDY."
 (defun ts-docstr-key-c-like-return (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes
-      (list c-mode c++-mode csharp-mode java-mode
-            javascript-mode js-mode js2-mode js3-mode)
+      (list c-mode c++-mode objc-mode csharp-mode swift-mode
+            java-mode groovy-mode processing-mode
+            javascript-mode js-mode js2-mode js3-mode json-mode rjsx-mode
+            web-mode php-mode
+            actionscript-mode typescript-mode
+            go-mode scala-mode
+            rust-mode rustic-mode
+            css-mode ssass-mode scss-mode)
     ;; TODO: ..
     ))
 
@@ -117,35 +123,49 @@ and GREEDY."
         (backward-delete-char 3)
         (ts-docstr-at-point)))))
 
-(defun ts-docstr-key-golang (&rest _)
+(defun ts-docstr-key-go (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(go-mode)
-    ;; TODO: ..
-    ))
+    (when (ts-docstr-key--valid-p)
+      (when (and (ts-docstr--line-is "//")
+                 (ts-docstr--looking-back "//" 2))
+        (backward-delete-char 2)
+        (ts-docstr-at-point)))))
 
 (defun ts-docstr-key-python (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(python-mode)
-    ;; TODO: ..
-    ))
+    (when (ts-docstr-key--valid-p)
+      (when (and (ts-docstr--line-is "\"\"\"")
+                 (ts-docstr--looking-back "\"\"\"" 3))
+        (backward-delete-char 3)
+        (ts-docstr-at-point)))))
 
 (defun ts-docstr-key-ruby (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(ruby-mode)
-    ;; TODO: ..
-    ))
+    (when (and (ts-docstr--line-is "##")
+               (ts-docstr--looking-back "##" 2))
+      (backward-delete-char 2)
+      (ts-docstr-at-point))))
 
 (defun ts-docstr-key-rust (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(rust-mode)
-    ;; TODO: ..
-    ))
+    (when (ts-docstr-key--valid-p)
+      (when (and (ts-docstr--line-is "///")
+                 (ts-docstr--looking-back "///" 3))
+        (backward-delete-char 3)
+        (ts-docstr-at-point)))))
 
 (defun ts-docstr-key-swift (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(swift-mode)
-    ;; TODO: ..
-    ))
+    (when (ts-docstr-key--valid-p)
+      (when (and (ts-docstr--line-is "///")
+                 (ts-docstr--looking-back "///" 3))
+        (backward-delete-char 3)
+        (ts-docstr-at-point)))))
 
 (provide 'ts-docstr-key)
 ;;; ts-docstr-key.el ends here
