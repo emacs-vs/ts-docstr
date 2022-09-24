@@ -94,6 +94,7 @@ These languages are fairly complete:
 * Go
 * Java / JavaScript
 * PHP
+* TypeScript
 
 These languages are in development:
 
@@ -102,7 +103,6 @@ These languages are in development:
 * Rust
 * Scala
 * Swift
-* TypeScript
 
 ## Contribute
 
@@ -117,5 +117,9 @@ clone the project and establish your own branch of this tool.
 Any methods are welcome!
 
 ### ❓ How to create a docstring parser?
+
+WIP
+
+### ❓ How to trigger by a key?
 
 WIP
