@@ -387,7 +387,7 @@ Optional argument MODULE is the targeted language's codename."
               (style (completing-read
                       (format "Select docstring style (default `%s`): " (symbol-value var))
                       options)))
-    (set (make-local-variable var) style)))
+    (set (make-local-variable var) (intern style))))
 
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here
