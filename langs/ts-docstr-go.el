@@ -30,7 +30,7 @@
   "Style specification for document string in Go."
   :type '(choice (const :tag "No specify" nil)
                  (const :tag "Official Golang documentation generator" godoc)
-                 (const :tag "Docstring in Swag RESTful API" swag))
+                 (const :tag "Swag RESTful API" swag))
   :group 'ts-docstr)
 
 (defcustom ts-docstr-go-start "// "
