@@ -108,7 +108,10 @@
 (defun ts-docstr--enable ()
   "Enable `ts-docstr' in current buffer."
   (if (ts-docstr--require-module)
-      (ts-docstr-key-enable)
+      (progn
+        (ts-docstr-key-enable)
+        (when ts-docstr-ask-on-enable
+          (run-with-idle-timer 0 nil #'ts-docstr-ask)))
     (ts-docstr-mode -1)))
 
 (defun ts-docstr--disable ()
@@ -369,6 +372,11 @@ Optional argument MODULE is the targeted language's codename."
 ;; (@* "Ask" )
 ;;
 
+(defcustom ts-docstr-ask-on-enable nil
+  "Ask to select docstring style on enable."
+  :type 'boolean
+  :group 'ts-docstr)
+
 ;;;###autoload
 (defun ts-docstr-ask ()
   "Ask and update document string style (locally)."
@@ -376,7 +384,9 @@ Optional argument MODULE is the targeted language's codename."
   (when-let* ((var (intern (format "%s-style" (ts-docstr-module))))
               ((boundp var))
               (options (refine--possible-values var))
-              (style (completing-read "Select docstring style: " options)))
+              (style (completing-read
+                      (format "Select docstring style (default `%s`): " (symbol-value var))
+                      options)))
     (set (make-local-variable var) style)))
 
 (provide 'ts-docstr)
