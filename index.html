@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Document String tool for Emacs">
+  <meta name="author" content="emacs-vs">
+  <link rel="shortcut icon" href="etc/favicon.ico">
+  
+  <title>Home - ts-docstr - A document string minor mode using tree-sitter</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="stylesheets/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "README.md";
+    var mkdocs_page_url = "/ts-docstr/";
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-165661257-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> ts-docstr - A document string minor mode using tree-sitter</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="tocbase current">
+    
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="page/">Overview</a>
+  </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">Languages</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/actionscript/">ActionScript</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/c/">C</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/c%2B%2B/">C++</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/csharp/">C#</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/go/">Go</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/groovy/">Groovy</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/java/">Java</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/javascript/">JavaScript</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/lua/">Lua</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/objc/">Objective-C</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/php/">PHP</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/python/">Python</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/ruby/">Ruby</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/rust/">Rust</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/scala/">Scala</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/swift/">Swift</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="page/langs/typescript/">TypeScript</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="CHANGELOG/">Change log</a>
+  </li>
+    
+  </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">ts-docstr - A document string minor mode using tree-sitter</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/emacs-vs/ts-docstr/edit/master/docs/README.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a href="https://www.gnu.org/licenses/gpl-3.0"><img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" /></a>
+<a href="https://jcs-emacs.github.io/jcs-elpa/#/ts-docstr"><img alt="JCS-ELPA" src="https://raw.githubusercontent.com/jcs-emacs/badges/master/elpa/v/ts-docstr.svg" /></a></p>
+<h1 id="ts-docstr">ts-docstr<a class="headerlink" href="#ts-docstr" title="Permanent link">#</a></h1>
+<blockquote>
+<p>A document string minor mode using tree-sitter</p>
+</blockquote>
+<p><a href="https://github.com/emacs-vs/ts-docstr/actions/workflows/test.yml"><img alt="CI" src="https://github.com/emacs-vs/ts-docstr/actions/workflows/test.yml/badge.svg" /></a>
+<a href="https://github.com/emacs-vs/ts-docstr/actions/workflows/docs.yml"><img alt="Docs" src="https://github.com/emacs-vs/ts-docstr/actions/workflows/docs.yml/badge.svg" /></a></p>
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+<p><strong>Table of Contents</strong></p>
+<ul>
+<li><a href="#ts-docstr">ts-docstr</a><ul>
+<li><a href="#💾-installation">💾 Installation</a><ul>
+<li><a href="#🔍-method-1-with-straightel-and-use-package">🔍 Method 1. with <code>straight.el</code> and <code>use-package</code>:</a></li>
+<li><a href="#🔍-method-2-manual">🔍 Method 2. Manual</a></li>
+</ul>
+</li>
+<li><a href="#📇-commands">📇 Commands</a></li>
+<li><a href="#🔧-customization">🔧 Customization</a><ul>
+<li><a href="#🎨-styles">🎨 Styles</a></li>
+<li><a href="#️-keys">⌨️ Keys</a></li>
+<li><a href="#🎣-hooks">🎣 Hooks</a></li>
+</ul>
+</li>
+<li><a href="#🔨-supported-languages">🔨 Supported languages</a></li>
+<li><a href="#contribute">Contribute</a><ul>
+<li><a href="#❓-how-to-support-my-favorite-language">❓ How to support my favorite language?</a><ul>
+<li><a href="#🔍-the-activate-function">🔍 The <code>activate</code> function</a></li>
+<li><a href="#🔍-the-parse-function">🔍 The <code>parse</code> function</a></li>
+<li><a href="#🔍-the-insert-function">🔍 The <code>insert</code> function</a></li>
+</ul>
+</li>
+<li><a href="#❓-how-to-add-a-document-string-style">❓ How to add a document string style?</a></li>
+<li><a href="#❓-how-to-trigger-by-a-key">❓ How to trigger by a key?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- markdown-toc end -->
+
+<h2 id="installation">💾 Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
+<h3 id="method-1-with-straightel-and-use-package">🔍 Method 1. with <code>straight.el</code> and <code>use-package</code>:<a class="headerlink" href="#method-1-with-straightel-and-use-package" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nb">use-package</span><span class="w"> </span><span class="nv">ts-docstr</span><span class="w"> </span>
+<span class="w">  </span><span class="nb">:straight</span><span class="w"> </span><span class="p">(</span><span class="nv">ts-docstr</span><span class="w"> </span><span class="nb">:repo</span><span class="w"> </span><span class="s">&quot;emacs-vs/ts-docstr&quot;</span><span class="w"> </span><span class="nb">:fetcher</span><span class="w"> </span><span class="nv">github</span><span class="w"></span>
+<span class="w">                       </span><span class="nb">:files</span><span class="w"> </span><span class="p">(</span><span class="nb">:defaults</span><span class="w"> </span><span class="s">&quot;langs/*.el&quot;</span><span class="p">)))</span><span class="w"></span>
+</code></pre></div>
+<h3 id="method-2-manual">🔍 Method 2. Manual<a class="headerlink" href="#method-2-manual" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code>git clone https://github.com/emacs-vs/ts-docstr /path/to/lib
+</code></pre></div>
+<p>then in Emacs:</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nv">add-to-list</span><span class="w"> </span><span class="ss">&#39;load-path</span><span class="w"> </span><span class="s">&quot;/path/to/lib&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="p">(</span><span class="nb">require</span><span class="w"> </span><span class="nv">ts-docstr</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nb">use-package</span><span class="w"> </span><span class="nv">ts-fold</span><span class="w"></span>
+<span class="w">  </span><span class="nb">:load-path</span><span class="w"> </span><span class="s">&quot;/path/to/lib&quot;</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h2 id="commands">📇 Commands<a class="headerlink" href="#commands" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th align="left">Commands</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>ts-docstr-at-point</code></td>
+<td align="left">Add document string at current point.</td>
+</tr>
+<tr>
+<td align="left"><code>ts-docstr-mode</code></td>
+<td align="left">Use nature key bindings.</td>
+</tr>
+<tr>
+<td align="left"><code>ts-docstr-ask</code></td>
+<td align="left">Ask and update document string style (locally).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="customization">🔧 Customization<a class="headerlink" href="#customization" title="Permanent link">#</a></h2>
+<h3 id="styles">🎨 Styles<a class="headerlink" href="#styles" title="Permanent link">#</a></h3>
+<p>The style can be customized by setting the variable with this pattern
+<code>ts-docstr-[lang]-style</code>. Here is an example to set <code>Java</code> docstring style
+to <code>Javadoc</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">ts-docstr-java-style</span><span class="w"> </span><span class="ss">&#39;javadoc</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h3 id="keys">⌨️ Keys<a class="headerlink" href="#keys" title="Permanent link">#</a></h3>
+<p>Better editing experience,</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">ts-docstr-key-support</span><span class="w"> </span><span class="no">t</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h3 id="hooks">🎣 Hooks<a class="headerlink" href="#hooks" title="Permanent link">#</a></h3>
+<p>Hook patterns are:</p>
+<ul>
+<li><code>ts-docstr-[module]-before-[activate/parse/insert]-hook</code></li>
+<li><code>ts-docstr-[module]-after-[activate/parse/insert]-hook</code></li>
+</ul>
+<p>For example,</p>
+<ul>
+<li><code>ts-docstr-c++-before-activate-hook</code></li>
+</ul>
+<p>or just a general one, (without the language name)</p>
+<ul>
+<li><code>ts-docstr-before-activate-hook</code></li>
+</ul>
+<h2 id="supported-languages">🔨 Supported languages<a class="headerlink" href="#supported-languages" title="Permanent link">#</a></h2>
+<blockquote>
+<p>⚠️ Please sort these two lists alphabetically!</p>
+</blockquote>
+<p>These languages are fairly complete:</p>
+<ul>
+<li>C / C++ / C#</li>
+<li>Go</li>
+<li>Java / JavaScript</li>
+<li>PHP</li>
+<li>Rust</li>
+<li>TypeScript</li>
+</ul>
+<p>These languages are in development:</p>
+<ul>
+<li>Elixir</li>
+<li>Haskell</li>
+<li>Python</li>
+<li>Ruby</li>
+<li>Scala</li>
+<li>Shellscript</li>
+<li>Swift</li>
+</ul>
+<h2 id="contribute">Contribute<a class="headerlink" href="#contribute" title="Permanent link">#</a></h2>
+<p><a href="http://makeapullrequest.com"><img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
+<a href="https://github.com/bbatsov/emacs-lisp-style-guide"><img alt="Elisp styleguide" src="https://img.shields.io/badge/elisp-style%20guide-purple" /></a>
+<a href="https://www.paypal.me/jcs090218"><img alt="Donate on paypal" src="https://img.shields.io/badge/paypal-donate-1?logo=paypal&amp;color=blue" /></a>
+<a href="https://www.patreon.com/jcs090218"><img alt="Become a patron" src="https://img.shields.io/badge/patreon-become%20a%20patron-orange.svg?logo=patreon" /></a></p>
+<p>If you would like to contribute to this project, you may either clone and make
+pull requests to this repository. Or you can clone the project and establish
+your own branch of this tool. Any methods are welcome!</p>
+<h3 id="how-to-support-my-favorite-language">❓ How to support my favorite language?<a class="headerlink" href="#how-to-support-my-favorite-language" title="Permanent link">#</a></h3>
+<blockquote>
+<p>⚠ Before you start, make sure <a href="https://github.com/emacs-tree-sitter/tree-sitter-langs">tree-sitter-langs</a>
+supports the language you want to add!</p>
+<p>⚠ The best way to learn how the entire process works is to look into other
+files in the <code>/langs</code> folder from the project root. Find a similar language
+and see through code, all languages' implementation are very similar to one
+another.</p>
+</blockquote>
+<p>All parsers are defined in the <code>/langs</code> folder from the project root. The file
+is named with the prefix <code>ts-docstr-</code> followed by the <code>language name</code>. For
+example, if you want to create a parser for the <code>C</code> programming languge; the
+file should be named <code>ts-docstr-c.el</code>.</p>
+<p>The parser file is consist in three part:</p>
+<ul>
+<li>ts-docstr-[lang]-activate <code>()</code></li>
+<li>ts-docstr-[lang]-parse <code>(node)</code></li>
+<li>ts-docstr-[lang]-insert <code>(node data)</code></li>
+</ul>
+<h4 id="the-activate-function">🔍 The <code>activate</code> function<a class="headerlink" href="#the-activate-function" title="Permanent link">#</a></h4>
+<p>The <code>activate</code> function is used to search for a node and confirm weather it
+should insert a document string. This function will eventually return a captured
+node, or return <code>nil</code> if we shouldn't insert a document string here.</p>
+<p>Here is the simplified version of <code>Java</code> activate function:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">;;;###autoload</span><span class="w"></span>
+<span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">ts-docstr-java-activate</span><span class="w"> </span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="s">&quot;...&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="c1">;; Narrow region to next line, this defines the valid region to insert a</span><span class="w"></span>
+<span class="w">  </span><span class="c1">;; document string.</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">ts-docstr-c-like-narrow-region</span><span class="w"></span>
+<span class="w">    </span><span class="c1">;; We grab a list of node from the narrowed region, here we try to capture</span><span class="w"></span>
+<span class="w">    </span><span class="c1">;; a `class&#39; or `method&#39; declaration. If this returns 2 or more nodes,</span><span class="w"></span>
+<span class="w">    </span><span class="c1">;; report an error since we don&#39;t expect these declarations happened on the</span><span class="w"></span>
+<span class="w">    </span><span class="c1">;; same line (region).</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nf">nth</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">(</span><span class="nv">ts-docstr-grab-nodes-in-range</span><span class="w"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">class_declaration</span><span class="w"></span>
+<span class="w">                                            </span><span class="nv">method_declaration</span><span class="p">)))))</span><span class="w"></span>
+</code></pre></div>
+<p>Use <code>ts-docstr-activatable-p</code> function to check to see if you are able to insert
+a document string at point, this function returns a node.</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">print-activate-node</span><span class="w"> </span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">interactive</span><span class="p">)</span><span class="w">  </span><span class="c1">; make interactive, so you could M-x</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nf">message</span><span class="w"> </span><span class="s">&quot;node: %s&quot;</span><span class="w"> </span><span class="p">(</span><span class="nv">ts-docstr-activatable-p</span><span class="p">)))</span><span class="w"></span>
+</code></pre></div>
+<p>Evaluate, then <code>M-x print-activate-node</code> to see if it return something or <code>nil</code>.</p>
+<h4 id="the-parse-function">🔍 The <code>parse</code> function<a class="headerlink" href="#the-parse-function" title="Permanent link">#</a></h4>
+<p>The <code>parse</code> function takes one argument <code>node</code> from the <code>activate</code> function.
+In this stage, we collect all necessary data (<code>paramters</code>, <code>class</code>/<code>enum</code> name,
+etc) and put into a property list.</p>
+<p>Here is a simplest <code>parse</code> function for example:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">;;;###autoload</span><span class="w"></span>
+<span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">ts-docstr-java-parse</span><span class="w"> </span><span class="p">(</span><span class="nv">node</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="s">&quot;...&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">equal</span><span class="w"> </span><span class="p">(</span><span class="nv">tsc-node-type</span><span class="w"> </span><span class="nv">node</span><span class="p">)</span><span class="w"> </span><span class="ss">&#39;method_declaration</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="c1">;; `types&#39; and `variables&#39; are lists. Each store typenames and variables</span><span class="w"></span>
+<span class="w">      </span><span class="c1">;; name. We simply parse the tree/node in this steps.</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nf">list</span><span class="w"> </span><span class="nb">:type</span><span class="w"> </span><span class="nv">types</span><span class="w"> </span><span class="nb">:variable</span><span class="w"> </span><span class="nv">variables</span><span class="w"></span>
+<span class="w">            </span><span class="nb">:return</span><span class="w"> </span><span class="p">(</span><span class="nv">ts-docstr-java--parse-return</span><span class="w"> </span><span class="nv">params</span><span class="p">)</span><span class="w">  </span><span class="c1">; return `t&#39; or `nil&#39;</span><span class="w"></span>
+<span class="w">            </span><span class="nb">:name</span><span class="w"> </span><span class="p">(</span><span class="nv">ts-docstr-java--get-name</span><span class="w"> </span><span class="nv">node</span><span class="p">))</span><span class="w">         </span><span class="c1">; return `function&#39; name</span><span class="w"></span>
+<span class="w">    </span><span class="c1">;; For `class&#39;, we don&#39;t need to parse parameters.</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nf">list</span><span class="w"> </span><span class="nb">:name</span><span class="w"> </span><span class="p">(</span><span class="nv">ts-docstr-java--get-name</span><span class="w"> </span><span class="nv">node</span><span class="p">))))</span><span class="w">         </span><span class="c1">; return `class&#39; name</span><span class="w"></span>
+</code></pre></div>
+<h4 id="the-insert-function">🔍 The <code>insert</code> function<a class="headerlink" href="#the-insert-function" title="Permanent link">#</a></h4>
+<p>The <code>insert</code> function takes two arguments <code>node</code> and <code>data</code> from previous
+stages. We will need to define a config variable and function.</p>
+<p>The config variable:</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nb">defcustom</span><span class="w"> </span><span class="nv">ts-docstr-java-style</span><span class="w"> </span><span class="ss">&#39;javadoc</span><span class="w"></span>
+<span class="w">  </span><span class="s">&quot;...&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nb">:type</span><span class="w"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">choice</span><span class="w"> </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;No specify&quot;</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"></span>
+<span class="w">                 </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;Javadoc Style&quot;</span><span class="w"> </span><span class="nv">javadoc</span><span class="p">)))</span><span class="w"></span>
+</code></pre></div>
+<p>The config function:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">;; This is later called and exposed in the insertion function.</span><span class="w"></span>
+<span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">ts-docstr-java-config</span><span class="w"> </span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="s">&quot;...&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">cl-case</span><span class="w"> </span><span class="nv">ts-docstr-java-style</span><span class="w">  </span><span class="c1">; define the style by each style guide</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">javadoc</span><span class="w"> </span><span class="p">(</span><span class="nf">list</span><span class="w"> </span><span class="nb">:start</span><span class="w"> </span><span class="s">&quot;/**&quot;</span><span class="w">  </span><span class="c1">; this plist is later used in insertion function</span><span class="w"></span>
+<span class="w">                   </span><span class="nb">:prefix</span><span class="w"> </span><span class="s">&quot;* &quot;</span><span class="w"></span>
+<span class="w">                   </span><span class="nb">:end</span><span class="w"> </span><span class="s">&quot;*/&quot;</span><span class="w"></span>
+<span class="w">                   </span><span class="nb">:summary</span><span class="w"> </span><span class="s">&quot;{d}&quot;</span><span class="w"></span>
+<span class="w">                   </span><span class="nb">:param</span><span class="w"> </span><span class="s">&quot;@param {v} {d}&quot;</span><span class="w"></span>
+<span class="w">                   </span><span class="nb">:return</span><span class="w"> </span><span class="s">&quot;@return {d}&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="no">t</span><span class="w"> </span><span class="o">...</span><span class="p">)))</span><span class="w"></span>
+</code></pre></div>
+<p>Lastly, you can create the <code>insert</code> function. In this stage you will write data
+to the current file.</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">ts-docstr-java-insert</span><span class="w"> </span><span class="p">(</span><span class="nv">node</span><span class="w"> </span><span class="nv">data</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="s">&quot;Insert document string upon NODE and DATA.&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">ts-docstr-inserting</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">ts-docstr-insert</span><span class="w"> </span><span class="nv">c-start</span><span class="w"> </span><span class="s">&quot;\n&quot;</span><span class="p">)</span><span class="w">                              </span><span class="c1">; /**</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">ts-docstr-insert</span><span class="w"> </span><span class="nv">c-prefix</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="p">(</span><span class="nf">plist-get</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="nb">:name</span><span class="p">)</span><span class="w"> </span><span class="s">&quot;\n&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">;  * NAME</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">ts-docstr-insert</span><span class="w"> </span><span class="nv">c-end</span><span class="p">)))</span><span class="w">                                   </span><span class="c1">;  */</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="cm">/**</span>
+<span class="cm"> * Example</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="kd">class</span> <span class="nc">Example</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+</code></pre></div>
+<h3 id="how-to-add-a-document-string-style">❓ How to add a document string style?<a class="headerlink" href="#how-to-add-a-document-string-style" title="Permanent link">#</a></h3>
+<p>Find the language file in the <code>/langs</code> folder from the project root, if you
+couldn't find it, see <a href="https://github.com/emacs-vs/ts-docstr#-how-to-support-my-favorite-language">❓ How to support my favorite language?</a>.</p>
+<p>First look into the variable with the name similar to <code>ts-docstr-[lang]-style</code>.
+See the following example,</p>
+<div class="highlight"><pre><span></span><code><span class="c1">;; langs/ts-docstr-java.el</span><span class="w"></span>
+<span class="p">(</span><span class="nb">defcustom</span><span class="w"> </span><span class="nv">ts-docstr-java-style</span><span class="w"> </span><span class="ss">&#39;javadoc</span><span class="w"></span>
+<span class="w">  </span><span class="s">&quot;...&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nb">:type</span><span class="w"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">choice</span><span class="w"> </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;No specify&quot;</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"></span>
+<span class="w">                 </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;Javadoc Style&quot;</span><span class="w"> </span><span class="nv">javadoc</span><span class="p">)))</span><span class="w"></span>
+</code></pre></div>
+<p>See if the style is already supported. Continue reading if it does <strong>NOT</strong>,</p>
+<h3 id="how-to-trigger-by-a-key">❓ How to trigger by a key?<a class="headerlink" href="#how-to-trigger-by-a-key" title="Permanent link">#</a></h3>
+<p>WIP</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>(c) 2017-2022 emacs-vs. All rights reserved.</p>
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/emacs-vs/ts-docstr" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.0
+Build Date UTC : 2022-09-24 19:07:37.314426+00:00
+-->
