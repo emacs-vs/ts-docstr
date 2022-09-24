@@ -112,15 +112,16 @@ These languages are in development:
 [![Donate on paypal](https://img.shields.io/badge/paypal-donate-1?logo=paypal&color=blue)](https://www.paypal.me/jcs090218)
 [![Become a patron](https://img.shields.io/badge/patreon-become%20a%20patron-orange.svg?logo=patreon)](https://www.patreon.com/jcs090218)
 
-If you would like to contribute to this project, you may either
-clone and make pull requests to this repository. Or you can
-clone the project and establish your own branch of this tool.
-Any methods are welcome!
+If you would like to contribute to this project, you may either clone and make
+pull requests to this repository. Or you can clone the project and establish
+your own branch of this tool. Any methods are welcome!
 
 ### ❓ How to create a docstring parser?
 
-> ⚠ The best way to learn how a parser works is to look into other files in 
-> `/langs` folder from the project root.
+> ⚠ The best way to learn how the entire process works is to look into other
+> files in the `/langs` folder from the project root. Find a similar language
+> and see through code, all languages' implementation are very similar to one
+> another.
 
 All parsers are defined in the `/langs` folder from the project root. The file
 is named with the prefix `ts-docstr-` followed by the `language name`. For
