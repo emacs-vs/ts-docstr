@@ -71,9 +71,9 @@
                                                    field_identifier
                                                    parameter_list))))
       (cond ((zerop (length nodes))
-             (user-error "No declaration found"))
+             (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
-             (user-error "Multiple declarations are invalid, %s" (length nodes)))
+             (ts-docstr-log "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
 
 ;; NOTE: This is only used in function declaration!
