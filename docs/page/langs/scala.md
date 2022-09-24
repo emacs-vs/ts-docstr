@@ -1,6 +1,6 @@
 # Scala
 
-You can customize variable `docstr-scala-style` for the following value.
+You can customize variable `ts-docstr-scala-style` for the following value.
 
 * `scaladoc` - Scaladoc (default)
 * `nil` - Respect to user's customization

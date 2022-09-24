@@ -1,6 +1,6 @@
 # Swift
 
-You can customize variable `docstr-swift-style` for the following value.
+You can customize variable `ts-docstr-swift-style` for the following value.
 
 * `swift-doc` - Generates documentation for Swift projects (default)
 * `nil` - Respect to user's customization

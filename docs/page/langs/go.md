@@ -1,6 +1,6 @@
 # Golang
 
-You can customize variable `docstr-go-style` for the following value.
+You can customize variable `ts-docstr-go-style` for the following value.
 
 * `godoc` - Document String in Golang (default)
 * `nil` - Respect to user's customization

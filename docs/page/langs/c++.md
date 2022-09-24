@@ -1,6 +1,6 @@
 # C++
 
-You can customize variable `docstr-c++-style` for the following value.
+You can customize variable `ts-docstr-c++-style` for the following value.
 
 * `javadoc` - Javadoc Style (default)
 * `qt` - Qt Style

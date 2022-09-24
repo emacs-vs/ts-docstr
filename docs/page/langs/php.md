@@ -1,6 +1,6 @@
 # PHP
 
-You can customize variable `docstr-php-style` for the following value.
+You can customize variable `ts-docstr-php-style` for the following value.
 
 * `phpdoc` - PHPDoc Style (default)
 * `nil` - Respect to user's customization

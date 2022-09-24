@@ -1,6 +1,6 @@
 # Rust
 
-You can customize variable `docstr-rust-style` for the following value.
+You can customize variable `ts-docstr-rust-style` for the following value.
 
 * `rfc-430` - RFC 430 documentation conventions (default)
 * `nil` - Respect to user's customization

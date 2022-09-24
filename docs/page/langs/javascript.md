@@ -1,6 +1,6 @@
 # JavaScript
 
-You can customize variable `docstr-js-style` for the following value.
+You can customize variable `ts-docstr-js-style` for the following value.
 
 * `jsdoc` - JSdoc Style (default)
 * `google` - Google Style

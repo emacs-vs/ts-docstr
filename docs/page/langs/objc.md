@@ -1,6 +1,6 @@
 # Objective-C
 
-You can customize variable `docstr-objc-style` for the following value.
+You can customize variable `ts-docstr-objc-style` for the following value.
 
 * `header-doc` HeaderDoc documentation generator developed by Apple Inc (default)
 * `nil` - Respect to user's customization

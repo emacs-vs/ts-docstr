@@ -1,6 +1,6 @@
 # TypeScript
 
-You can customize variable `docstr-typescript-style` for the following value.
+You can customize variable `ts-docstr-typescript-style` for the following value.
 
 * `typedoc` - Documentation generator for TypeScript projects. (default)
 * `tsdoc` - A doc comment standard for TypeScript

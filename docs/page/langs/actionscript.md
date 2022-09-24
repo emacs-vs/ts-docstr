@@ -1,6 +1,6 @@
 # ActionScript
 
-You can customize variable `docstr-actionscript-style` for the following value.
+You can customize variable `ts-docstr-actionscript-style` for the following value.
 
 * `asdoc` - ASDoc Style (default)
 * `nil` - Respect to user's customization

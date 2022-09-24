@@ -1,6 +1,6 @@
 # Ruby
 
-You can customize variable `docstr-ruby-style` for the following value.
+You can customize variable `ts-docstr-ruby-style` for the following value.
 
 * `rdoc` - Ruby Documentation System (default)
 * `nil` - Respect to user's customization

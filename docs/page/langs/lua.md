@@ -1,6 +1,6 @@
 # Lua
 
-You can customize variable `docstr-lua-style` for the following value.
+You can customize variable `ts-docstr-lua-style` for the following value.
 
 * `luadoc` - Kepler's specification (default)
 * `doxygen` - doxygen/Javadoc-like style

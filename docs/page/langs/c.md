@@ -1,6 +1,6 @@
 # C
 
-You can customize variable `docstr-c-style` for the following value.
+You can customize variable `ts-docstr-c-style` for the following value.
 
 * `nil` - Respect to user's customization
 

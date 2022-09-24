@@ -1,6 +1,6 @@
 # Python
 
-You can customize variable `docstr-python-style` for the following value.
+You can customize variable `ts-docstr-python-style` for the following value.
 
 * `pep-257` - PEP 257 convention (default)
 * `google` - Google Style

@@ -1,6 +1,6 @@
 # Java
 
-You can customize variable `docstr-java-style` for the following value.
+You can customize variable `ts-docstr-java-style` for the following value.
 
 * `javadoc` - Javadoc Style (default)
 * `nil` - Respect to user's customization
