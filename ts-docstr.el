@@ -180,17 +180,19 @@ node from the root."
               (found-nodes (tsc-query-captures query node #'ignore)))
     (mapcar #'cdr found-nodes)))
 
-(defun ts-docstr-grab-nodes-in-range (nodes &optional beg end)
+(defun ts-docstr-grab-nodes-in-range (nodes &optional backward beg end)
   "Grab a list of NODES in range from BEG to END."
   (when-let ((beg (or beg (point-min))) (end (or end (point-max)))
              (nodes (ts-docstr-grab-nodes nodes)))
     (cl-remove-if-not (lambda (node)
                         (let ((node-beg (tsc-node-start-position node))
-                              ;;(node-end (tsc-node-end-position node))
-                              )
+                              (node-end (tsc-node-end-position node)))
                           ;; Make sure the node is overlapped, but not exceeded
-                          (and (<= beg node-beg)
-                               (<= node-beg end))))
+                          (if backward
+                              (and (<= beg node-end)
+                                   (<= node-end end))
+                            (and (<= beg node-beg)
+                                 (<= node-beg end)))))
                       nodes)))
 
 (defun ts-docstr-get-next-sibling (node type)
