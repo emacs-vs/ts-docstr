@@ -6,7 +6,7 @@
 ;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; URL: https://github.com/emacs-vs/ts-docstr
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "27.1") (tree-sitter "0.15.1") (s "1.9.0") (list-utils "0.4.6") (msgu "0.1.0"))
+;; Package-Requires: ((emacs "27.1") (tree-sitter "0.15.1") (s "1.9.0") (list-utils "0.4.6") (msgu "0.1.0") (refine "0.4"))
 ;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
@@ -37,6 +37,7 @@
 
 (require 'list-utils)
 (require 'msgu)
+(require 'refine)
 (require 's)
 (require 'tree-sitter)
 
@@ -363,6 +364,18 @@ Optional argument MODULE is the targeted language's codename."
   `(save-restriction
      (narrow-to-region (line-beginning-position) (line-end-position 2))
      ,@body))
+
+;;
+;; (@* "Ask" )
+;;
+
+(defun ts-docstr-ask ()
+  ""
+  (interactive)
+  (let* ((options )
+         (var )
+         (style (completing-read "Select docstring style: " options)))
+    (setq-local var style)))
 
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here
