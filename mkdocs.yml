@@ -12,25 +12,24 @@ copyright: (c) 2017-2022 emacs-vs. All rights reserved.
 
 nav:
   - Overview: page/index.md
-  - Languages:
-    - Test:
-      #- ActionScript: page/langs/actionscript.md
-      - C: page/langs/c.md
-      - C++: page/langs/c++.md
-      - C#: page/langs/csharp.md
-      - Go: page/langs/go.md
-      #- Groovy: page/langs/groovy.md
-      - Java: page/langs/java.md
-      - JavaScript: page/langs/javascript.md
-      #- Lua: page/langs/lua.md
-      #- Objective-C: page/langs/objc.md
-      - PHP: page/langs/php.md
-      #- Python: page/langs/python.md
-      #- Ruby: page/langs/ruby.md
-      - Rust: page/langs/rust.md
-      #- Scala: page/langs/scala.md
-      #- Swift: page/langs/swift.md
-      - TypeScript: page/langs/typescript.md
+  - Languages: page/index.md
+    #- ActionScript: page/langs/actionscript.md
+    - C: page/langs/c.md
+    - C++: page/langs/c++.md
+    - C#: page/langs/csharp.md
+    - Go: page/langs/go.md
+    #- Groovy: page/langs/groovy.md
+    - Java: page/langs/java.md
+    - JavaScript: page/langs/javascript.md
+    #- Lua: page/langs/lua.md
+    #- Objective-C: page/langs/objc.md
+    - PHP: page/langs/php.md
+    #- Python: page/langs/python.md
+    #- Ruby: page/langs/ruby.md
+    - Rust: page/langs/rust.md
+    #- Scala: page/langs/scala.md
+    #- Swift: page/langs/swift.md
+    - TypeScript: page/langs/typescript.md
   - Change log: CHANGELOG.md
 
 extra_css:
