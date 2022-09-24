@@ -1,0 +1,72 @@
+site_name: ts-docstr - A document string minor mode using tree-sitter
+site_description: Document String tool for Emacs
+site_url: https://emacs-vs.github.io/ts-docstr
+site_author: 'emacs-vs'
+site_favicon: etc/favicon.ico
+
+repo_name: GitHub
+repo_url: https://github.com/emacs-vs/ts-docstr
+edit_uri: edit/master/docs/
+
+copyright: (c) 2017-2022 emacs-vs. All rights reserved. 
+
+nav:
+  - Overview: page/index.md
+  - Languages:
+    - ActionScript: page/langs/actionscript.md
+    - C: page/langs/c.md
+    - C++: page/langs/c++.md
+    - C#: page/langs/csharp.md
+    - Go: page/langs/go.md
+    - Groovy: page/langs/groovy.md
+    - Java: page/langs/java.md
+    - JavaScript: page/langs/javascript.md
+    - Lua: page/langs/lua.md
+    - Objective-C: page/langs/objc.md
+    - PHP: page/langs/php.md
+    - Python: page/langs/python.md
+    - Ruby: page/langs/ruby.md
+    - Rust: page/langs/rust.md
+    - Scala: page/langs/scala.md
+    - Swift: page/langs/swift.md
+    - TypeScript: page/langs/typescript.md
+  - Change log: CHANGELOG.md
+
+extra_css:
+  - stylesheets/extra.css
+
+theme:
+  name: 'rtd-dropdown'
+  logo: docs/logo.png
+  favicon: docs/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/emacs-vs/ts-docstr
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/jenchieh94
+
+markdown_extensions:
+  - pymdownx.superfences
+  - codehilite
+  - meta
+  - toc:
+      permalink: '#'
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+  - search
+  - awesome-pages
+  - git-revision-date-localized
+  - rss
+
+google_analytics:
+  - UA-165661257-1
+  - auto
