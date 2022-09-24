@@ -68,12 +68,19 @@
   (ts-docstr-c-like-narrow-region
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
                                                    enum_declaration
-                                                   formal_parameters))))
+                                                   function_definition))))
       (cond ((zerop (length nodes))
              (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
              (ts-docstr-log "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
+
+;; NOTE: This is generally not necessary but kinda useful for user.
+(defun ts-docstr-php--get-name (node)
+  "Return declaration name, class/struct/enum/function."
+  (let* ((nodes-name (ts-docstr-find-children node "name"))
+         (node-name (nth 0 nodes-name)))
+    (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-php--parse-return ()
@@ -92,25 +99,30 @@
 (defun ts-docstr-php-parse (node)
   "Parse declaration for PHP."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-find-children node '(simple_parameter))))
-      (let (types variables)
-        (dolist (param params)  ; loop through each parameter declaration
-          (tsc-mapc-children
-           (lambda (node)
-             (pcase (ts-docstr-2-str (tsc-node-type node))
-               ("type_list"
-                (ts-docstr-push (tsc-node-text node) types))
-               ("variable_name"
-                (ts-docstr-push (tsc-node-text node) variables))))
-           param)
-          ;; Make sure the typenames and variables have the same length
-          (while (not (= (length types) (length variables)))
-            ;; Add until they have the same length
-            (if (< (length types) (length variables))
-                (ts-docstr-push ts-docstr-default-typename types)
-              (ts-docstr-push ts-docstr-default-variable variables))))
-        (list :type types :variable variables
-              :return (ts-docstr-php--parse-return))))))
+    (if-let* ((params (ts-docstr-find-children node "formal_parameters")))
+        (let (types variables)
+          (dolist (param params)  ; loop through each parameter declaration
+            (tsc-mapc-children
+             (lambda (node)
+               (when (eq (tsc-node-type node) 'simple_parameter)
+                 (tsc-mapc-children
+                  (lambda (child)
+                    (pcase (ts-docstr-2-str (tsc-node-type child))
+                      ("type_list"
+                       (ts-docstr-push (tsc-node-text child) types))
+                      ("variable_name"
+                       (ts-docstr-push (tsc-node-text child) variables))))
+                  node))
+               ;; Make sure the typenames and variables have the same length
+               (while (not (= (length types) (length variables)))
+                 ;; Add until they have the same length
+                 (if (< (length types) (length variables))
+                     (ts-docstr-push ts-docstr-default-typename types)
+                   (ts-docstr-push ts-docstr-default-variable variables))))
+             param))
+          (list :type types :variable variables
+                :return (ts-docstr-php--parse-return)))
+      (list :name (ts-docstr-php--get-name node)))))
 
 (defun ts-docstr-php-config ()
   "Configure style according to variable `ts-docstr-php-style'."
