@@ -37,8 +37,8 @@ extra_css:
 
 theme:
   name: 'rtd-dropdown'
-  logo: docs/logo.png
-  favicon: docs/favicon.ico
+  logo: etc/logo.png
+  favicon: etc/favicon.ico
   icon:
     repo: fontawesome/brands/github
   features:
