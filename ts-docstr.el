@@ -285,22 +285,19 @@ Optional argument MODULE is the targeted language's codename."
               (node (ts-docstr--module-funcall module "activate")))
     node))
 
-(defmacro ts-docstr-complete-at-point (&rest body)
-  "The core process to add docstring at point."
-  (declare (indent 0))
-  `(when-let* ((module (ts-docstr-module))
-               (node (ts-docstr-activatable-p module)))
-     ,@body
-     (ts-docstr--module-funcall module "insert" node
-                                (ts-docstr--module-funcall module "parse" node))))
+(defun ts-docstr--process-events ()
+  "Process events, the entire core process to add document string."
+  (when-let* ((module (ts-docstr-module))
+              (node (ts-docstr-activatable-p module)))
+    (ts-docstr--module-funcall module "insert" node
+                               (ts-docstr--module-funcall module "parse" node))))
 
 ;;;###autoload
 (defun ts-docstr-at-point ()
   "Add document string at point."
   (interactive)
   (ts-docstr--ensure-ts
-    (if (ts-docstr--require-module)
-        (ts-docstr-complete-at-point)
+    (if (ts-docstr--require-module) (ts-docstr--process-events)
       (user-error "Language is either not supported or WIP... %s" major-mode))))
 
 (cl-defun ts-docstr-format (desc-type &key typename variable)

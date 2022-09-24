@@ -325,22 +325,26 @@ document string."
   "Insert docstring with key."
   (ts-docstr-key--with-env '(csharp-mode)
     (when (and (ts-docstr--line-is "///")
-               (ts-docstr--looking-back "///" 3))
-      (ts-docstr-complete-at-point
-        (backward-delete-char 3)))))
+               (ts-docstr--looking-back "///" 3)
+               (ts-docstr-activatable-p))
+      (backward-delete-char 3)
+      (ts-docstr-at-point))))
 
 (defun ts-docstr-key-go (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-env '(go-mode)
     (when (and (ts-docstr--line-is "//")
-               (ts-docstr--looking-back "//" 2))
-      (ts-docstr-complete-at-point (backward-delete-char 2)))))
+               (ts-docstr--looking-back "//" 2)
+               (ts-docstr-activatable-p))
+      (backward-delete-char 2)
+      (ts-docstr-at-point))))
 
 (defun ts-docstr-key-python (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-env '(python-mode)
     (when (and (ts-docstr--line-is "\"\"\"")
-               (ts-docstr--looking-back "\"\"\"" 3))
+               (ts-docstr--looking-back "\"\"\"" 3)
+               (ts-docstr-activatable-p))
       (backward-delete-char 3)
       (ts-docstr-at-point))))
 
@@ -348,7 +352,8 @@ document string."
   "Insert docstring with key."
   (ts-docstr-key--with-env '(ruby-mode)
     (when (and (ts-docstr--line-is "##")
-               (ts-docstr--looking-back "##" 2))
+               (ts-docstr--looking-back "##" 2)
+               (ts-docstr-activatable-p))
       (backward-delete-char 2)
       (ts-docstr-at-point))))
 
@@ -356,7 +361,8 @@ document string."
   "Insert docstring with key."
   (ts-docstr-key--with-env '(rust-mode)
     (when (and (ts-docstr--line-is "///")
-               (ts-docstr--looking-back "///" 3))
+               (ts-docstr--looking-back "///" 3)
+               (ts-docstr-activatable-p))
       (backward-delete-char 3)
       (ts-docstr-at-point))))
 
@@ -364,7 +370,8 @@ document string."
   "Insert docstring with key."
   (ts-docstr-key--with-env '(swift-mode)
     (when (and (ts-docstr--line-is "///")
-               (ts-docstr--looking-back "///" 3))
+               (ts-docstr--looking-back "///" 3)
+               (ts-docstr-activatable-p))
       (backward-delete-char 3)
       (ts-docstr-at-point))))
 
