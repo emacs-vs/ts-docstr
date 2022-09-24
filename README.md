@@ -143,11 +143,11 @@ The `activate` function is used to search for a node and confirm weather it
 should insert a document string. This function will eventually return a captured
 node, or return `nil` if we shouldn't insert a document string here.
 
-Here is the simplified version of `C#` activate function:
+Here is the simplified version of `Java` activate function:
 
 ```elisp
 ;;;###autoload
-(defun ts-docstr-csharp-activate ()
+(defun ts-docstr-java-activate ()
   "..."
   ;; Narrow region to next line, this defines the valid region to insert a
   ;; document string.
@@ -181,16 +181,16 @@ Here is a simplest `parse` function for example:
 
 ```elisp
 ;;;###autoload
-(defun ts-docstr-csharp-parse (node)
+(defun ts-docstr-java-parse (node)
   "..."
   (if (equal (tsc-node-type node) 'method_declaration)
       ;; `types' and `variables' are lists. Each store typenames and variables
       ;; name. We simply parse the tree/node in this steps.
       (list :type types :variable variables
-            :return (ts-docstr-csharp--parse-return params)  ; return `t' or `nil'
-            :name (ts-docstr-csharp--get-name node))         ; return `function' name
+            :return (ts-docstr-java--parse-return params)  ; return `t' or `nil'
+            :name (ts-docstr-java--get-name node))         ; return `function' name
     ;; For `class', we don't need to parse parameters.
-    (list :name (ts-docstr-csharp--get-name node))))         ; return `class' name
+    (list :name (ts-docstr-java--get-name node))))         ; return `class' name
 ```
 
 #### 🔍 The `insert` function
