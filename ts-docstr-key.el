@@ -109,7 +109,7 @@ See function `forward-line' for argument N."
 (defun ts-docstr--kill-comment-at-point ()
   "Kill comment at point."
   (interactive)
-  (kill-region (ts-docstr--comment-start-point) (ts-docstr--comment-end-point)))
+  (delete-region (ts-docstr--comment-start-point) (ts-docstr--comment-end-point)))
 
 (defun ts-docstr--start-comment-symbol (&optional pt)
   "Return the starting comment symbol form the given PT."

@@ -89,10 +89,10 @@
              (ts-docstr-find-children-traverse node-cs "return_statement"))))
 
 ;;;###autoload
-(defun ts-docstr-php-parse ()
+(defun ts-docstr-php-parse (node)
   "Parse declaration for PHP."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(simple_parameter))))
+    (when-let* ((params (ts-docstr-find-children node '(simple_parameter))))
       (let (types variables)
         (dolist (param params)  ; loop through each parameter declaration
           (tsc-mapc-children
