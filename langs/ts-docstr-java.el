@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'ts-docstr-c++)
+(require 'ts-docstr)
 
 (defcustom ts-docstr-java-style 'javadoc
   "Style specification for document string in Java."
@@ -69,12 +69,19 @@
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
                                                    interface_declaration
                                                    enum_declaration
-                                                   formal_parameters))))
+                                                   method_declaration))))
       (cond ((zerop (length nodes))
              (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
              (ts-docstr-log "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
+
+;; NOTE: This is generally not necessary but kinda useful for user.
+(defun ts-docstr-java--get-name (node)
+  "Return declaration name, class/struct/enum/function."
+  (let* ((nodes-name (ts-docstr-find-children node "identifier"))
+         (node-name (nth 0 nodes-name)))
+    (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-java--parse-return ()
@@ -94,24 +101,30 @@
     return))
 
 ;;;###autoload
-(defun ts-docstr-java-parse ()
+(defun ts-docstr-java-parse (node)
   "Parse declaration for Java."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(formal_parameters))))
-      (let (types variables)
-        (dolist (param params)
-          (tsc-traverse-mapc
-           (lambda (node)
-             (pcase (ts-docstr-2-str (tsc-node-type node))
-               ((or "array_type" "integral_type" "floating_point_type"
-                    "boolean_type" "scoped_type_identifier"
-                    "generic_type" "type_identifier")
-                (ts-docstr-push (tsc-node-text node) types))
-               ("identifier"
-                (ts-docstr-push (tsc-node-text node) variables))))
-           param))
-        (list :type types :variable variables
-              :return (ts-docstr-java--parse-return))))))
+    (if-let ((params (ts-docstr-find-children node "formal_parameters")))
+        (let (types variables)
+          (dolist (param params)
+            (tsc-mapc-children
+             (lambda (node)
+               (when (eq (tsc-node-type node) 'formal_parameter)
+                 (tsc-mapc-children
+                  (lambda (child)
+                    (pcase (ts-docstr-2-str (tsc-node-type child))
+                      ((or "array_type" "integral_type" "floating_point_type"
+                           "boolean_type" "scoped_type_identifier"
+                           "generic_type" "type_identifier")
+                       (ts-docstr-push (tsc-node-text child) types))
+                      ("identifier"
+                       (ts-docstr-push (tsc-node-text child) variables))))
+                  node)))
+             param))
+          (list :type types :variable variables
+                :return (ts-docstr-java--parse-return)
+                :name (ts-docstr-java--get-name node)))
+      (list :name (ts-docstr-java--get-name node)))))
 
 (defun ts-docstr-java-config ()
   "Configure style according to variable `ts-docstr-java-style'."
@@ -132,7 +145,29 @@
 ;;;###autoload
 (defun ts-docstr-java-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c++-insert node data))
+  (ts-docstr-inserting
+    (cl-case (tsc-node-type node)
+      (method_declaration  ; For function
+       (when-let* ((types (plist-get data :type))
+                   (variables (plist-get data :variable))
+                   (len (length variables)))
+         (ts-docstr-insert c-start "\n")
+         (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+         (setq restore-point (1- (point)))
+         (dotimes (index len)
+           (ts-docstr-insert c-prefix
+                             (ts-docstr-format 'param
+                                               :typename (nth index types)
+                                               :variable (nth index variables))
+                             "\n"))
+         (when (plist-get data :return)
+           (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+         (ts-docstr-insert c-end)))
+      (t  ; For the rest of the type, class/struct/enum
+       (ts-docstr-insert c-start "\n")
+       (ts-docstr-insert c-prefix "\n")
+       (setq restore-point (1- (point)))
+       (ts-docstr-insert c-end)))))
 
 (provide 'ts-docstr-java)
 ;;; ts-docstr-java.el ends here

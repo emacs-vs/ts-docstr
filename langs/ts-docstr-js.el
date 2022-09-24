@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'ts-docstr-c++)
+(require 'ts-docstr-typescript)
 
 (defcustom ts-docstr-js-style 'jsdoc
   "Style specification for document string in JavaScript."
@@ -68,12 +68,19 @@
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
-                                                   formal_parameters))))
+                                                   function_declaration))))
       (cond ((zerop (length nodes))
              (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
              (ts-docstr-log "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
+
+;; NOTE: This is generally not necessary but kinda useful for user.
+(defun ts-docstr-js--get-name (node)
+  "Return declaration name, class/struct/enum/function."
+  (let* ((nodes-name (ts-docstr-find-children node "identifier"))
+         (node-name (nth 0 nodes-name)))
+    (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-js--parse-return ()
@@ -90,21 +97,23 @@
              (ts-docstr-find-children-traverse node-sb "return_statement"))))
 
 ;;;###autoload
-(defun ts-docstr-js-parse ()
+(defun ts-docstr-js-parse (node)
   "Parse declaration for JavaScript."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(formal_parameters))))
-      (let (types variables)
-        (dolist (param params)
-          (tsc-traverse-mapc
-           (lambda (node)
-             (pcase (ts-docstr-2-str (tsc-node-type node))
-               ("identifier"
-                (ts-docstr-push ts-docstr-default-typename types)
-                (ts-docstr-push (tsc-node-text node) variables))))
-           param))
-        (list :type types :variable variables
-              :return (ts-docstr-js--parse-return))))))
+    (if-let ((params (ts-docstr-find-children node "formal_parameters")))
+        (let (types variables)
+          (dolist (param params)
+            (tsc-traverse-mapc
+             (lambda (node)
+               (pcase (ts-docstr-2-str (tsc-node-type node))
+                 ("identifier"
+                  (ts-docstr-push ts-docstr-default-typename types)
+                  (ts-docstr-push (tsc-node-text node) variables))))
+             param))
+          (list :type types :variable variables
+                :return (ts-docstr-js--parse-return)
+                :name (ts-docstr-js--get-name node)))
+      (list :name (ts-docstr-js--get-name node)))))
 
 (defun ts-docstr-js-config ()
   "Configure style according to variable `ts-docstr-js-style'."
@@ -131,7 +140,7 @@
 ;;;###autoload
 (defun ts-docstr-js-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c++-insert node data))
+  (ts-docstr-typescript-insert node data))
 
 (provide 'ts-docstr-js)
 ;;; ts-docstr-js.el ends here
