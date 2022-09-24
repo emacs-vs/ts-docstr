@@ -67,56 +67,100 @@
 (defun ts-docstr-go-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(struct_type
-                                                   field_identifier
-                                                   parameter_list))))
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(type_declaration
+                                                   function_declaration))))
       (cond ((zerop (length nodes))
              (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
              (ts-docstr-log "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
 
+;; NOTE: This is generally not necessary but kinda useful for user.
+(defun ts-docstr-go--get-name (node)
+  "Return declaration name, class/struct/enum/function."
+  (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
+                         (ts-docstr-find-children node "identifier")))
+         (node-name (nth 0 nodes-name)))
+    (tsc-node-text node-name)))
+
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-go--parse-return ()
+(defun ts-docstr-go--parse-return (nodes-pl)
   "Return t if function does have return value."
   (when-let*
-      ((nodes-pl (ts-docstr-grab-nodes-in-range '(parameter_list)))
-       (node-pl (nth 0 nodes-pl))
-       (node-sb (ts-docstr-get-next-sibling node-pl "block")))
+      ((node-pl (nth 0 nodes-pl))
+       (node-sb (ts-docstr-get-next-sibling node-pl "block"))
+       (node-sb-prev (tsc-get-prev-sibling node-sb)))
     ;; If node before `block' node is not `parameter_list', it means the user
     ;; does not define a return type.
-    (not (equal 'parameter_list (tsc-node-type (tsc-get-prev-sibling node-sb))))))
+    (or (not (equal (tsc-node-type node-sb-prev) 'parameter_list))
+        ;; OKAY: This is probably the best solution!
+        ;;
+        ;; We traverse the entire tree nad look for `return', if it does return
+        ;; with something else, we simply return true!
+        (cl-some (lambda (return-node) (<= 2 (tsc-count-children return-node)))
+                 (ts-docstr-find-children-traverse node-sb "return_statement")))))
 
 ;;;###autoload
-(defun ts-docstr-go-parse ()
+(defun ts-docstr-go-parse (node)
   "Parse declaration for Go."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params-lst (ts-docstr-grab-nodes-in-range '(parameter_list)))
-                (param-lst (nth (1- (length params-lst)) params-lst))
-                (params (ts-docstr-find-children param-lst "parameter_declaration")))
-      (let (types variables)
-        (dolist (param params)
-          (tsc-traverse-mapc
-           (lambda (node)
-             (pcase (ts-docstr-2-str (tsc-node-type node))
-               ((or "generic_type"
-                    "qualified_type"
-                    "pointer_type"
-                    "struct_type"
-                    "interface_type"
-                    "array_type"
-                    "slice_type"
-                    "map_type"
-                    "channel_type"
-                    "function_type"
-                    "type_identifier"
-                    "implicit_length_array_type")
-                (ts-docstr-push (tsc-node-text node) types))
-               ("identifier"
-                (ts-docstr-push (tsc-node-text node) variables))))
-           param))
-        (list :type types :variable variables
-              :return (ts-docstr-go--parse-return))))))
+    (if-let ((params (ts-docstr-find-children node "parameter_list")))
+        (let (types variables)
+          (dolist (param params)
+            (tsc-mapc-children
+             (lambda (node)
+               (when (eq (tsc-node-type node) 'parameter_declaration)
+                 (tsc-mapc-children
+                  (lambda (child)
+                    (pcase (ts-docstr-2-str (tsc-node-type child))
+                      ((or "generic_type"
+                           "qualified_type"
+                           "pointer_type"
+                           "struct_type"
+                           "interface_type"
+                           "array_type"
+                           "slice_type"
+                           "map_type"
+                           "channel_type"
+                           "function_type"
+                           "type_identifier"
+                           "implicit_length_array_type")
+                       (ts-docstr-push (tsc-node-text child) types))
+                      ("identifier"
+                       (ts-docstr-push (tsc-node-text child) variables))))
+                  node))
+               ;; TODO: There is no way to parse typenames in order. The parsed
+               ;; tree looks something like this:
+               ;;
+               ;; @ Parameters
+               ;;   (a int, b, c float)
+               ;;
+               ;; @ Tree
+               ;;   ...
+               ;;   parameter_declaration:
+               ;;     identifier:                       ; a
+               ;;     type_identifier:                  ; int
+               ;;   parameter_declaration:
+               ;;     identifier:                       ; b
+               ;;     identifier:                       ; c
+               ;;     type_identifier:                  ; float
+               ;;
+               ;; There might be a workaround but it mostly likely not going to
+               ;; work well.
+               ;;
+               ;;                                            Date: 2022-09-24
+               ;;
+               ;; Make sure the typenames and variables have the same length
+               (while (not (= (length types) (length variables)))
+                 ;; Add until they have the same length
+                 (if (< (length types) (length variables))
+                     (ts-docstr-push ts-docstr-default-typename types)
+                   (ts-docstr-push ts-docstr-default-variable variables))))
+             param))
+          (list :type types :variable variables
+                :return (ts-docstr-go--parse-return params)
+                :name (ts-docstr-go--get-name node)))
+      (list :name (ts-docstr-go--get-name node)))))
 
 (defun ts-docstr-go-config ()
   "Configure style according to variable `ts-docstr-go-style'."
@@ -145,7 +189,7 @@
   "Insert document string upon NODE and DATA."
   (ts-docstr-inserting
     (cl-case ts-docstr-go-style
-      (godoc (insert c-start ts-docstr-desc-summary "\n"))
+      (godoc (ts-docstr-insert c-prefix (ts-docstr-format 'summary)))
       (t
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
