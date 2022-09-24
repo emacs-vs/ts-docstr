@@ -87,11 +87,10 @@
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-c++--parse-return ()
+(defun ts-docstr-c++--parse-return (nodes-pl)
   "Return t if function does have return value."
-  (let* ((nodes-fd (ts-docstr-grab-nodes-in-range '(function_declarator)))
-         (node-fd (nth 0 nodes-fd))
-         (parent (tsc-get-parent node-fd))
+  (let* ((node-pl (nth 0 nodes-pl))
+         (parent (tsc-get-parent node-pl))
          (return t))
     ;; OKAY: We don't traverse like `JavaScript' does, since C/C++ needs to declare
     ;; return type in the function declaration.
@@ -128,7 +127,7 @@
                         (ts-docstr-push (s-replace " " "" (tsc-node-text child)) variables)))))))
              param))
           (list :type types :variable variables
-                :return (ts-docstr-c++--parse-return)
+                :return (ts-docstr-c++--parse-return params)
                 :name (ts-docstr-c++--get-name node)))
       (list :name (ts-docstr-c++--get-name node)))))
 

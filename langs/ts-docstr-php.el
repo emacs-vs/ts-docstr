@@ -83,10 +83,9 @@
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-php--parse-return ()
+(defun ts-docstr-php--parse-return (nodes-fp)
   "Return t if function does have return value."
-  (let* ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
-         (node-fp (nth 0 nodes-fp))
+  (let* ((node-fp (nth 0 nodes-fp))
          (node-cs (ts-docstr-get-next-sibling node-fp "compound_statement")))
     ;; OKAY: This is probably the best solution!
     ;;
@@ -121,7 +120,7 @@
                    (ts-docstr-push ts-docstr-default-variable variables))))
              param))
           (list :type types :variable variables
-                :return (ts-docstr-php--parse-return)))
+                :return (ts-docstr-php--parse-return params)))
       (list :name (ts-docstr-php--get-name node)))))
 
 (defun ts-docstr-php-config ()

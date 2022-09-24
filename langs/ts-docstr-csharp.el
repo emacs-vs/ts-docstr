@@ -84,10 +84,9 @@
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-csharp--parse-return ()
+(defun ts-docstr-csharp--parse-return (nodes-pl)
   "Return t if function does have return value."
-  (let* ((nodes-pl (ts-docstr-grab-nodes-in-range '(parameter_list)))
-         (node-pl (nth 0 nodes-pl))
+  (let* ((node-pl (nth 0 nodes-pl))
          (parent (tsc-get-parent node-pl))
          (return t))
     ;; OKAY: We don't traverse like `JavaScript' does, since C# needs to declare
@@ -129,7 +128,7 @@
                         ))))))
              param))
           (list :type types :variable variables
-                :return (ts-docstr-csharp--parse-return)
+                :return (ts-docstr-csharp--parse-return params)
                 :name (ts-docstr-csharp--get-name node)))
       (list :name (ts-docstr-csharp--get-name node)))))
 

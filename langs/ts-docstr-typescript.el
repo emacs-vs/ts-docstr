@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'ts-docstr-c++)
+(require 'ts-docstr)
 
 (defcustom ts-docstr-typescript-style 'typedoc
   "Style specification for document string in TypeScript."
@@ -88,11 +88,10 @@
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-typescript--parse-return (is-method)
+(defun ts-docstr-typescript--parse-return (nodes-fp is-method)
   "Return t if function does have return value."
   (when-let*
-      ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
-       (node-fp (nth 0 nodes-fp))
+      ((node-fp (nth 0 nodes-fp))
        (node-sb (ts-docstr-get-next-sibling node-fp "statement_block"))
        (node-sb-prev (tsc-get-prev-sibling node-sb)))
     (or (and is-method
@@ -138,7 +137,7 @@
                    (ts-docstr-push ts-docstr-default-variable variables))))
              param))
           (list :type types :variable variables
-                :return (ts-docstr-typescript--parse-return is-method)
+                :return (ts-docstr-typescript--parse-return params is-method)
                 :name (ts-docstr-typescript--get-name node)))
       (list :name (ts-docstr-typescript--get-name node)))))
 

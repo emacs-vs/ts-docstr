@@ -84,10 +84,11 @@
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-java--parse-return (node)
+(defun ts-docstr-java--parse-return (nodes-pl)
   "Return t if function does have return value."
-  (let ((parent (tsc-get-parent node))
-        (return t))
+  (let* ((node-pl (nth 0 nodes-pl))
+         (parent (tsc-get-parent node-pl))
+         (return t))
     ;; OKAY: We don't traverse like `JavaScript' does, since Java needs to declare
     ;; return type in the function declaration.
     (tsc-mapc-children
@@ -120,7 +121,7 @@
                   node)))
              param))
           (list :type types :variable variables
-                :return (ts-docstr-java--parse-return (nth 0 params))
+                :return (ts-docstr-java--parse-return params)
                 :name (ts-docstr-java--get-name node)))
       (list :name (ts-docstr-java--get-name node)))))
 

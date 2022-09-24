@@ -83,11 +83,10 @@
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-js--parse-return ()
+(defun ts-docstr-js--parse-return (nodes-fp)
   "Return t if function does have return value."
   (when-let*
-      ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
-       (node-fp (nth 0 nodes-fp))
+      ((node-fp (nth 0 nodes-fp))
        (node-sb (ts-docstr-get-next-sibling node-fp "statement_block")))
     ;; OKAY: This is probably the best solution!
     ;;
@@ -111,7 +110,7 @@
                   (ts-docstr-push (tsc-node-text node) variables))))
              param))
           (list :type types :variable variables
-                :return (ts-docstr-js--parse-return)
+                :return (ts-docstr-js--parse-return params)
                 :name (ts-docstr-js--get-name node)))
       (list :name (ts-docstr-js--get-name node)))))
 
