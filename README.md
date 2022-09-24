@@ -61,10 +61,11 @@ or
 
 ## 📇 Commands
 
-| Commands             | Description                           |
-|:---------------------|:--------------------------------------|
-| `ts-docstr-at-point` | Add document string at current point. |
-| `ts-docstr-mode`     | Use nature key bindings.              |
+| Commands             | Description                                     |
+|:---------------------|:------------------------------------------------|
+| `ts-docstr-at-point` | Add document string at current point.           |
+| `ts-docstr-mode`     | Use nature key bindings.                        |
+| `ts-docstr-ask`      | Ask and update document string style (locally). |
 
 ## 🔧 Customization
 

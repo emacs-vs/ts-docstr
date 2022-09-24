@@ -369,13 +369,15 @@ Optional argument MODULE is the targeted language's codename."
 ;; (@* "Ask" )
 ;;
 
+;;;###autoload
 (defun ts-docstr-ask ()
-  ""
+  "Ask and update document string style (locally)."
   (interactive)
-  (let* ((options )
-         (var )
-         (style (completing-read "Select docstring style: " options)))
-    (setq-local var style)))
+  (when-let* ((var (intern (format "%s-style" (ts-docstr-module))))
+              ((boundp var))
+              (options (refine--possible-values var))
+              (style (completing-read "Select docstring style: " options)))
+    (set (make-local-variable var) style)))
 
 (provide 'ts-docstr)
 ;;; ts-docstr.el ends here
