@@ -15,6 +15,7 @@
         - [🔍 Method 2. Manual](#🔍-method-2-manual)
     - [📇 Commands](#📇-commands)
     - [🔧 Customization](#🔧-customization)
+        - [🎨 Styles](#🎨-styles)
         - [⌨️ Keys](#️-keys)
         - [🎣 Hooks](#🎣-hooks)
     - [🔨 Supported languages](#🔨-supported-languages)
@@ -66,6 +67,16 @@ or
 | `ts-docstr-mode`     | Use nature key bindings.              |
 
 ## 🔧 Customization
+
+### 🎨 Styles
+
+The style can be customized by setting the variable with this pattern
+`ts-docstr-[lang]-style`. Here is an example to set `Java` docstring style
+to `Javadoc`.
+
+```elisp
+(setq ts-docstr-java-style 'javadoc)
+```
 
 ### ⌨️ Keys
 
@@ -251,6 +262,20 @@ class Example {}
 
 Find the language file in the `/langs` folder from the project root, if you
 couldn't find it, see [❓ How to support my favorite language?](https://github.com/emacs-vs/ts-docstr#-how-to-support-my-favorite-language).
+
+First look into the variable with the name similar to `ts-docstr-[lang]-style`.
+See the following example,
+
+```elisp
+;; langs/ts-docstr-java.el
+(defcustom ts-docstr-java-style 'javadoc
+  "..."
+  :type '(choice (const :tag "No specify" nil)
+                 (const :tag "Javadoc Style" javadoc)))
+```
+
+See if the style is already supported. Continue reading if it does **NOT**,
+
 
 
 ### ❓ How to trigger by a key?
