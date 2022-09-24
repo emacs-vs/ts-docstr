@@ -231,21 +231,17 @@ to the current file.
 (defun ts-docstr-java-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-inserting
-    (ts-docstr-insert c-start "\n")     ; /*
-    (ts-docstr-insert c-prefix "\n")    ;  *
-    (setq restore-point (1- (point)))   ; set cursor mark
-    (ts-docstr-insert c-end)))          ; */
+    (ts-docstr-insert c-start "\n")                              ; /**
+    (ts-docstr-insert c-prefix " " (plist-get data :name) "\n")  ;  * NAME
+    (ts-docstr-insert c-end)))                                   ;  */
 ```
-
-output
 
 ```java
 /**
- * $0
+ * Example
  */
+class Example {}
 ```
-
-`$0` is the cursor point.
 
 ### ❓ How to trigger by a key?
 
