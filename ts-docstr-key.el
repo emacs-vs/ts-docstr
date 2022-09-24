@@ -311,7 +311,8 @@ document string."
     (when (ts-docstr-key--valid-p)
       (let ((ln-prev (ts-docstr--line-relative -1 t))
             (ln-next (ts-docstr--line-relative 1 t)))
-        (when (and (string-prefix-p "/*" ln-prev) (string-suffix-p "*/" ln-next))
+        (when (and (string-prefix-p "/*" ln-prev) (string-suffix-p "*/" ln-next)
+                   (save-excursion (forward-line 1) (ts-docstr-activatable-p)))
           (ts-docstr--kill-comment-at-point)
           (ts-docstr-at-point))))))
 
@@ -321,8 +322,8 @@ document string."
     (when (ts-docstr-key--valid-p)
       (when (and (ts-docstr--line-is "///")
                  (ts-docstr--looking-back "///" 3))
-        (backward-delete-char 3)
-        (ts-docstr-at-point)))))
+        (ts-docstr-complete-at-point
+          (backward-delete-char 3))))))
 
 (defun ts-docstr-key-go (&rest _)
   "Insert docstring with key."
@@ -330,8 +331,7 @@ document string."
     (when (ts-docstr-key--valid-p)
       (when (and (ts-docstr--line-is "//")
                  (ts-docstr--looking-back "//" 2))
-        (backward-delete-char 2)
-        (ts-docstr-at-point)))))
+        (ts-docstr-complete-at-point (backward-delete-char 2))))))
 
 (defun ts-docstr-key-python (&rest _)
   "Insert docstring with key."
@@ -345,10 +345,11 @@ document string."
 (defun ts-docstr-key-ruby (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(ruby-mode)
-    (when (and (ts-docstr--line-is "##")
-               (ts-docstr--looking-back "##" 2))
-      (backward-delete-char 2)
-      (ts-docstr-at-point))))
+    (when (ts-docstr-key--valid-p)
+      (when (and (ts-docstr--line-is "##")
+                 (ts-docstr--looking-back "##" 2))
+        (backward-delete-char 2)
+        (ts-docstr-at-point)))))
 
 (defun ts-docstr-key-rust (&rest _)
   "Insert docstring with key."

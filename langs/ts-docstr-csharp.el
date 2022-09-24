@@ -158,9 +158,10 @@
            (setq restore-point (1- (point)))
            (insert c-end "\n")
            (dotimes (index len)
-             (insert c-prefix (ts-docstr-format 'param :variable (nth index variables)) "\n"))
+             (insert c-prefix (ts-docstr-format 'param :variable (nth index variables))
+                     (if (= index (1- len)) "" "\n")))
            (when (plist-get data :return)
-             (insert c-prefix (ts-docstr-format 'return)))))
+             (insert "\n" c-prefix (ts-docstr-format 'return)))))
         (t
          (insert c-start "\n")
          (insert c-prefix (ts-docstr-format 'summary) "\n")
