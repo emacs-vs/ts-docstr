@@ -85,20 +85,26 @@
 ;; NOTE: This is generally not necessary but kinda useful for user.
 (defun ts-docstr-rust--get-name (node)
   "Return declaration name, class/struct/enum/function."
-  (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
-                         (ts-docstr-find-children node "identifier")))
+  (let* ((nodes-name (or (ts-docstr-find-children node "identifier")
+                         (ts-docstr-find-children node "type_identifier")))
          (node-name (nth 0 nodes-name)))
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-rust--parse-return ()
+(defun ts-docstr-rust--parse-return (nodes-p)
   "Return t if function does have return value."
-  (let* ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
-         (node-fp (nth 0 nodes-fp))
-         (node-cs (ts-docstr-get-next-sibling node-fp "compound_statement")))
-    (cl-some (lambda (return-node)
-               (<= 3 (tsc-count-children return-node)))
-             (ts-docstr-find-children-traverse node-cs "return_statement"))))
+  (let* ((node-p (nth 0 nodes-p))
+         (node-block (ts-docstr-get-next-sibling node-p "block"))
+         (node-block-prev (tsc-get-prev-sibling node-block)))
+    (or
+     ;; If specified at the end.
+     (not (equal (tsc-node-type node-block-prev) 'parameters))
+     ;; OKAY: This is probably the best solution!
+     ;;
+     ;; We traverse the entire tree nad look for `return', if it does return
+     ;; with something else, we simply return true!
+     (cl-some (lambda (return-node) (<= 2 (tsc-count-children return-node)))
+              (ts-docstr-find-children-traverse node-block "return_expression")))))
 
 ;;;###autoload
 (defun ts-docstr-rust-parse (node)
@@ -109,11 +115,15 @@
           (dolist (param params)  ; loop through each parameter declaration
             (tsc-mapc-children
              (lambda (node)
-               (pcase (ts-docstr-2-str (tsc-node-type node))
-                 ("type_list"
-                  (ts-docstr-push (tsc-node-text node) types))
-                 ("variable_name"
-                  (ts-docstr-push (tsc-node-text node) variables))))
+               (when (eq (tsc-node-type node) 'parameter)
+                 (tsc-mapc-children
+                  (lambda (child)
+                    (pcase (ts-docstr-2-str (tsc-node-type child))
+                      ("type_list"
+                       (ts-docstr-push (tsc-node-text child) types))
+                      ("variable_name"
+                       (ts-docstr-push (tsc-node-text child) variables))))
+                  node)))
              param)
             ;; Make sure the typenames and variables have the same length
             (while (not (= (length types) (length variables)))
@@ -122,7 +132,7 @@
                   (ts-docstr-push ts-docstr-default-typename types)
                 (ts-docstr-push ts-docstr-default-variable variables))))
           (list :type types :variable variables
-                :return (ts-docstr-rust--parse-return)
+                :return (ts-docstr-rust--parse-return params)
                 :name (ts-docstr-rust--get-name node)))
       (list :name (ts-docstr-rust--get-name node)))))
 
