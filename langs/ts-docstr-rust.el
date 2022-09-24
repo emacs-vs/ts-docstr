@@ -156,7 +156,7 @@
              :header-arg ts-docstr-rust-header-argument))))
 
 ;;;###autoload
-(defun ts-docstr-rust-insert (node data)
+(defun ts-docstr-rust-insert (_node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-inserting
     (let ((types (plist-get data :type)))

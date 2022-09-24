@@ -140,7 +140,7 @@
              :return ts-docstr-php-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-php-insert (node data)
+(defun ts-docstr-php-insert (_node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-inserting
     (let ((types (plist-get data :type)))
