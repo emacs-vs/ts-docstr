@@ -5,6 +5,7 @@
 > A document string minor mode using tree-sitter
 
 [![CI](https://github.com/emacs-vs/ts-docstr/actions/workflows/test.yml/badge.svg)](https://github.com/emacs-vs/ts-docstr/actions/workflows/test.yml)
+[![Docs](https://github.com/emacs-vs/ts-docstr/actions/workflows/docs.yml/badge.svg)](https://github.com/emacs-vs/ts-docstr/actions/workflows/docs.yml)
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
