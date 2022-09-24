@@ -23,6 +23,7 @@
             - [🔍 The `activate` function](#🔍-the-activate-function)
             - [🔍 The `parse` function](#🔍-the-parse-function)
             - [🔍 The `insert` function](#🔍-the-insert-function)
+        - [❓ How to add a document string style?](#❓-how-to-add-a-document-string-style)
         - [❓ How to trigger by a key?](#❓-how-to-trigger-by-a-key)
 
 <!-- markdown-toc end -->
@@ -248,7 +249,9 @@ class Example {}
 
 ### ❓ How to add a document string style?
 
-WIP
+Find the language file in the `/langs` folder from the project root, if you
+couldn't find it, see [❓ How to support my favorite language?](https://github.com/emacs-vs/ts-docstr#-how-to-support-my-favorite-language).
+
 
 ### ❓ How to trigger by a key?
 
