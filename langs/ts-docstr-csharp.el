@@ -68,7 +68,8 @@
     (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
                                                    struct_declaration
                                                    enum_declaration
-                                                   method_declaration))))
+                                                   method_declaration
+                                                   delegate_declaration))))
       (cond ((zerop (length nodes))
              (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
@@ -147,7 +148,7 @@
   "Insert document string upon NODE and DATA."
   (ts-docstr-inserting
     (cl-case (tsc-node-type node)
-      (method_declaration
+      ((or method_declaration delegate_declaration)
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length types)))
