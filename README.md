@@ -19,7 +19,10 @@
         - [🎣 Hooks](#🎣-hooks)
     - [🔨 Supported languages](#🔨-supported-languages)
     - [Contribute](#contribute)
-        - [❓ How to create a docstring parser?](#❓-how-to-create-a-docstring-parser)
+        - [❓ How to support my favorite language?](#❓-how-to-support-my-favorite-language)
+            - [🔍 The `activate` function](#🔍-the-activate-function)
+            - [🔍 The `parse` function](#🔍-the-parse-function)
+            - [🔍 The `insert` function](#🔍-the-insert-function)
         - [❓ How to trigger by a key?](#❓-how-to-trigger-by-a-key)
 
 <!-- markdown-toc end -->
@@ -116,7 +119,7 @@ If you would like to contribute to this project, you may either clone and make
 pull requests to this repository. Or you can clone the project and establish
 your own branch of this tool. Any methods are welcome!
 
-### ❓ How to create a docstring parser?
+### ❓ How to support my favorite language?
 
 > ⚠ The best way to learn how the entire process works is to look into other
 > files in the `/langs` folder from the project root. Find a similar language
@@ -134,7 +137,7 @@ The parser file is consist in three part:
 * ts-docstr-[lang]-parse `(node)`
 * ts-docstr-[lang]-insert `(node data)`
 
-#### The `activate` function
+#### 🔍 The `activate` function
 
 The `activate` function is used to search for a node and confirm weather it
 should insert a document string. This function will eventually return a captured
@@ -168,9 +171,11 @@ a document string at point, this function returns a node.
 
 Evaluate, then `M-x print-activate-node` to see if it return something or `nil`.
 
-#### The `parse` function
+#### 🔍 The `parse` function
 
 The `parse` function takes one argument `node` from the `activate` function.
+In this stage, we collect all necessary data (`paramters`, `class`/`enum` name,
+etc) and put into a property list.
 
 Here is a simplest `parse` function for example:
 
@@ -187,6 +192,60 @@ Here is a simplest `parse` function for example:
     ;; For `class', we don't need to parse parameters.
     (list :name (ts-docstr-csharp--get-name node))))         ; return `class' name
 ```
+
+#### 🔍 The `insert` function
+
+The `insert` function takes two arguments `node` and `data` from previous
+stages. We will need to define a config variable and function.
+
+The config variable:
+
+```elisp
+
+(defcustom ts-docstr-java-style 'javadoc
+  "..."
+  :type '(choice (const :tag "No specify" nil)
+                 (const :tag "Javadoc Style" javadoc)))
+```
+
+The config function:
+
+```elisp
+;; This is later called and exposed in the insertion function.
+(defun ts-docstr-java-config ()
+  "..."
+  (cl-case ts-docstr-java-style  ; define the style by each style guide
+    (javadoc (list :start "/**"  ; this plist is later used in insertion function
+                   :prefix "* "
+                   :end "*/"
+                   :summary "{d}"
+                   :param "@param {v} {d}"
+                   :return "@return {d}"))
+    (t ...)))
+```
+
+Lastly, you can create the `insert` function. In this stage you will write data
+to the current file.
+
+```elisp
+(defun ts-docstr-java-insert (node data)
+  "Insert document string upon NODE and DATA."
+  (ts-docstr-inserting
+    (ts-docstr-insert c-start "\n")     ; /*
+    (ts-docstr-insert c-prefix "\n")    ;  *
+    (setq restore-point (1- (point)))   ; set cursor mark
+    (ts-docstr-insert c-end)))          ; */
+```
+
+output
+
+```java
+/**
+ * $0
+ */
+```
+
+`$0` is the cursor point.
 
 ### ❓ How to trigger by a key?
 
