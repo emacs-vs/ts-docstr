@@ -27,7 +27,7 @@ nav:
     #- Python: page/langs/python.md
     #- Ruby: page/langs/ruby.md
     - Rust: page/langs/rust.md
-    #- Scala: page/langs/scala.md
+    - Scala: page/langs/scala.md
     #- Swift: page/langs/swift.md
     - TypeScript: page/langs/typescript.md
   - Change log: CHANGELOG.md
