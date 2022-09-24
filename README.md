@@ -119,7 +119,19 @@ Any methods are welcome!
 
 ### ❓ How to create a docstring parser?
 
-WIP
+All parsers are defined in the `/langs` folder from the project root. The file
+is named with the prefix `ts-docstr-` followed by the `language name`. For
+example, if you want to create a parser for the `C` programming languge; the
+file should be named `ts-docstr-c.el`.
+
+The parser file is consist in three part:
+
+* ts-docstr-[lang]-activate `()`
+* ts-docstr-[lang]-parse `(node)`
+* ts-docstr-[lang]-insert `(node data)`
+
+The `activate` function is used to search for a node and confirm weather it
+should insert a document string.
 
 ### ❓ How to trigger by a key?
 
