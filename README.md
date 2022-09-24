@@ -116,9 +116,12 @@ These languages are fairly complete:
 
 These languages are in development:
 
+* Elixir
+* Haskell
 * Python
 * Ruby
 * Scala
+* Shellscript
 * Swift
 
 ## Contribute
