@@ -121,6 +121,9 @@ your own branch of this tool. Any methods are welcome!
 
 ### ❓ How to support my favorite language?
 
+> ⚠ Before you start, make sure [tree-sitter-langs](https://github.com/emacs-tree-sitter/tree-sitter-langs)
+> supports the language you want to add!
+
 > ⚠ The best way to learn how the entire process works is to look into other
 > files in the `/langs` folder from the project root. Find a similar language
 > and see through code, all languages' implementation are very similar to one
@@ -242,6 +245,10 @@ to the current file.
  */
 class Example {}
 ```
+
+### ❓ How to add a document string style?
+
+WIP
 
 ### ❓ How to trigger by a key?
 
