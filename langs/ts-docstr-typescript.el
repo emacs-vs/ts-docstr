@@ -93,16 +93,19 @@
   (when-let*
       ((nodes-fp (ts-docstr-grab-nodes-in-range '(formal_parameters)))
        (node-fp (nth 0 nodes-fp))
-       (node-sb (ts-docstr-get-next-sibling node-fp "statement_block")))
-    (when is-method
-      ;; TODO: .. Check if defined in method
-      )
-    ;; OKAY: This is probably the best solution!
-    ;;
-    ;; We traverse the entire tree nad look for `return', if it does return
-    ;; with something else, we simply return true!
-    (cl-some (lambda (return-node) (<= 3 (tsc-count-children return-node)))
-             (ts-docstr-find-children-traverse node-sb "return_statement"))))
+       (node-sb (ts-docstr-get-next-sibling node-fp "statement_block"))
+       (node-sb-prev (tsc-get-prev-sibling node-sb)))
+    (or (and is-method
+             ;; In TypesSript's method (not JavaScript's function), if node
+             ;; before statement_block isn't parameter list then it does
+             ;; return something!
+             (not (equal (tsc-node-type node-sb-prev) 'formal_parameters)))
+        ;; OKAY: This is probably the best solution!
+        ;;
+        ;; We traverse the entire tree nad look for `return', if it does return
+        ;; with something else, we simply return true!
+        (cl-some (lambda (return-node) (<= 3 (tsc-count-children return-node)))
+                 (ts-docstr-find-children-traverse node-sb "return_statement")))))
 
 ;;;###autoload
 (defun ts-docstr-typescript-parse (node)
