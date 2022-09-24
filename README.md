@@ -134,8 +134,28 @@ The parser file is consist in three part:
 * ts-docstr-[lang]-parse `(node)`
 * ts-docstr-[lang]-insert `(node data)`
 
+#### The `activate` function
+
 The `activate` function is used to search for a node and confirm weather it
-should insert a document string.
+should insert a document string. This function will eventually return a captured
+node, or return `nil` if we shouldn't insert a document string here.
+
+Here is the simplified version of `C#` activate function:
+
+```elisp
+;;;###autoload
+(defun ts-docstr-csharp-activate ()
+  "..."
+  ;; Narrow region to next line, this defines the valid region to insert a
+  ;; document string.
+  (ts-docstr-c-like-narrow-region
+    ;; We grab a list of node from the narrowed region, here we try to capture
+    ;; a `class' or `method' declaration. If this returns 2 or more nodes,
+    ;; report an error since we don't expect these declarations happened on the
+    ;; same line (region).
+    (nth 0 (ts-docstr-grab-nodes-in-range '(class_declaration
+                                            method_declaration)))))
+```
 
 Use `ts-docstr-activatable-p` function to check to see if you are able to insert
 a document string at point, this function returns a node.
@@ -147,6 +167,26 @@ a document string at point, this function returns a node.
 ```
 
 Evaluate, then `M-x print-activate-node` to see if it return something or `nil`.
+
+#### The `parse` function
+
+The `parse` function takes one argument `node` from the `activate` function.
+
+Here is a simplest `parse` function for example:
+
+```elisp
+;;;###autoload
+(defun ts-docstr-csharp-parse (node)
+  "..."
+  (if (equal (tsc-node-type node) 'method_declaration)
+      ;; `types' and `variables' are lists. Each store typenames and variables
+      ;; name. We simply parse the tree/node in this steps.
+      (list :type types :variable variables
+            :return (ts-docstr-csharp--parse-return params)  ; return `t' or `nil'
+            :name (ts-docstr-csharp--get-name node))         ; return `function' name
+    ;; For `class', we don't need to parse parameters.
+    (list :name (ts-docstr-csharp--get-name node))))         ; return `class' name
+```
 
 ### ❓ How to trigger by a key?
 
