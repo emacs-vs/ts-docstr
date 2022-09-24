@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'ts-docstr-c++)
+(require 'ts-docstr)
 
 (defcustom ts-docstr-rust-style 'rfc-430
   "Style specification for document string in Rust."
@@ -52,12 +52,12 @@
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-rust-format-param "@param {v} {d}"
+(defcustom ts-docstr-rust-format-param "* `{v}` - {d}"
   "Format for parameter line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-rust-format-return "@return {d}"
+(defcustom ts-docstr-rust-format-return ""
   "Format for return line."
   :type 'string
   :group 'ts-docstr)
@@ -71,14 +71,24 @@
 (defun ts-docstr-rust-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
-                                                   enum_declaration
-                                                   formal_parameters))))
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(trait_item
+                                                   impl_item
+                                                   struct_item
+                                                   function_item
+                                                   function_signature_item))))
       (cond ((zerop (length nodes))
              (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
              (ts-docstr-log "Multiple declarations are invalid, %s" (length nodes)))
             (t (nth 0 nodes))))))
+
+;; NOTE: This is generally not necessary but kinda useful for user.
+(defun ts-docstr-rust--get-name (node)
+  "Return declaration name, class/struct/enum/function."
+  (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
+                         (ts-docstr-find-children node "identifier")))
+         (node-name (nth 0 nodes-name)))
+    (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-rust--parse-return ()
@@ -91,28 +101,30 @@
              (ts-docstr-find-children-traverse node-cs "return_statement"))))
 
 ;;;###autoload
-(defun ts-docstr-php-parse ()
+(defun ts-docstr-rust-parse (node)
   "Parse declaration for Rust."
   (ts-docstr-c-like-narrow-region
-    (when-let* ((params (ts-docstr-grab-nodes-in-range '(simple_parameter))))
-      (let (types variables)
-        (dolist (param params)  ; loop through each parameter declaration
-          (tsc-mapc-children
-           (lambda (node)
-             (pcase (ts-docstr-2-str (tsc-node-type node))
-               ("type_list"
-                (ts-docstr-push (tsc-node-text node) types))
-               ("variable_name"
-                (ts-docstr-push (tsc-node-text node) variables))))
-           param)
-          ;; Make sure the typenames and variables have the same length
-          (while (not (= (length types) (length variables)))
-            ;; Add until they have the same length
-            (if (< (length types) (length variables))
-                (ts-docstr-push ts-docstr-default-typename types)
-              (ts-docstr-push ts-docstr-default-variable variables))))
-        (list :type types :variable variables
-              :return (ts-docstr-rust--parse-return))))))
+    (if-let ((params (ts-docstr-find-children node "parameters")))
+        (let (types variables)
+          (dolist (param params)  ; loop through each parameter declaration
+            (tsc-mapc-children
+             (lambda (node)
+               (pcase (ts-docstr-2-str (tsc-node-type node))
+                 ("type_list"
+                  (ts-docstr-push (tsc-node-text node) types))
+                 ("variable_name"
+                  (ts-docstr-push (tsc-node-text node) variables))))
+             param)
+            ;; Make sure the typenames and variables have the same length
+            (while (not (= (length types) (length variables)))
+              ;; Add until they have the same length
+              (if (< (length types) (length variables))
+                  (ts-docstr-push ts-docstr-default-typename types)
+                (ts-docstr-push ts-docstr-default-variable variables))))
+          (list :type types :variable variables
+                :return (ts-docstr-rust--parse-return)
+                :name (ts-docstr-rust--get-name node)))
+      (list :name (ts-docstr-rust--get-name node)))))
 
 (defun ts-docstr-rust-config ()
   "Configure style according to variable `ts-docstr-rust-style'."
@@ -152,5 +164,5 @@
           (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
         (ts-docstr-insert c-end)))))
 
-(provide 'ts-docstr-php)
-;;; ts-docstr-php.el ends here
+(provide 'ts-docstr-rust)
+;;; ts-docstr-rust.el ends here
