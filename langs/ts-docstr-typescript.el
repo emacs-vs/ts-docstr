@@ -111,21 +111,31 @@
 (defun ts-docstr-typescript-parse (node)
   "Parse declaration for TypeScript."
   (ts-docstr-c-like-narrow-region
-    (if-let* ((params (ts-docstr-grab-nodes-in-range '(formal_parameters)))
+    (if-let* ((params (ts-docstr-find-children node "formal_parameters"))
               (parent (tsc-get-parent (nth 0 params))))
         (let* ((node-method-or-function (tsc-node-type parent))
                (is-method (eq node-method-or-function 'method_definition))
                types variables)
           (dolist (param params)
-            (tsc-traverse-mapc
+            (tsc-mapc-children
              (lambda (node)
-               (pcase (ts-docstr-2-str (tsc-node-type node))
-                 ((or "type_identifier" "predefined_type")
-                  (ts-docstr-push (tsc-node-text node) types))
-                 ("identifier"
-                  (unless is-method
-                    (ts-docstr-push ts-docstr-default-typename types))
-                  (ts-docstr-push (tsc-node-text node) variables))))
+               (when (eq (tsc-node-type node) 'required_parameter)
+                 (tsc-traverse-mapc
+                  (lambda (child)  ; access `required_parameter' child
+                    (pcase (ts-docstr-2-str (tsc-node-type child))
+                      ((or "type_identifier" "predefined_type")
+                       (ts-docstr-push (tsc-node-text child) types))
+                      ("identifier"
+                       (unless is-method
+                         (ts-docstr-push ts-docstr-default-typename types))
+                       (ts-docstr-push (tsc-node-text child) variables))))
+                  node))
+               ;; Make sure the typenames and variables have the same length
+               (while (not (= (length types) (length variables)))
+                 ;; Add until they have the same length
+                 (if (< (length types) (length variables))
+                     (ts-docstr-push ts-docstr-default-typename types)
+                   (ts-docstr-push ts-docstr-default-variable variables))))
              param))
           (list :type types :variable variables
                 :return (ts-docstr-typescript--parse-return is-method)
