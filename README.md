@@ -15,11 +15,12 @@
         - [🔍 Method 2. Manual](#🔍-method-2-manual)
     - [📇 Commands](#📇-commands)
     - [🔧 Customization](#🔧-customization)
-        - [🎣 Keys](#🎣-keys)
+        - [⌨️ Keys](#️-keys)
         - [🎣 Hooks](#🎣-hooks)
     - [🔨 Supported languages](#🔨-supported-languages)
     - [Contribute](#contribute)
         - [❓ How to create a docstring parser?](#❓-how-to-create-a-docstring-parser)
+        - [❓ How to trigger by a key?](#❓-how-to-trigger-by-a-key)
 
 <!-- markdown-toc end -->
 
@@ -62,7 +63,7 @@ or
 
 ## 🔧 Customization
 
-### 🎣 Keys
+### ⌨️ Keys
 
 Better editing experience,
 
