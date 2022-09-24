@@ -119,6 +119,9 @@ Any methods are welcome!
 
 ### ❓ How to create a docstring parser?
 
+> ⚠ The best way to learn how a parser works is to look into other files in 
+> `/langs` folder from the project root.
+
 All parsers are defined in the `/langs` folder from the project root. The file
 is named with the prefix `ts-docstr-` followed by the `language name`. For
 example, if you want to create a parser for the `C` programming languge; the
@@ -132,6 +135,17 @@ The parser file is consist in three part:
 
 The `activate` function is used to search for a node and confirm weather it
 should insert a document string.
+
+Use `ts-docstr-activatable-p` function to check to see if you are able to insert
+a document string at point, this function returns a node.
+
+```elisp
+(defun print-activate-node ()
+  (interactive)  ; make interactive, so you could M-x
+  (message "node: %s" (ts-docstr-activatable-p)))
+```
+
+Evaluate, then `M-x print-activate-node` to see if it return something or `nil`.
 
 ### ❓ How to trigger by a key?
 
