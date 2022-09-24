@@ -13,7 +13,7 @@ copyright: (c) 2017-2022 emacs-vs. All rights reserved.
 nav:
   - Overview: page/index.md
   - Languages:
-    - +
+    - Test:
       #- ActionScript: page/langs/actionscript.md
       - C: page/langs/c.md
       - C++: page/langs/c++.md
