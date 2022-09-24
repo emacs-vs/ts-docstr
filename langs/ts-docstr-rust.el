@@ -119,10 +119,11 @@
                  (tsc-mapc-children
                   (lambda (child)
                     (pcase (ts-docstr-2-str (tsc-node-type child))
-                      ("type_list"
-                       (ts-docstr-push (tsc-node-text child) types))
-                      ("variable_name"
-                       (ts-docstr-push (tsc-node-text child) variables))))
+                      (":" )  ; do nothing! skip it!
+                      ("identifier"
+                       (ts-docstr-push (tsc-node-text child) variables))
+                      (_
+                       (ts-docstr-push (tsc-node-text child) types))))
                   node)))
              param)
             ;; Make sure the typenames and variables have the same length
@@ -164,14 +165,15 @@
         (ts-docstr-insert c-start "\n")
         (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
         (setq restore-point (1- (point)))
+        (ts-docstr-insert c-prefix "\n")
+        (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
+        (ts-docstr-insert c-prefix "\n")
         (dotimes (index len)
           (ts-docstr-insert c-prefix
                             (ts-docstr-format 'param
                                               :typename (nth index types)
                                               :variable (nth index variables))
-                            "\n"))
-        (when (plist-get data :return)
-          (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+                            (if (= index (1- len)) "" "\n")))
         (ts-docstr-insert c-end)))))
 
 (provide 'ts-docstr-rust)

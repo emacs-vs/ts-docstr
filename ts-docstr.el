@@ -324,13 +324,13 @@ Optional argument MODULE is the targeted language's codename."
 (defmacro ts-docstr--setup-style (&rest body)
   "Set up the style data."
   (declare (indent 0) (debug t))
-  `(let* ((config-data (funcall (intern (format "%s-config" (ts-docstr-module)))))
-          (c-start (plist-get config-data :start))
-          (c-prefix (plist-get config-data :prefix))
-          (c-end (plist-get config-data :end))
-          (c-summary (plist-get config-data :summary))
-          (c-param (plist-get config-data :param))
-          (c-return (plist-get config-data :return)))
+  `(let* ((config (funcall (intern (format "%s-config" (ts-docstr-module)))))
+          (c-start (plist-get config :start))
+          (c-prefix (plist-get config :prefix))
+          (c-end (plist-get config :end))
+          (c-summary (plist-get config :summary))
+          (c-param (plist-get config :param))
+          (c-return (plist-get config :return)))
      (setq ts-docstr--format-summary c-summary
            ts-docstr--format-param c-param
            ts-docstr--format-return c-return)
