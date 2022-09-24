@@ -143,26 +143,25 @@
 ;;;###autoload
 (defun ts-docstr-go-insert (_node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c-like-narrow-region
-    (ts-docstr-inserting
-      (cl-case ts-docstr-go-style
-        (godoc (insert c-start ts-docstr-desc-summary "\n"))
-        (t
-         (when-let* ((types (plist-get data :type))
-                     (variables (plist-get data :variable))
-                     (len (length types)))
-           (ts-docstr-insert c-start "\n")
-           (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-           (setq restore-point (1- (point)))
-           (dotimes (index len)
-             (ts-docstr-insert c-prefix
-                               (ts-docstr-format 'param
-                                                 :typename (nth index types)
-                                                 :variable (nth index variables))
-                               "\n"))
-           (when (plist-get data :return)
-             (ts-docstr-insert c-prefix (ts-docstr-format 'return)))
-           (ts-docstr-insert c-end)))))))
+  (ts-docstr-inserting
+    (cl-case ts-docstr-go-style
+      (godoc (insert c-start ts-docstr-desc-summary "\n"))
+      (t
+       (when-let* ((types (plist-get data :type))
+                   (variables (plist-get data :variable))
+                   (len (length types)))
+         (ts-docstr-insert c-start "\n")
+         (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+         (setq restore-point (1- (point)))
+         (dotimes (index len)
+           (ts-docstr-insert c-prefix
+                             (ts-docstr-format 'param
+                                               :typename (nth index types)
+                                               :variable (nth index variables))
+                             "\n"))
+         (when (plist-get data :return)
+           (ts-docstr-insert c-prefix (ts-docstr-format 'return)))
+         (ts-docstr-insert c-end))))))
 
 (provide 'ts-docstr-go)
 ;;; ts-docstr-go.el ends here

@@ -135,23 +135,22 @@
 ;;;###autoload
 (defun ts-docstr-rust-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c-like-narrow-region
-    (ts-docstr-inserting
-      (let ((types (plist-get data :type)))
-        (when-let* ((variables (plist-get data :variable))
-                    (len (length variables)))
-          (ts-docstr-insert c-start "\n")
-          (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-          (setq restore-point (1- (point)))
-          (dotimes (index len)
-            (ts-docstr-insert c-prefix
-                              (ts-docstr-format 'param
-                                                :typename (nth index types)
-                                                :variable (nth index variables))
-                              "\n"))
-          (when (plist-get data :return)
-            (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-          (ts-docstr-insert c-end))))))
+  (ts-docstr-inserting
+    (let ((types (plist-get data :type)))
+      (when-let* ((variables (plist-get data :variable))
+                  (len (length variables)))
+        (ts-docstr-insert c-start "\n")
+        (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+        (setq restore-point (1- (point)))
+        (dotimes (index len)
+          (ts-docstr-insert c-prefix
+                            (ts-docstr-format 'param
+                                              :typename (nth index types)
+                                              :variable (nth index variables))
+                            "\n"))
+        (when (plist-get data :return)
+          (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+        (ts-docstr-insert c-end)))))
 
 (provide 'ts-docstr-php)
 ;;; ts-docstr-php.el ends here

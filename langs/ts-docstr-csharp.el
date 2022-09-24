@@ -146,27 +146,26 @@
 ;;;###autoload
 (defun ts-docstr-csharp-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c-like-narrow-region
-    (ts-docstr-inserting
-      (cl-case (tsc-node-type node)
-        (method_declaration
-         (when-let* ((types (plist-get data :type))
-                     (variables (plist-get data :variable))
-                     (len (length types)))
-           (insert c-start "\n")
-           (insert c-prefix (ts-docstr-format 'summary) "\n")
-           (setq restore-point (1- (point)))
-           (insert c-end "\n")
-           (dotimes (index len)
-             (insert c-prefix (ts-docstr-format 'param :variable (nth index variables))
-                     (if (= index (1- len)) "" "\n")))
-           (when (plist-get data :return)
-             (insert "\n" c-prefix (ts-docstr-format 'return)))))
-        (t
+  (ts-docstr-inserting
+    (cl-case (tsc-node-type node)
+      (method_declaration
+       (when-let* ((types (plist-get data :type))
+                   (variables (plist-get data :variable))
+                   (len (length types)))
          (insert c-start "\n")
          (insert c-prefix (ts-docstr-format 'summary) "\n")
          (setq restore-point (1- (point)))
-         (insert c-end))))))
+         (insert c-end "\n")
+         (dotimes (index len)
+           (insert c-prefix (ts-docstr-format 'param :variable (nth index variables))
+                   (if (= index (1- len)) "" "\n")))
+         (when (plist-get data :return)
+           (insert "\n" c-prefix (ts-docstr-format 'return)))))
+      (t
+       (insert c-start "\n")
+       (insert c-prefix (ts-docstr-format 'summary) "\n")
+       (setq restore-point (1- (point)))
+       (insert c-end)))))
 
 (provide 'ts-docstr-csharp)
 ;;; ts-docstr-csharp.el ends here

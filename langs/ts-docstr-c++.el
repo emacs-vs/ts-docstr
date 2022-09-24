@@ -157,30 +157,29 @@
 ;;;###autoload
 (defun ts-docstr-c++-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-c-like-narrow-region
-    (ts-docstr-inserting
-      (cl-case (tsc-node-type node)
-        (function_declarator  ; For function
-         (when-let* ((types (plist-get data :type))
-                     (variables (plist-get data :variable))
-                     (len (length variables)))
-           (ts-docstr-insert c-start "\n")
-           (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-           (setq restore-point (1- (point)))
-           (dotimes (index len)
-             (ts-docstr-insert c-prefix
-                               (ts-docstr-format 'param
-                                                 :typename (nth index types)
-                                                 :variable (nth index variables))
-                               "\n"))
-           (when (plist-get data :return)
-             (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-           (ts-docstr-insert c-end)))
-        (t  ; For the rest of the type, class/struct/enum
+  (ts-docstr-inserting
+    (cl-case (tsc-node-type node)
+      (function_declarator  ; For function
+       (when-let* ((types (plist-get data :type))
+                   (variables (plist-get data :variable))
+                   (len (length variables)))
          (ts-docstr-insert c-start "\n")
-         (ts-docstr-insert c-prefix "\n")
+         (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
          (setq restore-point (1- (point)))
-         (ts-docstr-insert c-end))))))
+         (dotimes (index len)
+           (ts-docstr-insert c-prefix
+                             (ts-docstr-format 'param
+                                               :typename (nth index types)
+                                               :variable (nth index variables))
+                             "\n"))
+         (when (plist-get data :return)
+           (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+         (ts-docstr-insert c-end)))
+      (t  ; For the rest of the type, class/struct/enum
+       (ts-docstr-insert c-start "\n")
+       (ts-docstr-insert c-prefix "\n")
+       (setq restore-point (1- (point)))
+       (ts-docstr-insert c-end)))))
 
 (provide 'ts-docstr-c++)
 ;;; ts-docstr-c++.el ends here
