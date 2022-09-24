@@ -95,13 +95,13 @@ These languages are fairly complete:
 * Go
 * Java / JavaScript
 * PHP
+* Rust
 * TypeScript
 
 These languages are in development:
 
 * Python
 * Ruby
-* Rust
 * Scala
 * Swift
 
