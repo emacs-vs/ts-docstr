@@ -148,6 +148,21 @@
 ;; (@* "Util" )
 ;;
 
+(defmacro ts-docstr-with-no-redisplay (&rest body)
+  "Execute BODY without any redisplay execution."
+  (declare (indent 0) (debug t))
+  `(let ((inhibit-redisplay t)
+         (inhibit-modification-hooks t)
+         (inhibit-point-motion-hooks t)
+         after-focus-change-function
+         buffer-list-update-hook
+         display-buffer-alist
+         window-configuration-change-hook
+         window-scroll-functions
+         window-size-change-functions
+         window-state-change-hook)
+     ,@body))
+
 (defun ts-docstr-2-str (object)
   "Convert OBJECT to string."
   (format "%s" object))
@@ -365,10 +380,17 @@ Optional argument MODULE is the targeted language's codename."
      (goto-char restore-point)
      (goto-char (line-end-position))))
 
+(defmacro ts-docstr--setup-insert-env (&rest body)
+  "Set up for the insertion environment."
+  (declare (indent 0) (debug t))
+  `(ts-docstr--setup-restore-point
+     (ts-docstr-with-no-redisplay
+       ,@body)))
+
 (defmacro ts-docstr-with-insert-indent (&rest body)
   "Execute BODY then indent region."
   (declare (indent 0) (debug t))
-  `(ts-docstr--setup-restore-point
+  `(ts-docstr--setup-insert-env
      (indent-for-tab-command)
      ,@body
      (msgu-silent (ignore-errors (indent-region (point-min) (point-max))))))
@@ -376,7 +398,7 @@ Optional argument MODULE is the targeted language's codename."
 (defmacro ts-docstr-with-insert-indent-hold (&rest body)
   "Execute BODY and holds the indent level."
   (declare (indent 0) (debug t))
-  `(ts-docstr--setup-restore-point
+  `(ts-docstr--setup-insert-env
      (indent-for-tab-command)
      (let ((ts-docstr-indent-spaces
             (save-excursion
