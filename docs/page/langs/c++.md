@@ -2,7 +2,7 @@
 
 You can customize variable `ts-docstr-c++-style` for the following value.
 
-* `javadoc` - Javadoc Style (default)
+* `doxygen` - Doxygen Style (default)
 * `qt` - Qt Style
 * `nil` - Respect to user's customization
 

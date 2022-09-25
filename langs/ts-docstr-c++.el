@@ -26,10 +26,10 @@
 
 (require 'ts-docstr)
 
-(defcustom ts-docstr-c++-style 'javadoc
+(defcustom ts-docstr-c++-style 'doxygen
   "Style specification for document string in C++."
   :type '(choice (const :tag "No specify" nil)
-                 (const :tag "Javadoc Style" javadoc)
+                 (const :tag "Doxygen Style" doxygen)
                  (const :tag "Qt Style" qt))
   :group 'ts-docstr)
 
@@ -134,7 +134,7 @@
 (defun ts-docstr-c++-config ()
   "Configure style according to variable `ts-docstr-c++-style'."
   (cl-case ts-docstr-c++-style
-    (javadoc (list :start "/**"
+    (doxygen (list :start "/**"
                    :prefix "* "
                    :end "*/"
                    :summary "{d}"
@@ -162,23 +162,32 @@
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length variables)))
-         (ts-docstr-insert c-start "\n")
-         (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-         (setq restore-point (1- (point)))
-         (dotimes (index len)
-           (ts-docstr-insert c-prefix
-                             (ts-docstr-format 'param
-                                               :typename (nth index types)
-                                               :variable (nth index variables))
-                             "\n"))
-         (when (plist-get data :return)
-           (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-         (ts-docstr-insert c-end)))
-      (t  ; For the rest of the type, class/struct/enum
-       (ts-docstr-insert c-start "\n")
-       (ts-docstr-insert c-prefix "\n")
-       (setq restore-point (1- (point)))
-       (ts-docstr-insert c-end)))))
+         (cl-case ts-docstr-c++-style
+           ((or doxygen qt)
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                "\n"))
+            (when (plist-get data :return)
+              (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+            (ts-docstr-insert c-end))
+           (t
+            (ts-docstr-custom-insertion node data)))))
+      ;; For the rest of the type, class/struct/enum
+      (t
+       (cl-case ts-docstr-c++-style
+         ((or doxygen qt)
+          (ts-docstr-insert c-start "\n")
+          (insert c-prefix (ts-docstr-format 'summary) "\n")
+          (setq restore-point (1- (point)))
+          (ts-docstr-insert c-end))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-c++)
 ;;; ts-docstr-c++.el ends here
