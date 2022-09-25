@@ -29,7 +29,7 @@ nav:
     - Scala: page/langs/scala.md
     - Swift: page/langs/swift.md
     - TypeScript: page/langs/typescript.md
-  - Change log: CHANGELOG.md
+  #- Change log: CHANGELOG.md
 
 extra_css:
   - stylesheets/extra.css
