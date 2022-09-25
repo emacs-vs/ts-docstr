@@ -332,6 +332,9 @@ the third slash in a line.
 Once you have an idea, write the function to do the action. Here is the example
 for C# slash triggeration function.
 
+> ⚠ Check before you do, may be the triggeration is already there, and make
+> sure your design doesn't conflict with other keys!
+
 ```elisp
 (defun ts-docstr-key-csharp-/ (&rest _)
   "..."
