@@ -95,7 +95,7 @@ Better editing experience,
 ```
 
 <p align="center">
-  <img src="./etc/ask.png"/>
+  <img src="./etc/ask.png" width="60%"/>
 </p>
 
 ### 🎣 Hooks
