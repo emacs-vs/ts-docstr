@@ -277,9 +277,31 @@ See the following example,
                  (const :tag "Javadoc Style" javadoc)))
 ```
 
-See if the style is already supported. Continue reading if it does **NOT**,
+See if the style is already supported. Continue reading if it does **NOT**, 
+there are two parts you need to change in order to support your favorite style!
 
+First, you need to add an option to the style variable so other people would
+notice the changes.
 
+```elisp
+...
+  :type '(choice (const :tag "No specify" nil)
+                 (const :tag "New Doc Style" new-doc-style)
+...
+```
+
+Then next (last) step is to do the implementation in the insertion function.
+The implementation is isolated and complex depends on the style you targeted.
+Here we show the core logic of the implementation, but we prefer to look right
+into the code:
+
+```elisp
+...
+(ts-docstr-with-style-case
+  (new-doc-style  ; listen to new-doc-style
+   (insert "My new docstring style! :)"))
+...
+```
 
 ### ❓ How to trigger by a key?
 
