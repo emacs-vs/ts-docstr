@@ -112,7 +112,7 @@ These languages are fairly complete:
 * Go
 * Java / JavaScript
 * PHP / Python
-* Rust
+* Ruby / Rust
 * Scala
 * Swift
 * TypeScript
@@ -121,7 +121,6 @@ These languages are in development:
 
 * Elixir
 * Haskell
-* Ruby
 * Shellscript
 
 ## Contribute

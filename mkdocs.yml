@@ -25,7 +25,7 @@ nav:
     #- Objective-C: page/langs/objc.md
     - PHP: page/langs/php.md
     - Python: page/langs/python.md
-    #- Ruby: page/langs/ruby.md
+    - Ruby: page/langs/ruby.md
     - Rust: page/langs/rust.md
     - Scala: page/langs/scala.md
     - Swift: page/langs/swift.md

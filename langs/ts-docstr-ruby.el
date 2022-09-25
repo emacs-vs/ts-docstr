@@ -1,4 +1,4 @@
-;;; ts-docstr-java.el --- Document string for Java  -*- lexical-binding: t; -*-
+;;; ts-docstr-ruby.el --- Document string for Ruby  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Shen, Jen-Chieh
 
@@ -19,57 +19,55 @@
 
 ;;; Commentary:
 ;;
-;; Document string for Java.
+;; Document string for Ruby.
 ;;
 
 ;;; Code:
 
 (require 'ts-docstr)
 
-(defcustom ts-docstr-java-style 'javadoc
-  "Style specification for document string in Java."
+(defcustom ts-docstr-ruby-style 'rdoc
+  "Style specification for document string in Ruby."
   :type '(choice (const :tag "No specify" nil)
-                 (const :tag "Javadoc Style" javadoc))
+                 (const :tag "Ruby Documentation System" rdoc))
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-start "/**"
+(defcustom ts-docstr-ruby-start "##"
   "Docstring start line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-prefix "* "
+(defcustom ts-docstr-ruby-prefix "# "
   "Docstring prefix for each line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-end "*/"
+(defcustom ts-docstr-ruby-end ""
   "Docstring end line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-format-summary "{d}"
+(defcustom ts-docstr-ruby-format-summary "{d}"
   "Format for summary line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-format-param "@param {v} {d}"
+(defcustom ts-docstr-ruby-format-param "+{v}+ {d}"
   "Format for parameter line."
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-java-format-return "@return {d}"
+(defcustom ts-docstr-ruby-format-return ""
   "Format for return line."
   :type 'string
   :group 'ts-docstr)
 
 ;;;###autoload
-(defun ts-docstr-java-activate ()
+(defun ts-docstr-ruby-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-c-like-narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_declaration
-                                                   interface_declaration
-                                                   enum_declaration
-                                                   method_declaration))))
+    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class
+                                                   method))))
       (cond ((zerop (length nodes))
              (ts-docstr-log "No declaration found"))
             ((<= 2 (length nodes))
@@ -77,14 +75,14 @@
             (t (nth 0 nodes))))))
 
 ;; NOTE: This is generally not necessary but kinda useful for user.
-(defun ts-docstr-java--get-name (node)
+(defun ts-docstr-ruby--get-name (node)
   "Return declaration name, class/struct/enum/function."
   (let* ((nodes-name (ts-docstr-find-children node "identifier"))
          (node-name (nth 0 nodes-name)))
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-java--parse-return (nodes-pl)
+(defun ts-docstr-ruby--parse-return (nodes-pl)
   "Return t if function does have return value."
   (let* ((node-pl (nth 0 nodes-pl))
          (parent (tsc-get-parent node-pl))
@@ -100,10 +98,10 @@
     return))
 
 ;;;###autoload
-(defun ts-docstr-java-parse (node)
-  "Parse declaration for Java."
+(defun ts-docstr-ruby-parse (node)
+  "Parse declaration for Ruby."
   (ts-docstr-c-like-narrow-region
-    (if-let ((params (ts-docstr-find-children node "formal_parameters")))
+    (if-let ((params (ts-docstr-find-children node "method_parameters")))
         (let (types variables)
           (dolist (param params)
             (tsc-mapc-children
@@ -119,28 +117,28 @@
                   node)))
              param))
           (list :type types :variable variables
-                :return (ts-docstr-java--parse-return params)
-                :name (ts-docstr-java--get-name node)))
-      (list :name (ts-docstr-java--get-name node)))))
+                :return (ts-docstr-ruby--parse-return params)
+                :name (ts-docstr-ruby--get-name node)))
+      (list :name (ts-docstr-ruby--get-name node)))))
 
-(defun ts-docstr-java-config ()
-  "Configure style according to variable `ts-docstr-java-style'."
-  (cl-case ts-docstr-java-style
-    (javadoc (list :start "/**"
-                   :prefix "* "
-                   :end "*/"
-                   :summary "{d}"
-                   :param "@param {v} {d}"
-                   :return "@return {d}"))
-    (t (list :start ts-docstr-java-start
-             :prefix ts-docstr-java-prefix
-             :end ts-docstr-java-end
-             :summary ts-docstr-java-format-summary
-             :param ts-docstr-java-format-param
-             :return ts-docstr-java-format-return))))
+(defun ts-docstr-ruby-config ()
+  "Configure style according to variable `ts-docstr-ruby-style'."
+  (cl-case ts-docstr-ruby-style
+    (rdoc (list :start "##"
+                :prefix "# "
+                :end ""
+                :summary "{d}"
+                :param "+{v}+ {d}"
+                :return ""))
+    (t (list :start ts-docstr-ruby-start
+             :prefix ts-docstr-ruby-prefix
+             :end ts-docstr-ruby-end
+             :summary ts-docstr-ruby-format-summary
+             :param ts-docstr-ruby-format-param
+             :return ts-docstr-ruby-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-java-insert (node data)
+(defun ts-docstr-ruby-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
@@ -166,5 +164,5 @@
        (setq restore-point (1- (point)))
        (ts-docstr-insert c-end)))))
 
-(provide 'ts-docstr-java)
-;;; ts-docstr-java.el ends here
+(provide 'ts-docstr-ruby)
+;;; ts-docstr-ruby.el ends here
