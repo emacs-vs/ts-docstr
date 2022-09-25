@@ -394,6 +394,13 @@ Optional argument MODULE is the targeted language's codename."
            (apply #'insert (append (or ts-docstr-indent-spaces "") args))))
         (t (apply #'insert (append (or ts-docstr-indent-spaces "") args)))))
 
+(defun ts-docstr-custom-insertion (node data)
+  "Execute customized insertion function."
+  (let* ((var (format "%s-insertion" (ts-docstr-module)))
+         (sym (intern var)))
+    (when (fboundp sym)
+      (funcall sym node data))))
+
 ;;
 ;; (@* "C-like" )
 ;;

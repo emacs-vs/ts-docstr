@@ -352,6 +352,7 @@ document string."
                (ts-docstr--looking-back "\"\"\"" 3)
                (ts-docstr-activatable-p))
       (backward-delete-char 3)
+      (delete-char 3)
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-ruby (&rest _)

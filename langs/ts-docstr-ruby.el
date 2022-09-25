@@ -28,7 +28,8 @@
 
 (defcustom ts-docstr-ruby-style 'rdoc
   "Style specification for document string in Ruby."
-  :type '(choice (const :tag "Ruby Documentation System" rdoc))
+  :type '(choice (const :tag "No specify" nil)
+                 (const :tag "Ruby Documentation System" rdoc))
   :group 'ts-docstr)
 
 (defcustom ts-docstr-ruby-start "##"
@@ -160,7 +161,9 @@
                                 (if (= index (1- len)) "" "\n")))
             (when (plist-get data :return)
               (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-            (ts-docstr-insert c-end)))))
+            (ts-docstr-insert c-end))
+           (t
+            (ts-docstr-custom-insertion node data)))))
       (t  ; For the rest of the type, class/struct/enum
        (ts-docstr-insert c-start "\n")
        (ts-docstr-insert c-prefix (ts-docstr-format 'summary) (if (string-empty-p c-end) "" "\n"))

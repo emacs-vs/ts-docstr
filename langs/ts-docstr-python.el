@@ -28,7 +28,8 @@
 
 (defcustom ts-docstr-python-style 'pep-257
   "Style specification for document string in Python."
-  :type '(choice (const :tag "PEP 257 convention" pep-257)
+  :type '(choice (const :tag "No specify" nil)
+                 (const :tag "PEP 257 convention" pep-257)
                  (const :tag "Google Style" google)
                  (const :tag "NumPy Style" numpy))
   :group 'ts-docstr)
@@ -190,58 +191,71 @@
              :header-ret ts-docstr-python-header-return))))
 
 ;;;###autoload
-(defun ts-docstr-python-insert (_node data)
+(defun ts-docstr-python-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-with-insert-indent-hold
-    (let ((types (plist-get data :type)))
-      (when-let* ((variables (plist-get data :variable))
-                  (len (length variables)))
-        (let (ts-docstr-indent-spaces)
-          (ts-docstr-insert c-start (ts-docstr-format 'summary) "\n"))
-        (setq restore-point (1- (point)))
-        ;; XXX: Start insert the differences!
-        (cl-case ts-docstr-python-style
-          (pep-257
-           (ts-docstr-insert c-prefix " " "\n")
-           (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
-           (ts-docstr-insert c-prefix "\n")
-           (dotimes (index len)
-             (ts-docstr-insert c-prefix
-                               (ts-docstr-format 'param
-                                                 :typename (nth index types)
-                                                 :variable (nth index variables))
-                               "\n")))
-          (google
-           (ts-docstr-insert " " "\n")
-           (ts-docstr-insert (plist-get config :header-arg) "\n")
-           (dotimes (index len)
-             (ts-docstr-insert c-prefix
-                               (ts-docstr-format 'param
-                                                 :typename (nth index types)
-                                                 :variable (nth index variables))
-                               "\n"))
-           (when (plist-get data :return)
-             (ts-docstr-insert " " "\n")
-             (ts-docstr-insert (plist-get config :header-ret) "\n")
-             (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n")))
-          (numpy
-           (ts-docstr-insert c-prefix " " "\n")
-           (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
-           (ts-docstr-insert "-------" "\n")
-           (ts-docstr-insert c-prefix "\n")
-           (dotimes (index len)
-             (ts-docstr-insert c-prefix
-                               (ts-docstr-format 'param
-                                                 :typename (nth index types)
-                                                 :variable (nth index variables))
-                               "\n")
-             (ts-docstr-insert "    " ts-docstr-desc-param "\n"))
-           (when (plist-get data :return)
-             (ts-docstr-insert " " "\n")
-             (ts-docstr-insert (plist-get config :header-ret) "\n")
-             (ts-docstr-insert "-------" "\n")
-             (ts-docstr-insert c-prefix "    " (ts-docstr-format 'return) "\n"))))
-        (ts-docstr-insert c-end)))))
+    (cl-case (tsc-node-type node)
+      (function_definition
+       (let ((types (plist-get data :type)))
+         (when-let* ((variables (plist-get data :variable))
+                     (len (length variables)))
+           (let (ts-docstr-indent-spaces)
+             (ts-docstr-insert c-start (ts-docstr-format 'summary) "\n"))
+           (setq restore-point (1- (point)))
+           ;; XXX: Start insert the differences!
+           (cl-case ts-docstr-python-style
+             (pep-257
+              (ts-docstr-insert c-prefix " " "\n")
+              (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
+              (ts-docstr-insert c-prefix "\n")
+              (dotimes (index len)
+                (ts-docstr-insert c-prefix
+                                  (ts-docstr-format 'param
+                                                    :typename (nth index types)
+                                                    :variable (nth index variables))
+                                  "\n")))
+             (google
+              (ts-docstr-insert " " "\n")
+              (ts-docstr-insert (plist-get config :header-arg) "\n")
+              (dotimes (index len)
+                (ts-docstr-insert c-prefix
+                                  (ts-docstr-format 'param
+                                                    :typename (nth index types)
+                                                    :variable (nth index variables))
+                                  "\n"))
+              (when (plist-get data :return)
+                (ts-docstr-insert " " "\n")
+                (ts-docstr-insert (plist-get config :header-ret) "\n")
+                (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n")))
+             (numpy
+              (ts-docstr-insert c-prefix " " "\n")
+              (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
+              (ts-docstr-insert "-------" "\n")
+              (ts-docstr-insert c-prefix "\n")
+              (dotimes (index len)
+                (ts-docstr-insert c-prefix
+                                  (ts-docstr-format 'param
+                                                    :typename (nth index types)
+                                                    :variable (nth index variables))
+                                  "\n")
+                (ts-docstr-insert "    " ts-docstr-desc-param "\n"))
+              (when (plist-get data :return)
+                (ts-docstr-insert " " "\n")
+                (ts-docstr-insert (plist-get config :header-ret) "\n")
+                (ts-docstr-insert "-------" "\n")
+                (ts-docstr-insert c-prefix "    " (ts-docstr-format 'return) "\n")))
+             (t
+              (ts-docstr-custom-insertion node data)))
+           (ts-docstr-insert c-end))))
+      (t
+       (cl-case ts-docstr-python-style
+         ((or pep-257 google numpy)
+          (let (ts-docstr-indent-spaces)
+            (ts-docstr-insert c-start (ts-docstr-format 'summary) "\n"))
+          (setq restore-point (1- (point)))
+          (ts-docstr-insert c-end))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-python)
 ;;; ts-docstr-python.el ends here
