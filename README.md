@@ -18,6 +18,7 @@
     - [🔧 Customization](#🔧-customization)
         - [🎨 Styles](#🎨-styles)
         - [⌨️ Keys](#️-keys)
+        - [💬 Ask to select the style](#💬-ask-to-select-the-style)
         - [🎣 Hooks](#🎣-hooks)
     - [🔨 Supported languages](#🔨-supported-languages)
     - [Contribute](#contribute)
