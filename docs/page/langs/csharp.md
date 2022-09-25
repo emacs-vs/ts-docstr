@@ -2,6 +2,7 @@
 
 You can customize variable `ts-docstr-csharp-style` for the following value.
 
+* `microsoft` - Microsoft standard
 * `nil` - Respect to user's customization
 
 C# currently uses mix of [Javadoc](https://en.wikipedia.org/wiki/Javadoc) and

@@ -26,9 +26,10 @@
 
 (require 'ts-docstr)
 
-(defcustom ts-docstr-csharp-style nil
+(defcustom ts-docstr-csharp-style 'microsoft
   "Style specification for document string in C#."
-  :type '(choice (const :tag "No specify" nil))
+  :type '(choice (const :tag "No specify" nil)
+                 (const :tag "Microsoft" microsoft))
   :group 'ts-docstr)
 
 (defcustom ts-docstr-csharp-start "/// <summary>"
@@ -41,7 +42,7 @@
   :type 'string
   :group 'ts-docstr)
 
-(defcustom ts-docstr-csharp-end "/// <summary>"
+(defcustom ts-docstr-csharp-end "/// </summary>"
   "Docstring end line."
   :type 'string
   :group 'ts-docstr)
@@ -136,6 +137,13 @@
 (defun ts-docstr-csharp-config ()
   "Configure style according to variable `ts-docstr-csharp-style'."
   (cl-case ts-docstr-csharp-style
+    (microsoft
+     (list :start "/// <summary>"
+           :prefix "/// "
+           :end "/// </summary>"
+           :summary "{d}"
+           :param "<param name=\"{v}\">{d}</param>"
+           :return "<returns>{d}</returns>"))
     (t (list :start ts-docstr-csharp-start
              :prefix ts-docstr-csharp-prefix
              :end ts-docstr-csharp-end
@@ -152,20 +160,28 @@
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length types)))
-         (insert c-start "\n")
-         (insert c-prefix (ts-docstr-format 'summary) "\n")
-         (setq restore-point (1- (point)))
-         (insert c-end "\n")
-         (dotimes (index len)
-           (insert c-prefix (ts-docstr-format 'param :variable (nth index variables))
-                   (if (= index (1- len)) "" "\n")))
-         (when (plist-get data :return)
-           (insert "\n" c-prefix (ts-docstr-format 'return)))))
+         (cl-case ts-docstr-csharp-style
+           (microsoft
+            (insert c-start "\n")
+            (insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (insert c-end "\n")
+            (dotimes (index len)
+              (insert c-prefix (ts-docstr-format 'param :variable (nth index variables))
+                      (if (= index (1- len)) "" "\n")))
+            (when (plist-get data :return)
+              (insert "\n" c-prefix (ts-docstr-format 'return))))
+           (t
+            (ts-docstr-custom-insertion node data)))))
       (t
-       (insert c-start "\n")
-       (insert c-prefix (ts-docstr-format 'summary) "\n")
-       (setq restore-point (1- (point)))
-       (insert c-end)))))
+       (cl-case ts-docstr-csharp-style
+         (microsoft
+          (insert c-start "\n")
+          (insert c-prefix (ts-docstr-format 'summary) "\n")
+          (setq restore-point (1- (point)))
+          (insert c-end))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-csharp)
 ;;; ts-docstr-csharp.el ends here
