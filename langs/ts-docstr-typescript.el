@@ -173,7 +173,7 @@
                    (variables (plist-get data :variable))
                    (len (length variables)))
          (ts-docstr-with-style-case
-           ((or typedoc tsdoc)
+           ((or typedoc tsdoc jsdoc google)
             (ts-docstr-insert c-start "\n")
             (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
             (setq restore-point (1- (point)))
@@ -191,7 +191,7 @@
       ;; For the rest of the type, class/struct/enum
       (t
        (ts-docstr-with-style-case
-         ((or typedoc tsdoc)
+         ((or typedoc tsdoc jsdoc google)
           (ts-docstr-insert c-start "\n")
           (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
           (setq restore-point (1- (point)))
