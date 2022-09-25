@@ -34,12 +34,12 @@
 
 (defcustom ts-docstr-key-alist
   `(("RET" . ts-docstr-key-doxygen-like-return)
-    ("/"   . ts-docstr-key-csharp)
-    ("/"   . ts-docstr-key-go)
-    ("\""  . ts-docstr-key-python)
-    ("#"   . ts-docstr-key-ruby)
-    ("/"   . ts-docstr-key-rust)
-    ("/"   . ts-docstr-key-swift))
+    ("/"   . ts-docstr-key-csharp-/)
+    ("/"   . ts-docstr-key-go-/)
+    ("\""  . ts-docstr-key-python-dq)
+    ("#"   . ts-docstr-key-ruby-sharp)
+    ("/"   . ts-docstr-key-rust-/)
+    ("/"   . ts-docstr-key-swift-/))
   "List of trigger to each `major-mode'."
   :type 'hook
   :group 'ts-docstr)
@@ -325,7 +325,7 @@ document string."
         (ts-docstr--kill-comment-at-point)
         (ts-docstr-at-point)))))
 
-(defun ts-docstr-key-csharp (&rest _)
+(defun ts-docstr-key-csharp-/ (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-env '(csharp-mode)
     (when (and (ts-docstr--line-is "///")
@@ -334,7 +334,7 @@ document string."
       (backward-delete-char 3)
       (ts-docstr-at-point))))
 
-(defun ts-docstr-key-go (&rest _)
+(defun ts-docstr-key-go-/ (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-env '(go-mode)
     (when (and (ts-docstr--line-is "//")
@@ -343,7 +343,7 @@ document string."
       (backward-delete-char 2)
       (ts-docstr-at-point))))
 
-(defun ts-docstr-key-python (&rest _)
+(defun ts-docstr-key-python-dq (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-major-modes '(python-mode)
     (when (and ts-docstr-mode
@@ -355,7 +355,7 @@ document string."
       (delete-char 3)
       (ts-docstr-at-point))))
 
-(defun ts-docstr-key-ruby (&rest _)
+(defun ts-docstr-key-ruby-sharp (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-env '(ruby-mode)
     (when (and (ts-docstr--line-is "##")
@@ -364,7 +364,7 @@ document string."
       (backward-delete-char 2)
       (ts-docstr-at-point))))
 
-(defun ts-docstr-key-rust (&rest _)
+(defun ts-docstr-key-rust-/ (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-env '(rust-mode)
     (when (and (ts-docstr--line-is "///")
@@ -373,7 +373,7 @@ document string."
       (backward-delete-char 3)
       (ts-docstr-at-point))))
 
-(defun ts-docstr-key-swift (&rest _)
+(defun ts-docstr-key-swift-/ (&rest _)
   "Insert docstring with key."
   (ts-docstr-key--with-env '(swift-mode)
     (when (and (ts-docstr--line-is "///")
