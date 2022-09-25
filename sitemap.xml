@@ -11,11 +11,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://emacs-vs.github.io/ts-docstr/page/</loc>
-         <lastmod>2022-09-25</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://emacs-vs.github.io/ts-docstr/page/langs/actionscript/</loc>
          <lastmod>2022-09-25</lastmod>
          <changefreq>daily</changefreq>
