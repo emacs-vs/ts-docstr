@@ -88,6 +88,16 @@ Better editing experience,
 (setq ts-docstr-key-support t)
 ```
 
+### 💬 Ask to select the style
+
+```elisp
+(setq ts-docstr-ask-on-enable t)
+```
+
+<p align="center">
+  <img src="./etc/ask.png"/>
+</p>
+
 ### 🎣 Hooks
 
 Hook patterns are:
