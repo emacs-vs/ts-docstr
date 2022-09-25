@@ -158,7 +158,7 @@
 ;;;###autoload
 (defun ts-docstr-rust-insert (_node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-inserting
+  (ts-docstr-with-insert-indent
     (let ((types (plist-get data :type)))
       (when-let* ((variables (plist-get data :variable))
                   (len (length variables)))

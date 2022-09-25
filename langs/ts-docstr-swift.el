@@ -156,7 +156,7 @@
 ;;;###autoload
 (defun ts-docstr-swift-insert (_node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-inserting
+  (ts-docstr-with-insert-indent
     (cl-case ts-docstr-swift-style
       (swift-doc
        (let ((types (plist-get data :type)))

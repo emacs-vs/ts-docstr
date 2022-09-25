@@ -180,7 +180,7 @@ node from the root."
               (found-nodes (tsc-query-captures query node #'ignore)))
     (mapcar #'cdr found-nodes)))
 
-(defun ts-docstr-grab-nodes-in-range (nodes &optional backward beg end)
+(defun ts-docstr-grab-nodes-in-range (nodes &optional inner beg end)
   "Grab a list of NODES in range from BEG to END."
   (when-let ((beg (or beg (point-min))) (end (or end (point-max)))
              (nodes (ts-docstr-grab-nodes nodes)))
@@ -188,9 +188,9 @@ node from the root."
                         (let ((node-beg (tsc-node-start-position node))
                               (node-end (tsc-node-end-position node)))
                           ;; Make sure the node is overlapped, but not exceeded
-                          (if backward
-                              (and (<= beg node-end)
-                                   (<= node-end end))
+                          (if inner
+                              (and (<= node-beg beg)
+                                   (<= end node-end))
                             (and (<= beg node-beg)
                                  (<= node-beg end)))))
                       nodes)))
@@ -231,6 +231,20 @@ node from the root."
   "Like function `ts-docstr-find-children' but traverse it."
   (cl-remove-if-not (lambda (next) (ts-docstr--compare-type next type))
                     (ts-docstr-children-traverse node)))
+
+;; XXX: This is for language that insert document string under the function
+;; declaration. Like `Lisp', `Python', etc.
+(defun ts-docstr-find-closest-node (nodes)
+  "Find the closest node from NODES."
+  (let (closest-node lowest-diff)
+    (dolist (node nodes)
+      (let* ((diff-beg (- (point-min) (tsc-node-start-position node)))
+             (diff-end (- (tsc-node-end-position node) (point-max)))
+             (current-diff (+ diff-beg diff-end)))
+        (when (or (null lowest-diff) (< current-diff lowest-diff))
+          (setq lowest-diff current-diff
+                closest-node node))))
+    closest-node))
 
 ;;
 ;; (@* "Core" )
@@ -342,22 +356,43 @@ Optional argument MODULE is the targeted language's codename."
            ts-docstr--format-return c-return)
      ,@body))
 
-(defmacro ts-docstr-inserting (&rest body)
+(defmacro ts-docstr--setup-restore-point (&rest body)
   "Do stuff before and after inserting document string."
   (declare (indent 0) (debug t))
   `(let ((restore-point (point)))  ; this is expect to be modified
-     (indent-for-tab-command)
      (ts-docstr--setup-style ,@body)
-     (msgu-silent (ignore-errors (indent-region (point-min) (point-max))))
      (goto-char restore-point)
      (goto-char (line-end-position))))
+
+(defmacro ts-docstr-with-insert-indent (&rest body)
+  "Execute BODY then indent region."
+  (declare (indent 0) (debug t))
+  `(ts-docstr--setup-restore-point
+     (indent-for-tab-command)
+     ,@body
+     (msgu-silent (ignore-errors (indent-region (point-min) (point-max))))))
+
+(defmacro ts-docstr-with-insert-indent-hold (&rest body)
+  "Execute BODY and holds the indent level."
+  (declare (indent 0) (debug t))
+  `(ts-docstr--setup-restore-point
+     (indent-for-tab-command)
+     (let ((ts-docstr-indent-spaces
+            (save-excursion
+              (buffer-substring (line-beginning-position)
+                                (progn
+                                  (beginning-of-line)
+                                  (back-to-indentation) (point))))))
+       ,@body)))
+
+(defvar-local ts-docstr-indent-spaces nil)
 
 (defun ts-docstr-insert (&rest args)
   "Like `insert' but does nothing when string its empty including newline."
   (cond ((string= (car (last args)) "\n")
          (unless (string-empty-p (mapconcat #'identity (butlast args) ""))
-           (apply #'insert args)))
-        (t (apply #'insert args))))
+           (apply #'insert (append (or ts-docstr-indent-spaces "") args))))
+        (t (apply #'insert (append (or ts-docstr-indent-spaces "") args)))))
 
 ;;
 ;; (@* "C-like" )

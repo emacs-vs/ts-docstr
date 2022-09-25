@@ -146,7 +146,7 @@
 ;;;###autoload
 (defun ts-docstr-csharp-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-inserting
+  (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       ((or method_declaration delegate_declaration)
        (when-let* ((types (plist-get data :type))

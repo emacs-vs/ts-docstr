@@ -166,7 +166,7 @@
 ;;;###autoload
 (defun ts-docstr-typescript-insert (node data)
   "Insert document string upon NODE and DATA."
-  (ts-docstr-inserting
+  (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       ((or function_declaration method_definition)  ; For function
        (when-let* ((types (plist-get data :type))
