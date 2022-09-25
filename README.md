@@ -318,4 +318,13 @@ into the code:
 
 ### ❓ How to trigger by a key?
 
-WIP
+To insert document string with key is to use `ts-docstr-mode`. The entire key
+related logic is placed in `ts-docstr-key.el` file from the project root. 
+To implement one, you first need to design the method to insert the entire
+document string (I called it triggeration function, or trigger). For example,
+in `C#`, you can trigger the document string insertion function by hittting
+the third slash in a line.
+
+<p align="center">
+  <img src="./etc/langs/csharp/csharp-vs-doc-demo.gif" width="60%"/>
+</p>
