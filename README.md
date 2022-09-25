@@ -89,6 +89,8 @@ Better editing experience,
 (setq ts-docstr-key-support t)
 ```
 
+Then do `M-x ts-docstr-mode`.
+
 ### 💬 Ask to select the style
 
 ```elisp
