@@ -444,7 +444,25 @@ See the following example,</p>
 <span class="w">  </span><span class="nb">:type</span><span class="w"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">choice</span><span class="w"> </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;No specify&quot;</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"></span>
 <span class="w">                 </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;Javadoc Style&quot;</span><span class="w"> </span><span class="nv">javadoc</span><span class="p">)))</span><span class="w"></span>
 </code></pre></div>
-<p>See if the style is already supported. Continue reading if it does <strong>NOT</strong>,</p>
+<p>See if the style is already supported. Continue reading if it does <strong>NOT</strong>, 
+there are two parts you need to change in order to support your favorite style!</p>
+<p>First, you need to add an option to the style variable so other people would
+notice the changes.</p>
+<div class="highlight"><pre><span></span><code><span class="o">...</span><span class="w"></span>
+<span class="w">  </span><span class="nb">:type</span><span class="w"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">choice</span><span class="w"> </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;No specify&quot;</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"></span>
+<span class="w">                 </span><span class="p">(</span><span class="nv">const</span><span class="w"> </span><span class="nb">:tag</span><span class="w"> </span><span class="s">&quot;New Doc Style&quot;</span><span class="w"> </span><span class="nv">new-doc-style</span><span class="p">)</span><span class="w"></span>
+<span class="o">...</span><span class="w"></span>
+</code></pre></div>
+<p>Then next (last) step is to do the implementation in the insertion function.
+The implementation is isolated and complex depends on the style you targeted.
+Here we show the core logic of the implementation, but we prefer to look right
+into the code:</p>
+<div class="highlight"><pre><span></span><code><span class="o">...</span><span class="w"></span>
+<span class="p">(</span><span class="nv">ts-docstr-with-style-case</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">new-doc-style</span><span class="w">  </span><span class="c1">; listen to new-doc-style</span><span class="w"></span>
+<span class="w">   </span><span class="p">(</span><span class="nf">insert</span><span class="w"> </span><span class="s">&quot;My new docstring style! :)&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="o">...</span><span class="w"></span>
+</code></pre></div>
 <h3 id="how-to-trigger-by-a-key">❓ How to trigger by a key?<a class="headerlink" href="#how-to-trigger-by-a-key" title="Permanent link">#</a></h3>
 <p>WIP</p>
               
@@ -490,5 +508,5 @@ See the following example,</p>
 
 <!--
 MkDocs version : 1.3.0
-Build Date UTC : 2022-09-25 16:38:33.691858+00:00
+Build Date UTC : 2022-09-25 17:25:03.385492+00:00
 -->
