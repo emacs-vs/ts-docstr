@@ -133,7 +133,7 @@
 
 (defun ts-docstr-c++-config ()
   "Configure style according to variable `ts-docstr-c++-style'."
-  (cl-case ts-docstr-c++-style
+  (ts-docstr-with-style-case
     (doxygen (list :start "/**"
                    :prefix "* "
                    :end "*/"
@@ -162,7 +162,7 @@
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length variables)))
-         (cl-case ts-docstr-c++-style
+         (ts-docstr-with-style-case
            ((or doxygen qt)
             (ts-docstr-insert c-start "\n")
             (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
@@ -180,7 +180,7 @@
             (ts-docstr-custom-insertion node data)))))
       ;; For the rest of the type, class/struct/enum
       (t
-       (cl-case ts-docstr-c++-style
+       (ts-docstr-with-style-case
          ((or doxygen qt)
           (ts-docstr-insert c-start "\n")
           (insert c-prefix (ts-docstr-format 'summary) "\n")

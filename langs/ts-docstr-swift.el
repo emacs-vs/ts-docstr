@@ -127,13 +127,19 @@
                   (ts-docstr-push ts-docstr-default-typename types)
                 (ts-docstr-push ts-docstr-default-variable variables))))
           (list :type types :variable variables
+                ;; TODO: There are bugs in upstream, the parsed tree appears
+                ;; ERROR nodes; hence we couldn't continue and parse the return
+                ;; node in the parsed tree.
+                ;;
+                ;;                                             Date: 2020-09-25
+                ;;
                 ;;:return (ts-docstr-swift--parse-return params)
                 :name (ts-docstr-swift--get-name node)))
       (list :name (ts-docstr-swift--get-name node)))))
 
 (defun ts-docstr-swift-config ()
   "Configure style according to variable `ts-docstr-swift-style'."
-  (cl-case ts-docstr-swift-style
+  (ts-docstr-with-style-case
     (swift-doc (list :start ""
                      :prefix "/// "
                      :end ""
@@ -154,44 +160,58 @@
              :return ts-docstr-swift-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-swift-insert (_node data)
+(defun ts-docstr-swift-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-with-insert-indent
-    (cl-case ts-docstr-swift-style
-      (swift-doc
-       (let ((types (plist-get data :type)))
-         (when-let* ((variables (plist-get data :variable))
-                     (len (length variables)))
-           (ts-docstr-insert c-start "\n")
-           (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-           (setq restore-point (1- (point)))
-           (ts-docstr-insert c-prefix "\n")
-           (dotimes (index len)
-             (ts-docstr-insert c-prefix
-                               (ts-docstr-format 'param
-                                                 :typename (nth index types)
-                                                 :variable (nth index variables))
-                               (if (= index (1- len)) "" "\n")))
-           (when (plist-get data :return)
-             (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-           (ts-docstr-insert c-end))))
+    (cl-case (tsc-node-type node)
+      (function_declaration
+       (when-let* ((types (plist-get data :type))
+                   (variables (plist-get data :variable))
+                   (len (length variables)))
+         (ts-docstr-with-style-case
+           (swift-doc
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (ts-docstr-insert c-prefix "\n")
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                (if (= index (1- len)) "" "\n")))
+            (when (plist-get data :return)
+              (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+            (ts-docstr-insert c-end))
+           (header-doc
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (ts-docstr-insert c-prefix "\n")
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                "\n"))
+            (when (plist-get data :return)
+              (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+            (ts-docstr-insert c-end))
+           (t
+            (ts-docstr-custom-insertion node data)))))
+      ;; For the rest of the type, class/struct/enum
       (t
-       (let ((types (plist-get data :type)))
-         (when-let* ((variables (plist-get data :variable))
-                     (len (length variables)))
-           (ts-docstr-insert c-start "\n")
-           (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-           (setq restore-point (1- (point)))
-           (ts-docstr-insert c-prefix "\n")
-           (dotimes (index len)
-             (ts-docstr-insert c-prefix
-                               (ts-docstr-format 'param
-                                                 :typename (nth index types)
-                                                 :variable (nth index variables))
-                               "\n"))
-           (when (plist-get data :return)
-             (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-           (ts-docstr-insert c-end)))))))
+       (ts-docstr-with-style-case
+         (swift-doc
+          (ts-docstr-insert c-start "\n")
+          (ts-docstr-insert c-prefix (ts-docstr-format 'summary)))
+         (header-doc
+          (ts-docstr-insert c-start "\n")
+          (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+          (setq restore-point (1- (point)))
+          (ts-docstr-insert c-end))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-swift)
 ;;; ts-docstr-swift.el ends here

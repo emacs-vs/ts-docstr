@@ -156,7 +156,7 @@
 
 (defun ts-docstr-python-config ()
   "Configure style according to variable `ts-docstr-python-style'."
-  (cl-case ts-docstr-python-style
+  (ts-docstr-with-style-case
     (pep-257 (list :start "\"\"\""
                    :prefix ""
                    :end "\"\"\""
@@ -200,7 +200,7 @@
                    (variables (plist-get data :variable))
                    (len (length variables)))
          ;; XXX: Start insert the differences!
-         (cl-case ts-docstr-python-style
+         (ts-docstr-with-style-case
            (pep-257
             (let (ts-docstr-indent-spaces)
               (ts-docstr-insert c-start (ts-docstr-format 'summary) "\n"))
@@ -257,7 +257,7 @@
             (ts-docstr-custom-insertion node data)))))
       ;; For the rest of the type, class/struct/enum
       (t
-       (cl-case ts-docstr-python-style
+       (ts-docstr-with-style-case
          ((or pep-257 google numpy)
           (let (ts-docstr-indent-spaces)
             (ts-docstr-insert c-start (ts-docstr-format 'summary) "\n"))

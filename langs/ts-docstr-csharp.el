@@ -136,7 +136,7 @@
 
 (defun ts-docstr-csharp-config ()
   "Configure style according to variable `ts-docstr-csharp-style'."
-  (cl-case ts-docstr-csharp-style
+  (ts-docstr-with-style-case
     (microsoft
      (list :start "/// <summary>"
            :prefix "/// "
@@ -160,7 +160,7 @@
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length types)))
-         (cl-case ts-docstr-csharp-style
+         (ts-docstr-with-style-case
            (microsoft
             (insert c-start "\n")
             (insert c-prefix (ts-docstr-format 'summary) "\n")
@@ -174,7 +174,7 @@
            (t
             (ts-docstr-custom-insertion node data)))))
       (t
-       (cl-case ts-docstr-csharp-style
+       (ts-docstr-with-style-case
          (microsoft
           (insert c-start "\n")
           (insert c-prefix (ts-docstr-format 'summary) "\n")

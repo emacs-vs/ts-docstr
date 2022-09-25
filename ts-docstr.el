@@ -403,11 +403,10 @@ Optional argument MODULE is the targeted language's codename."
       (funcall sym node data))))
 
 (defmacro ts-docstr-with-style-case (&rest body)
-  ""
+  "Do execution BODY with current module style."
   (declare (indent 0) (debug t))
   `(let ((style (intern (format "%s-style" (ts-docstr-module)))))
-     (cl-case (symbol-value style)
-       ,@body)))
+     (cl-case (symbol-value style) ,@body)))
 
 ;;
 ;; (@* "C-like" )

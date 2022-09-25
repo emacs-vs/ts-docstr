@@ -78,7 +78,7 @@
 ;; NOTE: This is generally not necessary but kinda useful for user.
 (defun ts-docstr-go--get-name (node)
   "Return declaration name, class/struct/enum/function."
-  (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
+  (let* ((nodes-name (or (ts-docstr-find-children-traverse node "type_identifier")
                          (ts-docstr-find-children node "identifier")))
          (node-name (nth 0 nodes-name)))
     (tsc-node-text node-name)))
@@ -113,21 +113,10 @@
                  (tsc-mapc-children
                   (lambda (child)
                     (pcase (ts-docstr-2-str (tsc-node-type child))
-                      ((or "generic_type"
-                           "qualified_type"
-                           "pointer_type"
-                           "struct_type"
-                           "interface_type"
-                           "array_type"
-                           "slice_type"
-                           "map_type"
-                           "channel_type"
-                           "function_type"
-                           "type_identifier"
-                           "implicit_length_array_type")
-                       (ts-docstr-push (tsc-node-text child) types))
                       ("identifier"
-                       (ts-docstr-push (tsc-node-text child) variables))))
+                       (ts-docstr-push (tsc-node-text child) variables))
+                      (_
+                       (ts-docstr-push (tsc-node-text child) types))))
                   node))
                ;; TODO: There is no way to parse typenames in order. The parsed
                ;; tree looks something like this:
@@ -164,7 +153,7 @@
 
 (defun ts-docstr-go-config ()
   "Configure style according to variable `ts-docstr-go-style'."
-  (cl-case ts-docstr-go-style
+  (ts-docstr-with-style-case
     (godoc (list :start ""
                  :prefix "// "
                  :end ""
@@ -185,27 +174,38 @@
              :return ts-docstr-go-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-go-insert (_node data)
+(defun ts-docstr-go-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-with-insert-indent
-    (cl-case ts-docstr-go-style
-      (godoc (ts-docstr-insert c-prefix (ts-docstr-format 'summary)))
-      (t
+    (cl-case (tsc-node-type node)
+      (function_declaration
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length types)))
-         (ts-docstr-insert c-start "\n")
-         (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-         (setq restore-point (1- (point)))
-         (dotimes (index len)
-           (ts-docstr-insert c-prefix
-                             (ts-docstr-format 'param
-                                               :typename (nth index types)
-                                               :variable (nth index variables))
-                             "\n"))
-         (when (plist-get data :return)
-           (ts-docstr-insert c-prefix (ts-docstr-format 'return)))
-         (ts-docstr-insert c-end))))))
+         (ts-docstr-with-style-case
+           (godoc (ts-docstr-insert c-prefix (ts-docstr-format 'summary)))
+           (swag
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                "\n"))
+            (when (plist-get data :return)
+              (ts-docstr-insert c-prefix (ts-docstr-format 'return)))
+            (ts-docstr-insert c-end))
+           (t
+            (ts-docstr-custom-insertion node data)))))
+      ;; For the rest of the type, class/struct/enum
+      (t
+       (ts-docstr-with-style-case
+         (godoc (ts-docstr-insert c-prefix (ts-docstr-format 'summary)))
+         (swag (ts-docstr-insert c-prefix (ts-docstr-format 'summary)))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-go)
 ;;; ts-docstr-go.el ends here

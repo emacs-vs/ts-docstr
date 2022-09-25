@@ -125,7 +125,7 @@
 
 (defun ts-docstr-php-config ()
   "Configure style according to variable `ts-docstr-php-style'."
-  (cl-case ts-docstr-php-style
+  (ts-docstr-with-style-case
     (phpdoc (list :start "/**"
                   :prefix "* "
                   :end "*/"
@@ -140,24 +140,40 @@
              :return ts-docstr-php-format-return))))
 
 ;;;###autoload
-(defun ts-docstr-php-insert (_node data)
+(defun ts-docstr-php-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-with-insert-indent
-    (let ((types (plist-get data :type)))
-      (when-let* ((variables (plist-get data :variable))
-                  (len (length variables)))
-        (ts-docstr-insert c-start "\n")
-        (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-        (setq restore-point (1- (point)))
-        (dotimes (index len)
-          (ts-docstr-insert c-prefix
-                            (ts-docstr-format 'param
-                                              :typename (nth index types)
-                                              :variable (nth index variables))
-                            "\n"))
-        (when (plist-get data :return)
-          (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-        (ts-docstr-insert c-end)))))
+    (cl-case (tsc-node-type node)
+      (function_definition
+       (when-let* ((types (plist-get data :type))
+                   (variables (plist-get data :variable))
+                   (len (length variables)))
+         (ts-docstr-with-style-case
+           (phpdoc
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                "\n"))
+            (when (plist-get data :return)
+              (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+            (ts-docstr-insert c-end))
+           (t
+            (ts-docstr-custom-insertion node data)))))
+      ;; For the rest of the type, class/struct/enum
+      (t
+       (ts-docstr-with-style-case
+         (phpdoc
+          (ts-docstr-insert c-start "\n")
+          (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+          (setq restore-point (1- (point)))
+          (ts-docstr-insert c-end))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-php)
 ;;; ts-docstr-php.el ends here

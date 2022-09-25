@@ -124,7 +124,7 @@
 
 (defun ts-docstr-ruby-config ()
   "Configure style according to variable `ts-docstr-ruby-style'."
-  (cl-case ts-docstr-ruby-style
+  (ts-docstr-with-style-case
     (rdoc (list :start "##"
                 :prefix "# "
                 :end ""
@@ -147,7 +147,7 @@
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length variables)))
-         (cl-case ts-docstr-ruby-style
+         (ts-docstr-with-style-case
            (rdoc
             (ts-docstr-insert c-start "\n")
             (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
@@ -164,11 +164,16 @@
             (ts-docstr-insert c-end))
            (t
             (ts-docstr-custom-insertion node data)))))
-      (t  ; For the rest of the type, class/struct/enum
-       (ts-docstr-insert c-start "\n")
-       (ts-docstr-insert c-prefix (ts-docstr-format 'summary) (if (string-empty-p c-end) "" "\n"))
-       (setq restore-point (1- (point)))
-       (ts-docstr-insert c-end)))))
+      ;; For the rest of the type, class/struct/enum
+      (t
+       (ts-docstr-with-style-case
+         (rdoc
+          (ts-docstr-insert c-start "\n")
+          (ts-docstr-insert c-prefix (ts-docstr-format 'summary) (if (string-empty-p c-end) "" "\n"))
+          (setq restore-point (1- (point)))
+          (ts-docstr-insert c-end))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-ruby)
 ;;; ts-docstr-ruby.el ends here

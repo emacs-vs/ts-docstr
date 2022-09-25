@@ -116,7 +116,7 @@
 
 (defun ts-docstr-js-config ()
   "Configure style according to variable `ts-docstr-js-style'."
-  (cl-case ts-docstr-js-style
+  (ts-docstr-with-style-case
     (jsdoc (list :start "/**"
                  :prefix "* "
                  :end "*/"

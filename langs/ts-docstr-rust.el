@@ -139,7 +139,7 @@
 
 (defun ts-docstr-rust-config ()
   "Configure style according to variable `ts-docstr-rust-style'."
-  (cl-case ts-docstr-rust-style
+  (ts-docstr-with-style-case
     (rfc-430 (list :start ""
                    :prefix "/// "
                    :end ""
@@ -156,25 +156,39 @@
              :header-arg ts-docstr-rust-header-argument))))
 
 ;;;###autoload
-(defun ts-docstr-rust-insert (_node data)
+(defun ts-docstr-rust-insert (node data)
   "Insert document string upon NODE and DATA."
   (ts-docstr-with-insert-indent
-    (let ((types (plist-get data :type)))
-      (when-let* ((variables (plist-get data :variable))
-                  (len (length variables)))
-        (ts-docstr-insert c-start "\n")
-        (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-        (setq restore-point (1- (point)))
-        (ts-docstr-insert c-prefix "\n")
-        (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
-        (ts-docstr-insert c-prefix "\n")
-        (dotimes (index len)
-          (ts-docstr-insert c-prefix
-                            (ts-docstr-format 'param
-                                              :typename (nth index types)
-                                              :variable (nth index variables))
-                            (if (= index (1- len)) "" "\n")))
-        (ts-docstr-insert c-end)))))
+    (cl-case (tsc-node-type node)
+      ((or function_item function_signature_item)
+       (when-let* ((types (plist-get data :type))
+                   (variables (plist-get data :variable))
+                   (len (length variables)))
+         (ts-docstr-with-style-case
+           (rfc-430
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (ts-docstr-insert c-prefix "\n")
+            (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
+            (ts-docstr-insert c-prefix "\n")
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                (if (= index (1- len)) "" "\n")))
+            (ts-docstr-insert c-end))
+           (t
+            (ts-docstr-custom-insertion node data)))))
+      ;; For the rest of the type, class/struct/enum
+      (t
+       (ts-docstr-with-style-case
+         (rfc-430
+          (ts-docstr-insert c-start "\n")
+          (ts-docstr-insert c-prefix (ts-docstr-format 'summary)))
+         (t
+          (ts-docstr-custom-insertion node data)))))))
 
 (provide 'ts-docstr-rust)
 ;;; ts-docstr-rust.el ends here
