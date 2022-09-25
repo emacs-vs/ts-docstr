@@ -121,7 +121,7 @@
                       (":" )  ; do nothing! skip it!
                       ("identifier"
                        (ts-docstr-push (tsc-node-text child) variables))
-                      (t
+                      (_
                        (ts-docstr-push (tsc-node-text child) types))))
                   node)))
              param))
