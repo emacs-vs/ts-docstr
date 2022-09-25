@@ -87,6 +87,10 @@ See function `forward-line' for argument N."
   "Return non-nil when inside comment block."
   (save-excursion (goto-char (or pos (point))) (nth 4 (syntax-ppss))))
 
+(defun ts-docstr--string-p (&optional pos)
+  "Return non-nil when inside comment block."
+  (save-excursion (goto-char (or pos (point))) (nth 8 (syntax-ppss))))
+
 (defun ts-docstr--goto-start-comment ()
   "Go to the start of the comment."
   (while (ts-docstr--comment-p)
@@ -341,8 +345,10 @@ document string."
 
 (defun ts-docstr-key-python (&rest _)
   "Insert docstring with key."
-  (ts-docstr-key--with-env '(python-mode)
-    (when (and (ts-docstr--line-is "\"\"\"")
+  (ts-docstr-key--with-major-modes '(python-mode)
+    (when (and ts-docstr-mode
+               (ts-docstr--string-p)
+               (ts-docstr--line-is "\"\"\"\"\"\"")
                (ts-docstr--looking-back "\"\"\"" 3)
                (ts-docstr-activatable-p))
       (backward-delete-char 3)
