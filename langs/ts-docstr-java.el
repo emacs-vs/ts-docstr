@@ -114,7 +114,7 @@
                     (pcase (ts-docstr-2-str (tsc-node-type child))
                       ("identifier"
                        (ts-docstr-push (tsc-node-text child) variables))
-                      (t
+                      (_
                        (ts-docstr-push (tsc-node-text child) types))))
                   node)))
              param))

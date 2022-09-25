@@ -82,20 +82,17 @@
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
-(defun ts-docstr-ruby--parse-return (nodes-pl)
+(defun ts-docstr-ruby--parse-return (nodes-fp)
   "Return t if function does have return value."
-  (let* ((node-pl (nth 0 nodes-pl))
-         (parent (tsc-get-parent node-pl))
-         (return t))
-    ;; OKAY: We don't traverse like `JavaScript' does, since Java needs to declare
-    ;; return type in the function declaration.
-    (tsc-mapc-children
-     (lambda (node)
-       (when (ts-docstr-leaf-p node)
-         (when (string= (tsc-node-text node) "void")
-           (setq return nil))))
-     parent)
-    return))
+  (when-let*
+      ((node-fp (nth 0 nodes-fp))
+       (parent (tsc-get-parent node-fp)))
+    ;; OKAY: This is probably the best solution!
+    ;;
+    ;; We traverse the entire tree nad look for `return', if it does return
+    ;; with something else, we simply return true!
+    (cl-some (lambda (return-node) (<= 2 (tsc-count-children return-node)))
+             (ts-docstr-find-children-traverse parent "return"))))
 
 ;;;###autoload
 (defun ts-docstr-ruby-parse (node)
@@ -106,15 +103,18 @@
           (dolist (param params)
             (tsc-mapc-children
              (lambda (node)
-               (when (eq (tsc-node-type node) 'formal_parameter)
-                 (tsc-mapc-children
-                  (lambda (child)
-                    (pcase (ts-docstr-2-str (tsc-node-type child))
-                      ("identifier"
-                       (ts-docstr-push (tsc-node-text child) variables))
-                      (t
-                       (ts-docstr-push (tsc-node-text child) types))))
-                  node)))
+               (pcase (ts-docstr-2-str (tsc-node-type node))
+                 ("," )  ; do nothing! skip it!
+                 ("identifier"
+                  (ts-docstr-push (tsc-node-text node) variables))
+                 (_
+                  (ts-docstr-push (tsc-node-text node) types)))
+               ;; Make sure the typenames and variables have the same length
+               (while (not (= (length types) (length variables)))
+                 ;; Add until they have the same length
+                 (if (< (length types) (length variables))
+                     (ts-docstr-push ts-docstr-default-typename types)
+                   (ts-docstr-push ts-docstr-default-variable variables))))
              param))
           (list :type types :variable variables
                 :return (ts-docstr-ruby--parse-return params)
@@ -142,22 +142,25 @@
   "Insert document string upon NODE and DATA."
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
-      (method_declaration  ; For function
+      (method  ; For function
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length variables)))
-         (ts-docstr-insert c-start "\n")
-         (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
-         (setq restore-point (1- (point)))
-         (dotimes (index len)
-           (ts-docstr-insert c-prefix
-                             (ts-docstr-format 'param
-                                               :typename (nth index types)
-                                               :variable (nth index variables))
-                             "\n"))
-         (when (plist-get data :return)
-           (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
-         (ts-docstr-insert c-end)))
+         (cl-case ts-docstr-ruby-style
+           (rdoc
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (ts-docstr-insert c-prefix "\n")
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                (if (= index (1- len)) "" "\n")))
+            (when (plist-get data :return)
+              (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+            (ts-docstr-insert c-end)))))
       (t  ; For the rest of the type, class/struct/enum
        (ts-docstr-insert c-start "\n")
        (ts-docstr-insert c-prefix "\n")
