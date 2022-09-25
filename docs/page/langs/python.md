@@ -5,7 +5,6 @@ You can customize variable `ts-docstr-python-style` for the following value.
 * `pep-257` - PEP 257 convention (default)
 * `google` - Google Style
 * `numpy` - NumPy Style
-* `nil` - Respect to user's customization
 
 ## References
 

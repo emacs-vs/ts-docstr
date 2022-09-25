@@ -28,8 +28,7 @@
 
 (defcustom ts-docstr-ruby-style 'rdoc
   "Style specification for document string in Ruby."
-  :type '(choice (const :tag "No specify" nil)
-                 (const :tag "Ruby Documentation System" rdoc))
+  :type '(choice (const :tag "Ruby Documentation System" rdoc))
   :group 'ts-docstr)
 
 (defcustom ts-docstr-ruby-start "##"
@@ -77,7 +76,8 @@
 ;; NOTE: This is generally not necessary but kinda useful for user.
 (defun ts-docstr-ruby--get-name (node)
   "Return declaration name, class/struct/enum/function."
-  (let* ((nodes-name (ts-docstr-find-children node "identifier"))
+  (let* ((nodes-name (or (ts-docstr-find-children node "constant")
+                         (ts-docstr-find-children node "identifier")))
          (node-name (nth 0 nodes-name)))
     (tsc-node-text node-name)))
 
@@ -163,7 +163,7 @@
             (ts-docstr-insert c-end)))))
       (t  ; For the rest of the type, class/struct/enum
        (ts-docstr-insert c-start "\n")
-       (ts-docstr-insert c-prefix "\n")
+       (ts-docstr-insert c-prefix (ts-docstr-format 'summary) (if (string-empty-p c-end) "" "\n"))
        (setq restore-point (1- (point)))
        (ts-docstr-insert c-end)))))
 

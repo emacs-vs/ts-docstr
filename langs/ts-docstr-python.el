@@ -28,8 +28,7 @@
 
 (defcustom ts-docstr-python-style 'pep-257
   "Style specification for document string in Python."
-  :type '(choice (const :tag "No specify" nil)
-                 (const :tag "PEP 257 convention" pep-257)
+  :type '(choice (const :tag "PEP 257 convention" pep-257)
                  (const :tag "Google Style" google)
                  (const :tag "NumPy Style" numpy))
   :group 'ts-docstr)
@@ -241,8 +240,7 @@
              (ts-docstr-insert " " "\n")
              (ts-docstr-insert (plist-get config :header-ret) "\n")
              (ts-docstr-insert "-------" "\n")
-             (ts-docstr-insert c-prefix "    " (ts-docstr-format 'return) "\n")))
-          (t ))
+             (ts-docstr-insert c-prefix "    " (ts-docstr-format 'return) "\n"))))
         (ts-docstr-insert c-end)))))
 
 (provide 'ts-docstr-python)
