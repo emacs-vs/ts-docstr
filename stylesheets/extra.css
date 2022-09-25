@@ -1,3 +1,7 @@
+code, .rst-content tt, .rst-content code {
+  white-space: pre;
+}
+
 body {
   color: #ADBAC7;
 }
