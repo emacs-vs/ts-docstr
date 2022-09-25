@@ -473,7 +473,15 @@ into the code:</p>
 <span class="o">...</span><span class="w"></span>
 </code></pre></div>
 <h3 id="how-to-trigger-by-a-key">❓ How to trigger by a key?<a class="headerlink" href="#how-to-trigger-by-a-key" title="Permanent link">#</a></h3>
-<p>WIP</p>
+<p>To insert document string with key is to use <code>ts-docstr-mode</code>. The entire key
+related logic is placed in <code>ts-docstr-key.el</code> file from the project root. 
+To implement one, you first need to design the method to insert the entire
+document string (I called it triggeration function, or trigger). For example,
+in <code>C#</code>, you can trigger the document string insertion function by hittting
+the third slash in a line.</p>
+<p align="center">
+  <img src="./etc/langs/csharp/csharp-vs-doc-demo.gif" width="60%"/>
+</p>
               
             </div>
           </div>
@@ -517,5 +525,5 @@ into the code:</p>
 
 <!--
 MkDocs version : 1.3.0
-Build Date UTC : 2022-09-25 17:54:54.284429+00:00
+Build Date UTC : 2022-09-25 18:01:09.668251+00:00
 -->
