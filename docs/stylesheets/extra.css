@@ -1,3 +1,8 @@
+/*
+ * Fix code block rendering on the same line
+ *
+ * SOURCE: https://stackoverflow.com/questions/63189169/wrong-rendering-of-code-blocks-by-readthedocs-mkdocs
+ */
 code, .rst-content tt, .rst-content code {
   white-space: pre;
 }
