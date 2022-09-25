@@ -26,9 +26,10 @@
 
 (require 'ts-docstr-c++)
 
-(defcustom ts-docstr-c-style nil
+(defcustom ts-docstr-c-style 'doxygen
   "Style specification for document string in C."
-  :type '(choice (const :tag "No specify" nil))
+  :type '(choice (const :tag "Doxygen Style" doxygen)
+                 (const :tag "No specify" nil))
   :group 'docstr)
 
 (defcustom ts-docstr-c-start "/**"

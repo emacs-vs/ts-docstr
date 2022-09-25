@@ -111,12 +111,13 @@
       (progn
         (ts-docstr-key-enable)
         (when ts-docstr-ask-on-enable
-          (run-with-idle-timer 0 nil #'ts-docstr-ask)))
+          (add-hook 'find-file-hook #'ts-docstr-ask-deferred)))
     (ts-docstr-mode -1)))
 
 (defun ts-docstr--disable ()
   "Disable `ts-docstr' in current buffer."
-  (ts-docstr-key-disable))
+  (ts-docstr-key-disable)
+  (remove-hook 'find-file-hook #'ts-docstr-ask-deferred))
 
 ;;;###autoload
 (define-minor-mode ts-docstr-mode
@@ -401,6 +402,13 @@ Optional argument MODULE is the targeted language's codename."
     (when (fboundp sym)
       (funcall sym node data))))
 
+(defmacro ts-docstr-with-style-case (&rest body)
+  ""
+  (declare (indent 0) (debug t))
+  `(let ((style (intern (format "%s-style" (ts-docstr-module)))))
+     (cl-case (symbol-value style)
+       ,@body)))
+
 ;;
 ;; (@* "C-like" )
 ;;
@@ -420,6 +428,11 @@ Optional argument MODULE is the targeted language's codename."
   "Ask to select docstring style on enable."
   :type 'boolean
   :group 'ts-docstr)
+
+;;;###autoload
+(defun ts-docstr-ask-deferred ()
+  "Like `ts-docstr-ask' but delayed a frame."
+  (run-with-timer 0 nil #'ts-docstr-ask))
 
 ;;;###autoload
 (defun ts-docstr-ask ()

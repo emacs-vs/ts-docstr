@@ -125,7 +125,7 @@
 
 (defun ts-docstr-java-config ()
   "Configure style according to variable `ts-docstr-java-style'."
-  (cl-case ts-docstr-java-style
+  (ts-docstr-with-style-case
     (javadoc (list :start "/**"
                    :prefix "* "
                    :end "*/"
@@ -148,7 +148,7 @@
        (when-let* ((types (plist-get data :type))
                    (variables (plist-get data :variable))
                    (len (length variables)))
-         (cl-case ts-docstr-java-style
+         (ts-docstr-with-style-case
            (javadoc
             (ts-docstr-insert c-start "\n")
             (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
@@ -166,7 +166,7 @@
             (ts-docstr-custom-insertion node data)))))
       ;; For the rest of the type, class/struct/enum
       (t
-       (cl-case ts-docstr-java-style
+       (ts-docstr-with-style-case
          (javadoc
           (ts-docstr-insert c-start "\n")
           (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
