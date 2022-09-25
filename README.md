@@ -328,3 +328,27 @@ the third slash in a line.
 <p align="center">
   <img src="./etc/langs/csharp/csharp-vs-doc-demo.gif" width="60%"/>
 </p>
+
+Once you have an idea, write the function to do the action. Here is the example
+for C# slash triggeration function.
+
+```elisp
+(defun ts-docstr-key-csharp-/ (&rest _)
+  "..."
+  (ts-docstr-key--with-env '(csharp-mode)         ; Make sure it doesn't pollute other file
+    (when (and (ts-docstr--line-is "///")         ; Make sure the line consist of ///
+               (ts-docstr--looking-back "///" 3)  ; Make sure cursor is at the end of ///
+               (ts-docstr-activatable-p))         ; Check valid docstring insertion point
+      (backward-delete-char 3)                    ; Delete all slashes, ready to do docstrnig insertion
+      (ts-docstr-at-point))))                     ; Do docstring insertion
+```
+
+Then you would just need to register the function to variable `ts-docstr-key-alist.
+
+```elisp
+(defcustom ts-docstr-key-alist
+  `(("RET" . ts-docstr-key-doxygen-like-return)
+    ("/"   . ts-docstr-key-csharp-/)             ; Add this line!
+    ("/"   . ts-docstr-key-go-/)
+...
+```
