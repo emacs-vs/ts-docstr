@@ -447,6 +447,18 @@ Optional argument MODULE is the targeted language's codename."
   (intern (format "%s-style" (ts-docstr-module))))
 
 ;;;###autoload
+(defmacro ts-docstr-save-current-style (&rest body)
+  "Execute BODY and preserve the current style."
+  (declare (indent 0))
+  `(let* ((ts-docstr-ask-on-enable)  ; prevent asking
+          (style (ts-docstr-style))
+          (exists (boundp style))
+          (value (and exists (symbol-value style))))
+     ,@body
+     (when exists
+       (set (make-local-variable style) value))))
+
+;;;###autoload
 (defun ts-docstr-ask-deferred ()
   "Like `ts-docstr-ask' but delayed a frame."
   (when ts-docstr-ask-on-enable
