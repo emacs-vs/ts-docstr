@@ -29,6 +29,7 @@
 (defcustom ts-docstr-csharp-style 'microsoft
   "Style specification for document string in C#."
   :type '(choice (const :tag "No specify" nil)
+                 (const :tag "Doxygen Style" doxygen)
                  (const :tag "Microsoft" microsoft))
   :group 'ts-docstr)
 
@@ -137,13 +138,18 @@
 (defun ts-docstr-csharp-config ()
   "Configure style according to variable `ts-docstr-csharp-style'."
   (ts-docstr-with-style-case
-    (microsoft
-     (list :start "/// <summary>"
-           :prefix "/// "
-           :end "/// </summary>"
-           :summary "{d}"
-           :param "<param name=\"{v}\">{d}</param>"
-           :return "<returns>{d}</returns>"))
+    (doxygen (list :start "/**"
+                   :prefix "* "
+                   :end "*/"
+                   :summary "{d}"
+                   :param "@param {v} {d}"
+                   :return "@return {d}"))
+    (microsoft (list :start "/// <summary>"
+                     :prefix "/// "
+                     :end "/// </summary>"
+                     :summary "{d}"
+                     :param "<param name=\"{v}\">{d}</param>"
+                     :return "<returns>{d}</returns>"))
     (t (list :start ts-docstr-csharp-start
              :prefix ts-docstr-csharp-prefix
              :end ts-docstr-csharp-end
@@ -161,6 +167,19 @@
                    (variables (plist-get data :variable))
                    (len (length types)))
          (ts-docstr-with-style-case
+           (doxygen
+            (ts-docstr-insert c-start "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (setq restore-point (1- (point)))
+            (dotimes (index len)
+              (ts-docstr-insert c-prefix
+                                (ts-docstr-format 'param
+                                                  :typename (nth index types)
+                                                  :variable (nth index variables))
+                                "\n"))
+            (when (plist-get data :return)
+              (ts-docstr-insert c-prefix (ts-docstr-format 'return) "\n"))
+            (ts-docstr-insert c-end))
            (microsoft
             (insert c-start "\n")
             (insert c-prefix (ts-docstr-format 'summary) "\n")
@@ -175,6 +194,11 @@
             (ts-docstr-custom-insertion node data)))))
       (t
        (ts-docstr-with-style-case
+         (doxygen
+          (ts-docstr-insert c-start "\n")
+          (insert c-prefix (ts-docstr-format 'summary) "\n")
+          (setq restore-point (1- (point)))
+          (ts-docstr-insert c-end))
          (microsoft
           (insert c-start "\n")
           (insert c-prefix (ts-docstr-format 'summary) "\n")
