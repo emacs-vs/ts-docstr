@@ -2,7 +2,8 @@
 
 You can customize variable `ts-docstr-csharp-style` for the following value.
 
-* `microsoft` - Microsoft standard
+* `microsoft` - Microsoft standard (default)
+* `doxygen` - Doxygen Style
 * `nil` - Respect to user's customization
 
 C# currently uses mix of [Javadoc](https://en.wikipedia.org/wiki/Javadoc) and
@@ -14,7 +15,7 @@ C# currently uses mix of [Javadoc](https://en.wikipedia.org/wiki/Javadoc) and
 Generally, you will need something around to parse to make document string work
 correctly.
 
-* `/*[*]*/` - hit return between `/*` and `*/` (Javadoc)
+* `/*[*]*/` - hit return between `/*` and `*/` (Doxygen)
 * `///` - the third slashes (XML documentation)
 
 ## References
