@@ -419,7 +419,7 @@ Optional argument MODULE is the targeted language's codename."
 (defmacro ts-docstr-with-style-case (&rest body)
   "Do execution BODY with current module style."
   (declare (indent 0) (debug t))
-  `(let ((style (intern (format "%s-style" (ts-docstr-module)))))
+  `(let ((style (ts-docstr-style)))
      (cl-case (symbol-value style) ,@body)))
 
 ;;
@@ -442,16 +442,21 @@ Optional argument MODULE is the targeted language's codename."
   :type 'boolean
   :group 'ts-docstr)
 
+(defun ts-docstr-style ()
+  "Return current style as a symbol."
+  (intern (format "%s-style" (ts-docstr-module))))
+
 ;;;###autoload
 (defun ts-docstr-ask-deferred ()
   "Like `ts-docstr-ask' but delayed a frame."
-  (run-with-timer 0 nil #'ts-docstr-ask))
+  (when ts-docstr-ask-on-enable
+    (run-with-timer 0 nil #'ts-docstr-ask)))
 
 ;;;###autoload
 (defun ts-docstr-ask ()
   "Ask and update document string style (locally)."
   (interactive)
-  (when-let* ((var (intern (format "%s-style" (ts-docstr-module))))
+  (when-let* ((var (ts-docstr-style))
               ((boundp var))
               (options (refine--possible-values var))
               (style (completing-read
