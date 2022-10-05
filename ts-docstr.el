@@ -101,6 +101,11 @@
   :type 'hook
   :group 'ts-docstr)
 
+(defcustom ts-docstr-ask-on-enable nil
+  "Ask to select docstring style on enable."
+  :type 'boolean
+  :group 'ts-docstr)
+
 ;;
 ;; (@* "Entry" )
 ;;
@@ -436,11 +441,6 @@ Optional argument MODULE is the targeted language's codename."
 ;;
 ;; (@* "Ask" )
 ;;
-
-(defcustom ts-docstr-ask-on-enable nil
-  "Ask to select docstring style on enable."
-  :type 'boolean
-  :group 'ts-docstr)
 
 (defun ts-docstr-style ()
   "Return current style as a symbol."
