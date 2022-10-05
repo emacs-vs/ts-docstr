@@ -181,7 +181,7 @@ See function `forward-line' for argument N."
   "Enable key support."
   (when ts-docstr-key-support  ; Be infront, in order to take effect
     (ts-docstr-key--advice-add "*" :around #'ts-docstr-key--doxygen-asterik)
-    (ts-docstr-key--advice-add "RET" :around #'ts-docstr-key--c-like-return)
+    (ts-docstr-key--advice-add "RET" :around #'ts-docstr-key--doxygen-return)
     (ts-docstr-key--advice-add "RET" :around #'ts-docstr-key--sharp-return))
   (ts-docstr-key--active t))
 
@@ -189,7 +189,7 @@ See function `forward-line' for argument N."
 (defun ts-docstr-key-disable ()
   "Disable key support."
   (ts-docstr-key--advice-remove "*" #'ts-docstr-key--doxygen-asterik)
-  (ts-docstr-key--advice-remove "RET" #'ts-docstr-key--c-like-return)
+  (ts-docstr-key--advice-remove "RET" #'ts-docstr-key--doxygen-return)
   (ts-docstr-key--advice-remove "RET" #'ts-docstr-key--sharp-return)
   (ts-docstr-key--active nil))
 
@@ -266,13 +266,16 @@ See function `forward-line' for argument N."
   (and (save-excursion (search-backward p1 (line-beginning-position) t))
        (save-excursion (search-forward p2 (line-end-position) t))))
 
-(defun ts-docstr-key--insert-prefix ()
+(defun ts-docstr-key--insert-doxygen-prefix ()
   "Insert prefix."
   (ts-docstr--setup-style
     (ignore c-start) (ignore c-end)
-    (when c-prefix (insert c-prefix) (indent-for-tab-command))))
+    (if (and c-prefix (string-prefix-p "*" (string-trim c-prefix)))
+        (insert c-prefix)
+      (insert "* "))
+    (indent-for-tab-command)))
 
-(defun ts-docstr-key--c-like-return (fnc &rest args)
+(defun ts-docstr-key--doxygen-return (fnc &rest args)
   "Return key for C like programming languages.
 
 This function will help insert the corresponding prefix on every line of the
@@ -282,7 +285,7 @@ document string."
     (let ((new-doc-p (ts-docstr--between-pair-p "/*" "*/")))
       (apply fnc args)
       (if (ts-docstr--multiline-comment-p)
-          (ts-docstr-key--insert-prefix)
+          (ts-docstr-key--insert-doxygen-prefix)
         (ts-docstr-key--single-line-prefix-insertion))
       (when (and new-doc-p
                  ;; Make sure end symbol */ still at the back
