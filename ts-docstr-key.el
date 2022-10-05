@@ -267,12 +267,14 @@ See function `forward-line' for argument N."
        (save-excursion (search-forward p2 (line-end-position) t))))
 
 (defun ts-docstr-key--insert-doxygen-prefix ()
-  "Insert prefix."
+  "Insert doxygen prefix."
   (ts-docstr--setup-style
     (ignore c-start) (ignore c-end)
+    ;; XXX: If prefix doesn't look like a valid doxygen (asterik) like prefix,
+    ;; we avoid inserting it.
     (if (and c-prefix (string-prefix-p "*" (string-trim c-prefix)))
         (insert c-prefix)
-      (insert "* "))
+      (insert "* "))  ; then, we insert the default style
     (indent-for-tab-command)))
 
 (defun ts-docstr-key--doxygen-return (fnc &rest args)
