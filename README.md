@@ -37,7 +37,7 @@
 
 ```elisp
 (use-package ts-docstr 
-  :straight (ts-docstr :repo "emacs-vs/ts-docstr" :fetcher github
+  :straight (ts-docstr :type git :host github :repo "emacs-vs/ts-docstr"
                        :files (:defaults "langs/*.el")))
 ```
 
