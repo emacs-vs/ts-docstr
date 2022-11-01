@@ -470,10 +470,11 @@ Optional argument MODULE is the targeted language's codename."
   (interactive)
   (when-let* ((var (ts-docstr-style))
               ((boundp var))
+              (value (symbol-value var))
               (options (refine--possible-values var))
               (style (completing-read
-                      (format "Select docstring style (default `%s`): " (symbol-value var))
-                      options)))
+                      (format "Select docstring style (default `%s`): " value)
+                      options nil nil nil nil (ts-docstr-2-str value))))
     (set (make-local-variable var) (intern style))))
 
 (provide 'ts-docstr)
