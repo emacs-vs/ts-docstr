@@ -1,6 +1,6 @@
 ;;; ts-docstr-swift.el --- Document string for Swift  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  Shen, Jen-Chieh
+;; Copyright (C) 2022-2023  Shen, Jen-Chieh
 
 ;; This file is not part of GNU Emacs.
 
