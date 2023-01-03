@@ -57,7 +57,7 @@ then in Emacs:
 or
 
 ```elisp
-(use-package ts-fold
+(use-package ts-docstr
   :load-path "/path/to/lib")
 ```
 
