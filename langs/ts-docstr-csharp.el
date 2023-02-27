@@ -163,9 +163,9 @@
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       ((or method_declaration delegate_declaration)
-       (when-let* ((types (plist-get data :type))
-                   (variables (plist-get data :variable))
-                   (len (length types)))
+       (let* ((types (plist-get data :type))
+              (variables (plist-get data :variable))
+              (len (length types)))
          (ts-docstr-with-style-case
            (doxygen
             (ts-docstr-insert c-start "\n")
@@ -184,7 +184,9 @@
             (insert c-start "\n")
             (insert c-prefix (ts-docstr-format 'summary) "\n")
             (setq restore-point (1- (point)))
-            (insert c-end "\n")
+            (insert c-end)
+            (unless (zerop len)
+              (insert "\n"))
             (dotimes (index len)
               (insert c-prefix (ts-docstr-format 'param :variable (nth index variables))
                       (if (= index (1- len)) "" "\n")))
