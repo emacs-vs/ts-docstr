@@ -161,17 +161,20 @@
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       ((or function_item function_signature_item)
-       (when-let* ((types (plist-get data :type))
-                   (variables (plist-get data :variable))
-                   (len (length variables)))
+       (let* ((types (plist-get data :type))
+              (variables (plist-get data :variable))
+              (len (length variables)))
          (ts-docstr-with-style-case
            (rfc-430
             (ts-docstr-insert c-start "\n")
-            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary))
+            (unless (zerop len)
+              (insert "\n"))
             (setq restore-point (1- (point)))
-            (ts-docstr-insert c-prefix "\n")
-            (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
-            (ts-docstr-insert c-prefix "\n")
+            (unless (zerop len)
+              (ts-docstr-insert c-prefix "\n")
+              (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
+              (ts-docstr-insert c-prefix "\n"))
             (dotimes (index len)
               (ts-docstr-insert c-prefix
                                 (ts-docstr-format 'param

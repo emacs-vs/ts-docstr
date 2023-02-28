@@ -145,9 +145,9 @@
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       (method_declaration  ; For function
-       (when-let* ((types (plist-get data :type))
-                   (variables (plist-get data :variable))
-                   (len (length variables)))
+       (let* ((types (plist-get data :type))
+              (variables (plist-get data :variable))
+              (len (length variables)))
          (ts-docstr-with-style-case
            (javadoc
             (ts-docstr-insert c-start "\n")

@@ -90,7 +90,8 @@
 (defun ts-docstr-c++--parse-return (nodes-pl)
   "Return t if function does have return value."
   (let* ((node-pl (nth 0 nodes-pl))
-         (parent (tsc-get-parent node-pl))
+         (parent-func-dec (tsc-get-parent node-pl))
+         (parent-func-def (tsc-get-parent parent-func-dec))
          (return t))
     ;; OKAY: We don't traverse like `JavaScript' does, since C/C++ needs to declare
     ;; return type in the function declaration.
@@ -99,7 +100,7 @@
        (when (ts-docstr-leaf-p node)
          (when (string= (tsc-node-text node) "void")
            (setq return nil))))
-     parent)
+     parent-func-def)
     return))
 
 ;;;###autoload
@@ -159,9 +160,9 @@
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       (function_declarator  ; For function
-       (when-let* ((types (plist-get data :type))
-                   (variables (plist-get data :variable))
-                   (len (length variables)))
+       (let* ((types (plist-get data :type))
+              (variables (plist-get data :variable))
+              (len (length variables)))
          (ts-docstr-with-style-case
            ((or doxygen qt)
             (ts-docstr-insert c-start "\n")

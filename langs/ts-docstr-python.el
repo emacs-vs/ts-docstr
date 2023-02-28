@@ -196,9 +196,9 @@
   (ts-docstr-with-insert-indent-hold
     (cl-case (tsc-node-type node)
       (function_definition  ; For function
-       (when-let* ((types (plist-get data :type))
-                   (variables (plist-get data :variable))
-                   (len (length variables)))
+       (let* ((types (plist-get data :type))
+              (variables (plist-get data :variable))
+              (len (length variables)))
          ;; XXX: Start insert the differences!
          (ts-docstr-with-style-case
            (pep-257
