@@ -357,13 +357,18 @@ document string."
                (or (ts-docstr--looking-back "\"\"\"" 3)
                    (ts-docstr--looking-back "\"\"\"\"\"" 5))
                (ts-docstr-activatable-p))
-      (if (ts-docstr--looking-back "\"\"\"" 5)
-          (progn
-            (backward-delete-char 5)
-            (delete-char 1))
-        (backward-delete-char 3)
-        (delete-char 3))
-      (ts-docstr-at-point))))
+      ;; XXX: Not sure why Python act differently compare to other languages.
+      ;;
+      ;; The current workaround is to keep the old parsed tree.
+      (let ((old-tree tree-sitter-tree))
+        (if (ts-docstr--looking-back "\"\"\"" 5)
+            (progn
+              (backward-delete-char 5)
+              (delete-char 1))
+          (backward-delete-char 3)
+          (delete-char 3))
+        (setq tree-sitter-tree old-tree)  ; keep the old parsed tree
+        (ts-docstr-at-point)))))
 
 (defun ts-docstr-key-ruby-sharp (&rest _)
   "Insert docstring with key."

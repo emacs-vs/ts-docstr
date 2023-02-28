@@ -396,7 +396,6 @@ Optional argument MODULE is the targeted language's codename."
   "Execute BODY and holds the indent level."
   (declare (indent 0) (debug t))
   `(ts-docstr--setup-insert-env
-     (indent-for-tab-command)
      (let ((ts-docstr-indent-spaces
             (save-excursion
               (buffer-substring (line-beginning-position)
