@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## 0.1.1 (Unreleased)
 > Released N/A
 
-* N/A
+* fix: Remain insert when no args (#6)
 
 ## 0.1.0
 > Released Sep 25, 2022
