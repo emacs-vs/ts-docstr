@@ -336,7 +336,7 @@ document string."
     (when (and (ts-docstr--line-is "///")
                (ts-docstr--looking-back "///" 3)
                (ts-docstr-activatable-p))
-      (backward-delete-char 3)
+      (delete-char -3)
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-go-/ (&rest _)
@@ -345,7 +345,7 @@ document string."
     (when (and (ts-docstr--line-is "//")
                (ts-docstr--looking-back "//" 2)
                (ts-docstr-activatable-p))
-      (backward-delete-char 2)
+      (delete-char -2)
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-python-dq (&rest _)
@@ -363,9 +363,9 @@ document string."
       (let ((old-tree tree-sitter-tree))
         (if (ts-docstr--looking-back "\"\"\"" 5)
             (progn
-              (backward-delete-char 5)
+              (delete-char -5)
               (delete-char 1))
-          (backward-delete-char 3)
+          (delete-char -3)
           (delete-char 3))
         (setq tree-sitter-tree old-tree)  ; keep the old parsed tree
         (ts-docstr-at-point)))))
@@ -376,7 +376,7 @@ document string."
     (when (and (ts-docstr--line-is "##")
                (ts-docstr--looking-back "##" 2)
                (ts-docstr-activatable-p))
-      (backward-delete-char 2)
+      (delete-char -2)
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-rust-/ (&rest _)
@@ -385,7 +385,7 @@ document string."
     (when (and (ts-docstr--line-is "///")
                (ts-docstr--looking-back "///" 3)
                (ts-docstr-activatable-p))
-      (backward-delete-char 3)
+      (delete-char -3)
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-swift-/ (&rest _)
@@ -394,7 +394,7 @@ document string."
     (when (and (ts-docstr--line-is "///")
                (ts-docstr--looking-back "///" 3)
                (ts-docstr-activatable-p))
-      (backward-delete-char 3)
+      (delete-char -3)
       (ts-docstr-at-point))))
 
 (provide 'ts-docstr-key)
