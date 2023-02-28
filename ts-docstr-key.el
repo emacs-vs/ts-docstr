@@ -354,10 +354,15 @@ document string."
     (when (and ts-docstr-mode
                (ts-docstr--string-p)
                (ts-docstr--line-is "\"\"\"\"\"\"")
-               (ts-docstr--looking-back "\"\"\"" 3)
+               (or (ts-docstr--looking-back "\"\"\"" 3)
+                   (ts-docstr--looking-back "\"\"\"\"\"" 5))
                (ts-docstr-activatable-p))
-      (backward-delete-char 3)
-      (delete-char 3)
+      (if (ts-docstr--looking-back "\"\"\"" 5)
+          (progn
+            (backward-delete-char 5)
+            (delete-char 1))
+        (backward-delete-char 3)
+        (delete-char 3))
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-ruby-sharp (&rest _)

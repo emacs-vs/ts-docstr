@@ -144,15 +144,17 @@
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       (method  ; For function
-       (when-let* ((types (plist-get data :type))
-                   (variables (plist-get data :variable))
-                   (len (length variables)))
+       (let* ((types (plist-get data :type))
+              (variables (plist-get data :variable))
+              (len (length variables)))
          (ts-docstr-with-style-case
            (rdoc
             (ts-docstr-insert c-start "\n")
             (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
             (setq restore-point (1- (point)))
-            (ts-docstr-insert c-prefix "\n")
+            (ts-docstr-insert c-prefix)
+            (unless (zerop len)
+              (insert "\n"))
             (dotimes (index len)
               (ts-docstr-insert c-prefix
                                 (ts-docstr-format 'param

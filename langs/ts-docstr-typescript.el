@@ -169,9 +169,9 @@
   (ts-docstr-with-insert-indent
     (cl-case (tsc-node-type node)
       ((or function_declaration method_definition)  ; For function
-       (when-let* ((types (plist-get data :type))
-                   (variables (plist-get data :variable))
-                   (len (length variables)))
+       (let* ((types (plist-get data :type))
+              (variables (plist-get data :variable))
+              (len (length variables)))
          (ts-docstr-with-style-case
            ((or typedoc tsdoc jsdoc google)
             (ts-docstr-insert c-start "\n")
