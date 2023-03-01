@@ -74,6 +74,12 @@
   :type 'string
   :group 'ts-docstr)
 
+(defcustom ts-docstr-python-splitter
+  "-------"
+  "Document string splitter for Lua programming language."
+  :type 'string
+  :group 'ts-docstr)
+
 (defmacro ts-docstr-python--narrow-region (&rest body)
   "Narrow region to class/struct/function declaration."
   (declare (indent 0))
@@ -85,15 +91,15 @@
 (defun ts-docstr-python-activate ()
   "Return t if we are able to add document string at this point."
   (ts-docstr-python--narrow-region
-    (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_definition
-                                                   decorated_definition
-                                                   function_definition)
-                                                 t)))
-      (cond ((zerop (length nodes))
-             (ts-docstr-log "No declaration found"))
-            ((<= 2 (length nodes))
-             (ts-docstr-find-closest-node nodes))
-            (t (nth 0 nodes))))))
+   (let* ((nodes (ts-docstr-grab-nodes-in-range '(class_definition
+                                                  decorated_definition
+                                                  function_definition)
+                                                t)))
+     (cond ((zerop (length nodes))
+            (ts-docstr-log "No declaration found"))
+           ((<= 2 (length nodes))
+            (ts-docstr-find-closest-node nodes))
+           (t (nth 0 nodes))))))
 
 ;; NOTE: This is generally not necessary but kinda useful for user.
 (defun ts-docstr-python--get-name (node)
@@ -238,7 +244,7 @@
             (setq restore-point (1- (point)))
             (ts-docstr-insert c-prefix " " "\n")
             (ts-docstr-insert c-prefix (plist-get config :header-arg) "\n")
-            (ts-docstr-insert "-------" "\n")
+            (ts-docstr-insert ts-docstr-python-splitter "\n")
             (ts-docstr-insert c-prefix "\n")
             (dotimes (index len)
               (ts-docstr-insert c-prefix
@@ -250,7 +256,7 @@
             (when (plist-get data :return)
               (ts-docstr-insert " " "\n")
               (ts-docstr-insert (plist-get config :header-ret) "\n")
-              (ts-docstr-insert "-------" "\n")
+              (ts-docstr-insert ts-docstr-python-splitter "\n")
               (ts-docstr-insert c-prefix "    " (ts-docstr-format 'return) "\n"))
             (ts-docstr-insert c-end))
            (t

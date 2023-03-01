@@ -266,6 +266,7 @@ node from the root."
     (js-mode         . ts-docstr-js)
     (js2-mode        . ts-docstr-js)
     (js3-mode        . ts-docstr-js)
+    (lua-mode        . ts-docstr-lua)
     (php-mode        . ts-docstr-php)
     (python-mode     . ts-docstr-python)
     (ruby-mode       . ts-docstr-ruby)
