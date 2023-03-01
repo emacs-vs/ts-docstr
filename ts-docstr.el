@@ -368,8 +368,7 @@ Optional argument MODULE is the targeted language's codename."
   (declare (indent 0) (debug t))
   `(let ((restore-point (point)))  ; this is expect to be modified
      (ts-docstr--setup-style ,@body)
-     (goto-char restore-point)
-     (goto-char (line-end-position))))
+     (goto-char restore-point)))
 
 ;; NOTE: This is the default insertion entry point!
 (defmacro ts-docstr--setup-insert-env (&rest body)

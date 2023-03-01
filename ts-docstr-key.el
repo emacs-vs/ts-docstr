@@ -36,6 +36,7 @@
   `(("RET" . ts-docstr-key-doxygen-like-return)
     ("/"   . ts-docstr-key-csharp-/)
     ("/"   . ts-docstr-key-go-/)
+    ("-"   . ts-docstr-key-lua-dash)
     ("\""  . ts-docstr-key-python-dq)
     ("#"   . ts-docstr-key-ruby-sharp)
     ("/"   . ts-docstr-key-rust-/)
@@ -346,6 +347,15 @@ document string."
                (ts-docstr--looking-back "//" 2)
                (ts-docstr-activatable-p))
       (delete-char -2)
+      (ts-docstr-at-point))))
+
+(defun ts-docstr-key-lua-dash (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-env '(lua-mode)
+    (when (and (ts-docstr--line-is "---")
+               (ts-docstr--looking-back "---" 3)
+               (ts-docstr-activatable-p))
+      (delete-char -3)
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-python-dq (&rest _)
