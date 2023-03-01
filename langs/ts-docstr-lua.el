@@ -158,7 +158,7 @@
          (ts-docstr-with-style-case
            (luadoc
             (ts-docstr-insert c-start (ts-docstr-format 'summary))
-            (setq restore-point (1- (point)))
+            (setq restore-point (point))
             (when (or (not (zerop len))
                       (plist-get data :return))
               (insert "\n"))
