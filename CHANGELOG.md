@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 > Released N/A
 
 * fix: Remain insert when no args (#6)
+* Add support for Lua (#7)
 
 ## 0.1.0
 > Released Sep 25, 2022

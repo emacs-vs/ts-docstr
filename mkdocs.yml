@@ -20,7 +20,7 @@ nav:
     #- Groovy: page/langs/groovy.md
     - Java: page/langs/java.md
     - JavaScript: page/langs/javascript.md
-    #- Lua: page/langs/lua.md
+    - Lua: page/langs/lua.md
     #- Objective-C: page/langs/objc.md
     - PHP: page/langs/php.md
     - Python: page/langs/python.md

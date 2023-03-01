@@ -124,6 +124,7 @@ These languages are fairly complete:
 * C / C++ / C#
 * Go
 * Java / JavaScript
+* Lua
 * PHP / Python
 * Ruby / Rust
 * Scala

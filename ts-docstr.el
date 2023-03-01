@@ -266,6 +266,7 @@ node from the root."
     (js-mode         . ts-docstr-js)
     (js2-mode        . ts-docstr-js)
     (js3-mode        . ts-docstr-js)
+    (lua-mode        . ts-docstr-lua)
     (php-mode        . ts-docstr-php)
     (python-mode     . ts-docstr-python)
     (ruby-mode       . ts-docstr-ruby)
@@ -367,8 +368,7 @@ Optional argument MODULE is the targeted language's codename."
   (declare (indent 0) (debug t))
   `(let ((restore-point (point)))  ; this is expect to be modified
      (ts-docstr--setup-style ,@body)
-     (goto-char restore-point)
-     (goto-char (line-end-position))))
+     (goto-char restore-point)))
 
 ;; NOTE: This is the default insertion entry point!
 (defmacro ts-docstr--setup-insert-env (&rest body)

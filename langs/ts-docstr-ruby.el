@@ -150,11 +150,12 @@
          (ts-docstr-with-style-case
            (rdoc
             (ts-docstr-insert c-start "\n")
-            (ts-docstr-insert c-prefix (ts-docstr-format 'summary) "\n")
+            (ts-docstr-insert c-prefix (ts-docstr-format 'summary))
             (setq restore-point (1- (point)))
-            (ts-docstr-insert c-prefix)
-            (unless (zerop len)
-              (insert "\n"))
+            (when (or (not (zerop len))
+                      (plist-get data :return))
+              (insert "\n")
+              (ts-docstr-insert c-prefix "\n"))
             (dotimes (index len)
               (ts-docstr-insert c-prefix
                                 (ts-docstr-format 'param

@@ -36,6 +36,7 @@
   `(("RET" . ts-docstr-key-doxygen-like-return)
     ("/"   . ts-docstr-key-csharp-/)
     ("/"   . ts-docstr-key-go-/)
+    ("-"   . ts-docstr-key-lua-dash)
     ("\""  . ts-docstr-key-python-dq)
     ("#"   . ts-docstr-key-ruby-sharp)
     ("/"   . ts-docstr-key-rust-/)
@@ -182,7 +183,8 @@ See function `forward-line' for argument N."
   (when ts-docstr-key-support  ; Be infront, in order to take effect
     (ts-docstr-key--advice-add "*" :around #'ts-docstr-key--doxygen-asterik)
     (ts-docstr-key--advice-add "RET" :around #'ts-docstr-key--doxygen-return)
-    (ts-docstr-key--advice-add "RET" :around #'ts-docstr-key--sharp-return))
+    (ts-docstr-key--advice-add "RET" :around #'ts-docstr-key--sharp-return)
+    (ts-docstr-key--advice-add "RET" :around #'ts-docstr-key--dash-return))
   (ts-docstr-key--active t))
 
 ;;;###autoload
@@ -191,6 +193,7 @@ See function `forward-line' for argument N."
   (ts-docstr-key--advice-remove "*" #'ts-docstr-key--doxygen-asterik)
   (ts-docstr-key--advice-remove "RET" #'ts-docstr-key--doxygen-return)
   (ts-docstr-key--advice-remove "RET" #'ts-docstr-key--sharp-return)
+  (ts-docstr-key--advice-remove "RET" #'ts-docstr-key--dash-return)
   (ts-docstr-key--active nil))
 
 ;;
@@ -298,6 +301,25 @@ document string."
       (end-of-line))))
 
 ;;
+;; (@* "Dash" )
+;;
+
+(defcustom ts-docstr-key-dash-doc-modes
+  '(lua-mode)
+  "List of `major-mode' that use -- as document string prefix."
+  :type 'list
+  :group 'ts-docstr)
+
+(defun ts-docstr-key--dash-return (fnc &rest args)
+  "Return key for programming languages that can use -- as document."
+  (cond ((and (memq major-mode ts-docstr-key-dash-doc-modes) (ts-docstr--comment-p))
+         (let ((start-comment (ts-docstr--start-comment-symbol)))
+           (apply fnc args)
+           (when (string-match-p "--" start-comment)
+             (ts-docstr-key--single-line-prefix-insertion))))
+        (t (apply fnc args))))
+
+;;
 ;; (@* "Sharp" )
 ;;
 
@@ -346,6 +368,15 @@ document string."
                (ts-docstr--looking-back "//" 2)
                (ts-docstr-activatable-p))
       (delete-char -2)
+      (ts-docstr-at-point))))
+
+(defun ts-docstr-key-lua-dash (&rest _)
+  "Insert docstring with key."
+  (ts-docstr-key--with-env '(lua-mode)
+    (when (and (ts-docstr--line-is "---")
+               (ts-docstr--looking-back "---" 3)
+               (ts-docstr-activatable-p))
+      (delete-char -3)
       (ts-docstr-at-point))))
 
 (defun ts-docstr-key-python-dq (&rest _)
