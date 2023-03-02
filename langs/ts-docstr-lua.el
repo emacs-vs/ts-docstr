@@ -135,7 +135,7 @@
                    :return "@return {d}"))
     (scriptum (list :start "--[["
                     :prefix ""
-                    :end "--]]"
+                    :end "]]"
                     :summary "{d}"
                     :param "@param {{t}} {v} {d}"
                     :return "@return {d}"))
@@ -205,10 +205,7 @@
                       (if (= index (1- len)) "" "\n")))
             (when (plist-get data :return)
               (ts-docstr-insert "\n" c-prefix (ts-docstr-format 'return)))
-            (when (or (not (zerop len))
-                      (plist-get data :return))
-              (insert "\n"))
-            (ts-docstr-insert c-end))
+            (ts-docstr-insert "\n" c-end))
            (t
             (ts-docstr-custom-insertion node data)))))
       (t
