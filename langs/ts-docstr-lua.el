@@ -159,8 +159,7 @@
            (luadoc
             (ts-docstr-insert c-start (ts-docstr-format 'summary))
             (setq restore-point (point))
-            (when (or (not (zerop len))
-                      (plist-get data :return))
+            (unless (zerop len)
               (insert "\n"))
             (dotimes (index len)
               (insert c-prefix
@@ -194,8 +193,7 @@
             (ts-docstr-insert c-start)
             (insert c-prefix (ts-docstr-format 'summary))
             (setq restore-point (point))
-            (when (or (not (zerop len))
-                      (plist-get data :return))
+            (unless (zerop len)
               (insert "\n"))
             (dotimes (index len)
               (insert c-prefix
