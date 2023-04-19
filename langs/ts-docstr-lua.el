@@ -82,9 +82,14 @@
 ;; NOTE: This is generally not necessary but kinda useful for user.
 (defun ts-docstr-lua--get-name (node)
   "Return declaration name, class/struct/enum/function."
-  (let* ((nodes-name (ts-docstr-find-children node "identifier"))
+  (let* ((nodes-name
+          (or (ts-docstr-find-children node "identifier")
+              (when-let* ((dot-exp (ts-docstr-find-children node "dot_index_expression"))
+                          (dot-exp-node (car dot-exp))
+                          (nodes (ts-docstr-find-children dot-exp-node "identifier")))
+                (last nodes))))
          (node-name (nth 0 nodes-name)))
-    (tsc-node-text node-name)))
+    (ignore-errors (tsc-node-text node-name))))
 
 ;; NOTE: This is only used in function declaration!
 (defun ts-docstr-lua--parse-return (nodes-fp)
