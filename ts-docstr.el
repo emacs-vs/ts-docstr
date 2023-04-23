@@ -107,6 +107,13 @@
   :group 'ts-docstr)
 
 ;;
+;; (@* "Externals" )
+;;
+
+(declare-function ts-docstr-key-enable "ts-docstr-key.el")
+(declare-function ts-docstr-key-disable "ts-docstr-key.el")
+
+;;
 ;; (@* "Entry" )
 ;;
 

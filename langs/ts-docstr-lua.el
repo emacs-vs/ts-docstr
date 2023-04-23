@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'ts-docstr)
+
 (defcustom ts-docstr-lua-style 'luadoc
   "Style specification for document string in Lua."
   :type '(choice (const :tag "No specify" nil)
