@@ -384,20 +384,17 @@ document string."
   (ts-docstr-key--with-major-modes '(python-mode)
     (when (and ts-docstr-mode
                (ts-docstr--string-p)
-               (ts-docstr--line-is "\"\"\"\"\"\"")
-               (or (ts-docstr--looking-back "\"\"\"" 3)
-                   (ts-docstr--looking-back "\"\"\"\"\"" 5))
+               (or (and (ts-docstr--line-is "\"\"\"\"\"\"")
+                        (ts-docstr--looking-back "\"\"\"\"\"" 5))
+                   (and (ts-docstr--line-is "\"\"\"\"")
+                        (ts-docstr--looking-back "\"\"\"" 3)))
                (ts-docstr-activatable-p))
       ;; XXX: Not sure why Python act differently compare to other languages.
       ;;
       ;; The current workaround is to keep the old parsed tree.
       (let ((old-tree tree-sitter-tree))
-        (if (ts-docstr--looking-back "\"\"\"" 5)
-            (progn
-              (delete-char -5)
-              (delete-char 1))
-          (delete-char -3)
-          (delete-char 3))
+        (back-to-indentation)
+        (delete-region (point) (line-end-position))
         (setq tree-sitter-tree old-tree)  ; keep the old parsed tree
         (ts-docstr-at-point)))))
 
