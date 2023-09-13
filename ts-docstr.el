@@ -113,6 +113,8 @@
 (declare-function ts-docstr-key-enable "ts-docstr-key.el")
 (declare-function ts-docstr-key-disable "ts-docstr-key.el")
 
+(defvar lsp-inhibit-lsp-hooks)
+
 ;;
 ;; (@* "Entry" )
 ;;
@@ -233,7 +235,7 @@ node from the root."
 
 (defun ts-docstr--compare-type (node type)
   "Compare NODE's type to TYPE."
-  (string= (ts-docstr-2-str (tsc-node-type node)) type))
+  (string= (tsc-node-type node) type))
 
 (defun ts-docstr-find-children (node type)
   "Search node TYPE from children; this return a list."
@@ -389,7 +391,8 @@ Optional argument MODULE is the targeted language's codename."
      ;;
      ;; This save us a lot of performance, but not sure if there are other
      ;; side effects.
-     (let (tree-sitter-tree)
+     (let ((tree-sitter-tree)
+           (lsp-inhibit-lsp-hooks t))
        ,@body)))
 
 (defmacro ts-docstr-with-insert-indent (&rest body)

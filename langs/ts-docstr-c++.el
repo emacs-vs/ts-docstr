@@ -82,8 +82,9 @@
 (defun ts-docstr-c++--get-name (node)
   "Return declaration name, class/struct/enum/function."
   (let* ((nodes-name (or (ts-docstr-find-children node "type_identifier")
-                         (ts-docstr-find-children node "identifier")))
-         (node-name (nth 0 nodes-name)))
+                         (ts-docstr-find-children node "identifier")
+                         (ts-docstr-find-children node "field_identifier")))
+         (node-name (car nodes-name)))
     (tsc-node-text node-name)))
 
 ;; NOTE: This is only used in function declaration!
