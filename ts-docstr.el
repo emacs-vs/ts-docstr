@@ -113,8 +113,6 @@
 (declare-function ts-docstr-key-enable "ts-docstr-key.el")
 (declare-function ts-docstr-key-disable "ts-docstr-key.el")
 
-(defvar lsp-inhibit-lsp-hooks)
-
 ;;
 ;; (@* "Entry" )
 ;;
@@ -391,6 +389,7 @@ Optional argument MODULE is the targeted language's codename."
      ;;
      ;; This save us a lot of performance, but not sure if there are other
      ;; side effects.
+     (defvar lsp-inhibit-lsp-hooks)
      (let ((tree-sitter-tree)
            (lsp-inhibit-lsp-hooks t))
        ,@body)))
