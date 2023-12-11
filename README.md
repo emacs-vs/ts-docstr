@@ -21,8 +21,8 @@
     - [💬 Ask to select the style](#💬-ask-to-select-the-style)
     - [🎣 Hooks](#🎣-hooks)
   - [🔨 Supported languages](#🔨-supported-languages)
-- [🛠️ Contribute](#🛠️-contribute)
-  - [-](#-)
+  - [🛠️ Contribute](#🛠️-contribute)
+    - [🔬 Development](#🔬-development)
   - [⚜️ License](#⚜️-license)
     - [❓ How to support my favorite language?](#❓-how-to-support-my-favorite-language)
       - [🔍 The `activate` function](#🔍-the-activate-function)
@@ -139,7 +139,7 @@ These languages are in development:
 * Haskell
 * Shellscript
 
-# 🛠️ Contribute
+## 🛠️ Contribute
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![Elisp styleguide](https://img.shields.io/badge/elisp-style%20guide-purple)](https://github.com/bbatsov/emacs-lisp-style-guide)
@@ -191,23 +191,6 @@ $ eask lint package
 ```
 
 *📝 P.S. For more information, find the Eask manual at https://emacs-eask.github.io/.*
-
-## ⚜️ License
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-See [`LICENSE`](./LICENSE.txt) for details.
 
 ### ❓ How to support my favorite language?
 
@@ -417,3 +400,21 @@ Then you would just need to register the function to variable `ts-docstr-key-ali
     ("/"   . ts-docstr-key-go-/)
 ...
 ```
+
+## ⚜️ License
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+See [`LICENSE`](./LICENSE.txt) for details.
+
