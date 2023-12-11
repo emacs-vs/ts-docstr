@@ -23,13 +23,13 @@
   - [🔨 Supported languages](#🔨-supported-languages)
   - [🛠️ Contribute](#🛠️-contribute)
     - [🔬 Development](#🔬-development)
-  - [⚜️ License](#⚜️-license)
     - [❓ How to support my favorite language?](#❓-how-to-support-my-favorite-language)
       - [🔍 The `activate` function](#🔍-the-activate-function)
       - [🔍 The `parse` function](#🔍-the-parse-function)
       - [🔍 The `insert` function](#🔍-the-insert-function)
     - [❓ How to add a document string style?](#❓-how-to-add-a-document-string-style)
     - [❓ How to trigger by a key?](#❓-how-to-trigger-by-a-key)
+  - [⚜️ License](#⚜️-license)
 
 <!-- markdown-toc end -->
 
