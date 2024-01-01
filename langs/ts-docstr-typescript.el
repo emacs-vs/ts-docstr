@@ -1,6 +1,6 @@
 ;;; ts-docstr-typescript.el --- Document string for TypeScript  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2023  Shen, Jen-Chieh
+;; Copyright (C) 2022-2024  Shen, Jen-Chieh
 
 ;; This file is not part of GNU Emacs.
 
