@@ -1,6 +1,6 @@
 ;;; ts-docstr-c++.el --- Document string for C++  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2024  Shen, Jen-Chieh
+;; Copyright (C) 2022-2025 Shen, Jen-Chieh
 
 ;; This file is not part of GNU Emacs.
 
