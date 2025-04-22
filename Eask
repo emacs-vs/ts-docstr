@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "ts-docstr"
          "0.1.0"
          "A document string minor mode using tree-sitter")
