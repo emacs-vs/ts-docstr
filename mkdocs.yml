@@ -10,6 +10,8 @@ edit_uri: edit/master/docs/
 
 copyright: (c) 2017-2022 emacs-vs. All rights reserved. 
 
+fallback_to_build_date: true
+
 nav:
   - Languages:
     #- ActionScript: page/langs/actionscript.md
