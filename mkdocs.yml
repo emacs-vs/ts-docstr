@@ -8,7 +8,7 @@ repo_name: GitHub
 repo_url: https://github.com/emacs-vs/ts-docstr
 edit_uri: edit/master/docs/
 
-copyright: (c) 2017-2022 emacs-vs. All rights reserved. 
+copyright: (c) 2017-2025 emacs-vs. All rights reserved. 
 
 fallback_to_build_date: true
 
@@ -50,7 +50,7 @@ extra:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/emacs-vs/ts-docstr
     - icon: fontawesome/brands/twitter
-      link: https://twitter.com/jenchieh94
+      link: https://twitter.com/jcs090218
 
 markdown_extensions:
   - pymdownx.superfences
