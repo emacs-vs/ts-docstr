@@ -36,7 +36,6 @@ extra_css:
 
 theme:
   name: 'rtd-dropdown'
-  custom_dir: overrides
   logo: etc/logo.png
   favicon: etc/favicon.ico
   icon:
