@@ -10,8 +10,6 @@ edit_uri: edit/master/docs/
 
 copyright: (c) 2017-2025 emacs-vs. All rights reserved. 
 
-fallback_to_build_date: true
-
 nav:
   - Languages:
     #- ActionScript: page/langs/actionscript.md
@@ -66,6 +64,7 @@ plugins:
   - search
   - awesome-pages
   - git-revision-date-localized
+      fallback_to_build_date: true
   - rss
 
 google_analytics:
