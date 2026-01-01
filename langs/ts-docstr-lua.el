@@ -1,6 +1,6 @@
 ;;; ts-docstr-lua.el --- Document string for Lua  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2025 Shen, Jen-Chieh
+;; Copyright (C) 2023-2026 Shen, Jen-Chieh
 
 ;; This file is not part of GNU Emacs.
 

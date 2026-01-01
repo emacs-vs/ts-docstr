@@ -8,7 +8,7 @@ repo_name: GitHub
 repo_url: https://github.com/emacs-vs/ts-docstr
 edit_uri: edit/master/docs/
 
-copyright: (c) 2017-2025 emacs-vs. All rights reserved. 
+copyright: (c) 2017-2026 emacs-vs. All rights reserved. 
 
 nav:
   - Languages:

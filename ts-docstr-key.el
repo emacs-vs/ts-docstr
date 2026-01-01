@@ -1,6 +1,6 @@
 ;;; ts-docstr-key.el --- Support keys to add document string  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2025 Shen, Jen-Chieh
+;; Copyright (C) 2022-2026 Shen, Jen-Chieh
 
 ;; This file is not part of GNU Emacs.
 
